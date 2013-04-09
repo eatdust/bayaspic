@@ -3,8 +3,6 @@ module rbflike
   use rbfnd, only : rbf_polyharmonic_two
   implicit none
 
-  integer, parameter :: imn = kind(4)
-  integer, parameter :: fmn = kind(1._8)
 
   private
    
@@ -13,14 +11,13 @@ module rbflike
   real(fp), save :: scale
   real(fp), save, dimension(:,:), pointer :: xctrs => null()
   real(fp), save, dimension(:), pointer :: weights => null()
-
   real(fp), save, dimension(:), pointer :: xpmin => null(), xpmax=>null()
 
 
-  public initialize_rbf_like, rbf_multinest_loglike
-  public rbflike_eval
+  public initialize_rbf_like
+  public rbflike_eval, uncubize_params, cubize_params
   public posterior_boundaries, cubize_paramspace
-
+  public check_rbf, get_rbf_ndim, get_rbf_nctrs
 
 contains
 
@@ -34,7 +31,35 @@ contains
 
   end function check_rbf
 
-  
+
+  function get_rbf_ndim()
+    implicit none
+    integer :: get_rbf_ndim
+
+    if (.not.check_rbf()) then
+       get_rbf_ndim = 0
+       return
+    endif
+
+    get_rbf_ndim = ndim
+
+  end function get_rbf_ndim
+
+
+  function get_rbf_nctrs()
+    implicit none
+    integer :: get_rbf_nctrs
+
+    if (.not.check_rbf()) then
+       get_rbf_nctrs = 0
+       return
+    endif
+
+    get_rbf_nctrs = nctrs
+
+  end function get_rbf_nctrs
+
+
   subroutine initialize_rbf_like(fileweights, filecentres, filebounds)
     use iorbf, only : load_weights, load_centres, read_boundaries
     implicit none   
@@ -50,29 +75,6 @@ contains
     nctrs = size(weights,1)
 
   end subroutine initialize_rbf_like
-
-
-  subroutine rbf_multinest_loglike(cube,ndimmn,npars,lnew)
-    use rbfnd, only : rbf_svd_eval
-    implicit none   
-    integer(imn), intent(in) :: ndimmn, npars
-    real(fmn), dimension(ndim+npars), intent(in) :: cube
-    real(fmn) :: lnew
-
-    integer(ip) :: ndimrbf
-    real(fp), dimension(ndim) :: xcuberbf
-
-    if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
-    if (ndimmn.ne.ndim) stop 'rbf_multinest_loglike: dim mismatch!'
-
-    ndimrbf = ndimmn
-
-    xcuberbf(1:ndimrbf) = cube(1:ndimmn)
-    
-
-    lnew = rbf_svd_eval(ndimrbf,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,xcuberbf)
-
-  end subroutine rbf_multinest_loglike
 
 
 
@@ -112,24 +114,32 @@ contains
   end subroutine posterior_boundaries
 
 
-  function cubize_params(ndim,pmin,pmax,uncubed)
+  function cubize_params(ndim,uncubed)
     implicit none
     integer(ip), intent(in) :: ndim
     real(fp), dimension(ndim) :: cubize_params
-    real(fp), dimension(ndim), intent(in) :: pmin,pmax,uncubed
+    real(fp), dimension(ndim), intent(in) :: uncubed
 
-    cubize_params = (uncubed - pmin)/(pmax-pmin)
+    if (ndim.ne.size(uncubed,1)) then
+       stop 'uncubize_params: sizes do not match!'
+    endif
+
+    cubize_params = (uncubed - xpmin)/(xpmax-xpmin)
 
   end function cubize_params
 
 
-  function uncubize_params(ndim,pmin,pmax,cubed)
+  function uncubize_params(ndim,cubed)
     implicit none
     integer(ip), intent(in) :: ndim
     real(fp), dimension(ndim) :: uncubize_params
-    real(fp), dimension(ndim), intent(in) :: pmin,pmax,cubed
+    real(fp), dimension(ndim), intent(in) :: cubed
 
-    uncubize_params = pmin + (pmax-pmin)*cubed
+    if (ndim.ne.size(cubed,1)) then
+       stop 'uncubize_params: sizes do not match!'
+    endif
+
+    uncubize_params = xpmin + (xpmax-xpmin)*cubed
 
   end function uncubize_params
 
