@@ -1,0 +1,3 @@
+[submodule "rbflikes"]
+	path = rbflikes
+	url = /home/chris/numerics/cmb/repository/rbflikes.rs
