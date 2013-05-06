@@ -7,14 +7,14 @@ module nestparams
 !whether to do multimodal sampling
   logical, parameter :: nestMmodal = .false.
 
-!max no. of live points
-  integer(imn), parameter :: nestNlive = 20000
+!max no. of live points !20000
+  integer(imn), parameter :: nestNlive = 10000
 
 !sample with constant efficiency
   logical, parameter :: nestCteEff = .false.
 
-!evidence tolerance factor
-  real(fmn), parameter :: nestZTol = 1e-4
+!evidence tolerance factor !1e-4
+  real(fmn), parameter :: nestZTol = 1e-3
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
@@ -64,7 +64,7 @@ module nestparams
   logical, parameter :: nestInitMPI = .true.
 
 !points with loglike < logZero will be ignored 
-  real(fmn), parameter :: nestLogZero = -huge(1d0)
+  real(fmn), parameter :: nestLogZero = -10.
 
  !max no. of iterations, a non-positive value means
  !infinity. MultiNest will terminate if either it has done max no. of

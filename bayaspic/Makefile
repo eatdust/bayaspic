@@ -2,8 +2,9 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=gfortran
-FCFLAGS= -O -fopenmp 
-LFLAGS= -lblas -llapack
+FCFLAGS= -O -fopenmp -DASPIC
+INCLUDE=-I/usr/local/include/aspic
+LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
 endif 
 
 OBJ=rbfprec.o iorbf.o rbfnd.o rbflike.o
@@ -11,15 +12,17 @@ OBJ=rbfprec.o iorbf.o rbfnd.o rbflike.o
 RBFDIR = ../rbflikes
 NESTDIR = ..
 
-OBJSRBF =  rbfprec.o iorbf.o rbfnd.o rbflike.o
+OBJSRBF =  rbfprec.o iorbf.o rbfnd.o aspicvars.o aspicwrap.o rbflike.o
 OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
 
-OBJFILES = $(OBJSRBF) $(OBJSNEST) nestprec.o nestparams.o nestwrap.o
+OBJFILES = nestprec.o $(OBJSRBF) $(OBJSNEST) nestparams.o nestwrap.o
 
-infbayes.$(ext): $(OBJFILES) bayesinf.o
-	$(FC) $(FCFLAGS) $(OBJFILES) bayesinf.o -o ../$@ $(LFLAGS) 
+FCFLAGS+=$(INCLUDE)
+
+infbayes.$(ext): $(OBJFILES) bayaspic.o
+	$(FC) $(FCFLAGS) $(OBJFILES) bayaspic.o -o ../$@ $(LFLAGS) 
 
 %.o: $(RBFDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<
@@ -40,4 +43,4 @@ infbayes.$(ext): $(OBJFILES) bayesinf.o
 	$(FC) $(FCFLAGS) -c $<
 
 clean:
-	rm -f *.o *.mod ../bayesinf.$(ext)
+	rm -f *.o *.mod ../bayaspic.$(ext)
