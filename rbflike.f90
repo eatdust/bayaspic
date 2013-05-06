@@ -15,8 +15,8 @@ module rbflike
 
 
   public initialize_rbf_like
-  public rbflike_eval, uncubize_params, cubize_params
-  public posterior_boundaries, cubize_paramspace
+  public rbflike_eval, uncubize_rbfparams, cubize_rbfparams
+  public posterior_boundaries, cubize_rbfparamspace
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
 
 contains
@@ -114,38 +114,38 @@ contains
   end subroutine posterior_boundaries
 
 
-  function cubize_params(ndim,uncubed)
+  function cubize_rbfparams(ndim,uncubed)
     implicit none
     integer(ip), intent(in) :: ndim
-    real(fp), dimension(ndim) :: cubize_params
+    real(fp), dimension(ndim) :: cubize_rbfparams
     real(fp), dimension(ndim), intent(in) :: uncubed
 
     if (ndim.ne.size(uncubed,1)) then
-       stop 'uncubize_params: sizes do not match!'
+       stop 'uncubize_rbfparams: sizes do not match!'
     endif
 
-    cubize_params = (uncubed - xpmin)/(xpmax-xpmin)
+    cubize_rbfparams = (uncubed - xpmin)/(xpmax-xpmin)
 
-  end function cubize_params
+  end function cubize_rbfparams
 
 
-  function uncubize_params(ndim,cubed)
+  function uncubize_rbfparams(ndim,cubed)
     implicit none
     integer(ip), intent(in) :: ndim
-    real(fp), dimension(ndim) :: uncubize_params
+    real(fp), dimension(ndim) :: uncubize_rbfparams
     real(fp), dimension(ndim), intent(in) :: cubed
 
     if (ndim.ne.size(cubed,1)) then
-       stop 'uncubize_params: sizes do not match!'
+       stop 'uncubize_rbfparams: sizes do not match!'
     endif
 
-    uncubize_params = xpmin + (xpmax-xpmin)*cubed
+    uncubize_rbfparams = xpmin + (xpmax-xpmin)*cubed
 
-  end function uncubize_params
+  end function uncubize_rbfparams
 
 
  
-  subroutine cubize_paramspace(xdata,xcubes)
+  subroutine cubize_rbfparamspace(xdata,xcubes)
     implicit none
     real(fp), dimension(:,:), intent(in) :: xdata
     real(fp), dimension(:,:), intent(out) :: xcubes
@@ -157,7 +157,7 @@ contains
     ndata = size(xdata,2)
 
     if ((size(xcubes,1).ne.ndim).or.(size(xcubes,2).ne.ndata)) then
-       stop 'cube_paramspace: mismatch arrays!'
+       stop 'cube_rbfparamspace: mismatch arrays!'
     endif
 
     do i=1,ndim
@@ -167,7 +167,7 @@ contains
     enddo
 
 
-  end subroutine cubize_paramspace
+  end subroutine cubize_rbfparamspace
 
 
 

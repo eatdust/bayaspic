@@ -9,7 +9,7 @@ program rbfmain
   integer :: ndim
   integer(ip) :: ndata
 
-  integer(ip), save :: nctrs = 380
+  integer(ip), save :: nctrs = 800
 
   integer, parameter :: ndump = 100
 
@@ -34,7 +34,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_10.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_4D_8.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
@@ -56,7 +56,7 @@ program rbfmain
   print *,'xnmax',xnmax
   print *
 
-  call cubize_paramspace(xdata,xcubes)
+  call cubize_rbfparamspace(xdata,xcubes)
 
   deallocate(xdata)
 
@@ -71,7 +71,7 @@ program rbfmain
 !tp     
 !     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))
 
-     scale = 1_fp
+     scale = 1._fp
  
      print *,'scale=',scale
 
@@ -104,15 +104,16 @@ program rbfmain
   sr1max = xnmax(2)
   sr2min = xnmin(3)
   sr2max = xnmax(3)
-!  sr3min = xnmin(4)
-!  sr3max = xnmax(4)
+  sr3min = xnmin(4)
+  sr3max = xnmax(4)
 
   call delete_file('output.dat')
   call delete_file('output2.dat')
-  lnA = 3.05
-!  sr3 = 0
-  sr2 = 0.04
-  sr1 = -4
+  call delete_file('output3.dat')
+  lnA = 3.1
+  sr3 = 0
+
+
   do i=1,ndump
      sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
 
@@ -121,7 +122,7 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
         f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
         call livewrite('output.dat',sr1,sr2,f)
@@ -129,6 +130,7 @@ program rbfmain
      enddo
   enddo
 
+  sr3=0
   sr2 = 0.04
   do i=1,ndump
      sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
@@ -138,7 +140,7 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
         f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
         call livewrite('output2.dat',sr1,lnA,f)
@@ -146,6 +148,29 @@ program rbfmain
      enddo
 
   enddo
+
+!  stop
+
+  lnA = 3.1
+  sr1 = -5
+  sr2 = 0.04
+!  do i=1,ndump
+!     sr2 = sr2min + (sr2max-sr2min)*real(i-1,fp)/real(ndump-1,fp)
+     
+     do j=1,ndump
+        sr3 = sr3min + (sr3max-sr3min)*real(j-1,fp)/real(ndump-1,fp)
+        x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
+        x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
+        x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
+        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+
+        f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
+!        call livewrite('output3.dat',sr2,sr3,f)
+        call livewrite('output3.dat',sr3,f)
+!        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
+     enddo
+
+!  enddo
 
   
   deallocate(xcubes,fdata)
