@@ -70,7 +70,7 @@ contains
 
     if (.not.associated(xpmin)) then
        stop 'get_rbf_xpmin: not allocated!'
-    elseif ((i.gt.ndim).or.(i.le.0))
+    elseif ((i.gt.ndim).or.(i.le.0)) then
        stop 'get_rbf_xpmin: i out of range!'
     endif
 
@@ -86,7 +86,7 @@ contains
 
     if (.not.associated(xpmax)) then
        stop 'get_rbf_xpmax: not allocated!'
-    elseif ((i.gt.ndim).or.(i.le.0))
+    elseif ((i.gt.ndim).or.(i.le.0)) then
        stop 'get_rbf_xpmax: i out of range!'
     endif
 
