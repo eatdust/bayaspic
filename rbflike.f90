@@ -20,6 +20,7 @@ module rbflike
   public posterior_boundaries, cubize_rbfparamspace
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
   public cutmin_rbfparams, cutmax_rbfparams
+  public get_rbf_xpmin, get_rbf_xpmax
 
 contains
 
@@ -60,6 +61,39 @@ contains
     get_rbf_nctrs = nctrs
 
   end function get_rbf_nctrs
+
+
+  function get_rbf_xpmin(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_rbf_xpmin
+
+    if (.not.associated(xpmin)) then
+       stop 'get_rbf_xpmin: not allocated!'
+    elseif ((i.gt.ndim).or.(i.le.0))
+       stop 'get_rbf_xpmin: i out of range!'
+    endif
+
+    get_rbf_xpmin = xpmin(i)
+
+  end function get_rbf_xpmin
+
+
+  function get_rbf_xpmax(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_rbf_xpmax
+
+    if (.not.associated(xpmax)) then
+       stop 'get_rbf_xpmax: not allocated!'
+    elseif ((i.gt.ndim).or.(i.le.0))
+       stop 'get_rbf_xpmax: i out of range!'
+    endif
+
+    get_rbf_xpmax = xpmax(i)
+
+  end function get_rbf_xpmax
+
 
 
   subroutine initialize_rbf_like(fileweights, filecentres, filebounds)
