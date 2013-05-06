@@ -8,8 +8,9 @@ program rbfmain
  
   integer :: ndim
   integer(ip) :: ndata
-
-  integer(ip), save :: nctrs = 2800
+  
+  integer(ip), dimension(:), allocatable, save :: ictrs
+  integer(ip), save :: nctrs = 2400
 
   integer, parameter :: ndump = 100
 
@@ -40,6 +41,11 @@ program rbfmain
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
 
+  allocate(ictrs(ndim))
+  
+  ictrs = (/7,7,7,10/)
+  nctrs = product(ictrs)
+
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -65,8 +71,8 @@ program rbfmain
      allocate(xctrs(ndim,nctrs))
      allocate(weights(nctrs))
 
-     call rbf_random_centers(xctrs)
-!     call rbf_grid_centers(xctrs)
+!     call rbf_random_centers(xctrs)
+     call rbf_grid_centers(xctrs,ictrs)
 
 !tp     
 !     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))

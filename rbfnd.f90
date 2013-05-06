@@ -32,10 +32,11 @@ contains
   end subroutine rbf_random_centers
 
   
-  subroutine rbf_grid_centers(xctrs)
+  subroutine rbf_grid_centers(xctrs,ictrs)
     use rbfprec, only : unflatten_indices
     implicit none
     real(fp), dimension(:,:), intent(out) :: xctrs
+    integer(ip), dimension(:), intent(in), optional :: ictrs
 
     integer(ip) :: ndim, nctrs
     integer(ip) :: npts, q
@@ -43,16 +44,24 @@ contains
 
     ndim = size(xctrs,1)
     nctrs = size(xctrs,2)
-
-    npts = nint(real(nctrs,fp)**(1._fp/real(ndim,fp)))
-
-    if (npts**ndim.ne.nctrs) then
-       write(*,*)'nctrs= ndim= npts= ',nctrs,ndim,npts
-       stop 'rbf_grid_centers: cannot equally grid!'
-    endif
+    
 
     allocate(isize(ndim), ivec(ndim))
-    isize = npts
+
+    if (present(ictrs)) then
+       if (size(ictrs,1).ne.ndim) stop 'rbf_grid_centers: ictrs mismatch!'
+       isize = ictrs
+       write(*,*)'rbf_grid_centers:'
+       write(*,*)'ictrs= ',ictrs
+    else
+       npts = nint(real(nctrs,fp)**(1._fp/real(ndim,fp)))
+
+       if (npts**ndim.ne.nctrs) then
+          write(*,*)'nctrs= ndim= npts= ',nctrs,ndim,npts
+          stop 'rbf_grid_centers: cannot equally grid!'
+       endif
+       isize = npts
+    endif
 
     do q=1,nctrs
        ivec = unflatten_indices(ndim,isize,q)
