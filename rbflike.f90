@@ -13,11 +13,13 @@ module rbflike
   real(fp), save, dimension(:), pointer :: weights => null()
   real(fp), save, dimension(:), pointer :: xpmin => null(), xpmax=>null()
 
+  logical, parameter :: display = .true.
 
   public initialize_rbf_like
   public rbflike_eval, uncubize_rbfparams, cubize_rbfparams
   public posterior_boundaries, cubize_rbfparamspace
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
+  public cutmin_rbfparams, cutmax_rbfparams
 
 contains
 
@@ -112,6 +114,53 @@ contains
     enddo
 
   end subroutine posterior_boundaries
+
+
+  function cutmin_rbfparams(ndim,icut,uncubed)
+    implicit none
+    integer(ip), intent(in) :: ndim,icut
+    real(fp), dimension(ndim) :: cutmin_rbfparams
+    real(fp), dimension(ndim), intent(in) :: uncubed
+
+    integer(ip) :: i
+
+    if (icut.gt.ndim) stop 'cutmin_rbfparams: icut > ndim!'
+
+    cutmin_rbfparams = uncubed
+
+    if (uncubed(icut).lt.xpmin(icut)) then
+       cutmin_rbfparams(icut) = xpmin(icut)
+       if (display) then
+          write(*,*)'cutmin_rbfparams: ',icut,uncubed(icut),xpmin(icut)
+       endif
+    endif    
+
+  end function cutmin_rbfparams
+
+
+
+  function cutmax_rbfparams(ndim,icut,uncubed)
+    implicit none
+    integer(ip), intent(in) :: ndim,icut
+    real(fp), dimension(ndim) :: cutmax_rbfparams
+    real(fp), dimension(ndim), intent(in) :: uncubed
+
+    integer(ip) :: i
+
+    if (icut.gt.ndim) stop 'cutmax_rbfparams: icut > ndim!'
+
+    cutmax_rbfparams = uncubed
+
+    if (uncubed(icut).gt.xpmax(icut)) then
+       cutmax_rbfparams(icut) = xpmax(icut)
+       if (display) then
+          write(*,*)'cutmax_rbfparams: ',icut,uncubed(icut),xpmax(icut)
+       endif
+    endif    
+
+  end function cutmax_rbfparams
+
+
 
 
   function cubize_rbfparams(ndim,uncubed)

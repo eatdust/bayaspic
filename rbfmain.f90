@@ -9,7 +9,7 @@ program rbfmain
   integer :: ndim
   integer(ip) :: ndata
 
-  integer(ip), save :: nctrs = 800
+  integer(ip), save :: nctrs = 2800
 
   integer, parameter :: ndump = 100
 
@@ -34,7 +34,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_4D_8.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_4D_10.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
@@ -152,10 +152,9 @@ program rbfmain
 !  stop
 
   lnA = 3.1
-  sr1 = -5
   sr2 = 0.04
-!  do i=1,ndump
-!     sr2 = sr2min + (sr2max-sr2min)*real(i-1,fp)/real(ndump-1,fp)
+  do i=1,ndump
+     sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
      
      do j=1,ndump
         sr3 = sr3min + (sr3max-sr3min)*real(j-1,fp)/real(ndump-1,fp)
@@ -166,11 +165,11 @@ program rbfmain
 
         f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
 !        call livewrite('output3.dat',sr2,sr3,f)
-        call livewrite('output3.dat',sr3,f)
+        call livewrite('output3.dat',sr1,sr3,f)
 !        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
      enddo
 
-!  enddo
+  enddo
 
   
   deallocate(xcubes,fdata)

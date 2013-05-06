@@ -20,7 +20,7 @@ contains
     character(len=*), intent(in) :: filename   
 
     logical, parameter :: logpost = .true.
-    integer, parameter :: nzeroskip = 10
+    integer, parameter :: nzeroskip = 50
 
     real(fp), parameter :: eps = exp(-10._fp)
 
