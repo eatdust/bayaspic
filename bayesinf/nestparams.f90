@@ -8,13 +8,13 @@ module nestparams
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points
-  integer(imn), parameter :: nestNlive = 100000
+  integer(imn), parameter :: nestNlive = 20000
 
 !sample with constant efficiency
   logical, parameter :: nestCteEff = .false.
 
 !evidence tolerance factor
-  real(fmn), parameter :: nestZTol = 0.01
+  real(fmn), parameter :: nestZTol = 1e-4
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
