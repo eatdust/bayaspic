@@ -117,8 +117,8 @@ contains
 
 
   subroutine nest_init_aspic(modelname)
-    use aspicwrap, only : set_aspic_model, get_aspic_ntot
-    use aspicwrap, only : get_aspic_allprior
+    use wraspic, only : set_model, get_ntot
+    use wraspic, only : get_allprior
     use rbflike, only : initialize_rbf_like
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
@@ -126,17 +126,17 @@ contains
     implicit none    
     character(len=*), intent(in) :: modelname
 
-    call set_aspic_model(modelname)
+    call set_model(modelname)
 
-    nestNdim = get_aspic_ntot()
+    nestNdim = get_ntot()
     nestNpars = nestNdim
     nestCdim = nestNdim
-    nestRootName = nestRootName//modelname
+    nestRootName = trim(nestRootName)//modelname
     
     allocate(nestPmin(nestNdim))
     allocate(nestPmax(nestNdim))
 
-    call get_aspic_allprior(nestPmin, nestPmax)
+    call get_allprior(nestPmin, nestPmax)
         
     call initialize_rbf_like(fileweights, filecentres, filebounds)
 
@@ -182,7 +182,7 @@ contains
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, uncubize_rbfparams, check_rbf
     use rbflike, only : rbflike_eval, cutmin_rbfparams
-    use aspicwrap, only : get_aspic_slowroll, get_aspic_derived
+    use wraspic, only : get_slowroll, get_derived
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -198,7 +198,7 @@ contains
     mnpars = uncubize_nestparams(nestdim,cube)
 
 !use aspic to get the slowroll parameters
-    rbfpars = get_aspic_slowroll(rbfNdim,mnpars)
+    rbfpars = get_slowroll(rbfNdim,mnpars)
 
 !if eps1<eps1min, the likelihood is flat
     rbfcuts = cutmin_rbfparams(rbfNdim,eps1pos,rbfpars)
@@ -214,7 +214,7 @@ contains
 
 !+ derived parameters
     do i=1,nestpars-nestdim
-       cube(nestdim+i) = get_aspic_derived(i)
+       cube(nestdim+i) = get_derived(i)
     enddo
 
   end subroutine rbf_multinest_aspic_loglike

@@ -6,19 +6,17 @@ module aspicvars
   integer, parameter :: kp = kind(1._8)
 
   integer, parameter :: lname = 6
-  integer, parameter :: neps = 3
 
   type infaspic     
      character(len=lname) :: name     
      integer :: nasp
      real(kp), dimension(:), pointer :: params
-     real(kp) :: Pstar, lnRrad
-     real(kp) :: lnM, lnRhoEnd, lnR, bfold
-     real(kp), dimension(neps) :: eps
+     real(kp) :: Pstar, lnRrad, lnRreh
+     real(kp) :: lnM, lnRhoEnd, bfold
      real(kp) :: ns, r, alpha
   end type infaspic
 
-  public infaspic, kp, neps
+  public infaspic, kp, lname
 
 
 end module aspicvars

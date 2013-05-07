@@ -1,0 +1,10 @@
+ONEPNAME(rchi)
+ONEPNAME(lfi)
+ONEPNAME(rcmi)
+ONEPNAME(rcqi)
+ONEPNAME(ni)
+ONEPNAME(esi)
+ONEPNAME(pli)
+
+TWOPNAME(sfi)
+TWOPNAME(kmiii)

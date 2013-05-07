@@ -1,0 +1,10 @@
+ONEPRIOR(rchi,-1,1)
+ONEPRIOR(lfi,0.1,5)
+ONEPRIOR(rcmi,-6,-3)
+ONEPRIOR(rcqi,-3,0)
+ONEPRIOR(ni,0,3)
+ONEPRIOR(esi,-3,1)
+ONEPRIOR(pli,-4,0)
+
+TWOPRIOR(sfi,1,10,-1,1)
+TWOPRIOR(ii,-1,1,1,100)

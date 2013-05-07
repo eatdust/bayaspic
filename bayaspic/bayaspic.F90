@@ -4,12 +4,13 @@ program bayaspic
   use nestwrap, only : nest_init_aspic, nest_sample_aspic
   implicit none
 
-!  call nest_init_slowroll()
+  call nest_init_slowroll()
 
-!  call nest_sample_slowroll()
+  call nest_sample_slowroll()
 
-  call nest_init_aspic('lfi')
-  call nest_sample_aspic()
+
+!  call nest_init_aspic('lfi')
+!  call nest_sample_aspic()
 
 
 
