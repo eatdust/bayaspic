@@ -3,8 +3,8 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=gfortran
-FCFLAGS= -O -fopenmp -DASPIC
+FC=mpif90
+FCFLAGS= -O -fopenmp -DASPIC -DMPISCHED
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
@@ -15,19 +15,27 @@ OBJ=rbfprec.o iorbf.o rbfnd.o rbflike.o
 RBFDIR = ../rbflikes
 NESTDIR = ..
 
-OBJSRBF =  rbfprec.o iorbf.o rbfnd.o aspicvars.o \
-	aspicpriors.o aspicmodels.o \
-	wraspic.o rbflike.o
+OBJSRBF =  rbfprec.o iorbf.o rbfnd.o rbflike.o
+
+#with -DASPIC
+OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
+
+OBJSMPI = fifo.o iofifo.o scheduler.o
+
 OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
 
-OBJFILES = nestprec.o $(OBJSRBF) $(OBJSNEST) nestparams.o nestwrap.o
+OBJFILES = nestprec.o $(OBJSASPIC) $(OBJSRBF) $(OBJSNEST) \
+	nestparams.o nestwrap.o
 
 FCFLAGS+=$(INCLUDE)
 
-bayaspic.$(ext): $(OBJFILES) bayaspic.o
-	$(FC) $(FCFLAGS) $(OBJFILES) bayaspic.o -o ../$@ $(LFLAGS) 
+bayaspic.$(ext): $(OBJFILES)  $(OBJSMPI) bayaspic.o
+	$(FC) $(FCFLAGS) $(OBJFILES) $(OBJSMPI) bayaspic.o -o ../$@ $(LFLAGS) 
+
+bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
+	$(FC) $(FCFLAGS) $(OBJFILES) bayslowroll.o -o ../$@ $(LFLAGS) 
 
 %.o: $(RBFDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<

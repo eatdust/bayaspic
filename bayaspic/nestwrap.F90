@@ -16,8 +16,9 @@ module nestwrap
 
 
   public nest_init_slowroll, nest_sample_slowroll
+#ifdef ASPIC
   public nest_init_aspic, nest_sample_aspic
-
+#endif
 
 contains
 
@@ -115,7 +116,7 @@ contains
 
   end subroutine nest_print
 
-
+#ifdef ASPIC
   subroutine nest_init_aspic(modelname)
     use wraspic, only : set_model, get_ntot
     use wraspic, only : get_allprior
@@ -182,7 +183,8 @@ contains
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, uncubize_rbfparams, check_rbf
     use rbflike, only : rbflike_eval, cutmin_rbfparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_slowroll, get_derived, test_hardprior
+    use nestparams, only : nestLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -197,17 +199,26 @@ contains
 !get the aspic parameters we are sampling on
     mnpars = uncubize_nestparams(nestdim,cube)
 
+!check for any hard prior
+    if (test_hardprior(mnpars)) then
+
+       lnew = nestLogZero - 1._fmn
+
+    else
+       
 !use aspic to get the slowroll parameters
-    rbfpars = get_slowroll(rbfNdim,mnpars)
+       rbfpars = get_slowroll(rbfNdim,mnpars)
 
 !if eps1<eps1min, the likelihood is flat
-    rbfcuts = cutmin_rbfparams(rbfNdim,eps1pos,rbfpars)
+       rbfcuts = cutmin_rbfparams(rbfNdim,eps1pos,rbfpars)
 
 !go into cubic space for the rbf
-    rbfcube = cubize_rbfparams(rbfNdim,rbfcuts)
+       rbfcube = cubize_rbfparams(rbfNdim,rbfcuts)
 
 !get the likelihood
-    lnew = rbflike_eval(rbfcube)
+       lnew = rbflike_eval(rbfcube)
+
+    endif
 
 !dump the physical params into cube
     cube(1:nestdim) = mnpars(1:nestdim)
@@ -218,7 +229,7 @@ contains
     enddo
 
   end subroutine rbf_multinest_aspic_loglike
-
+#endif
 
   function uncubize_nestparams(nestdim,nestcube)
     implicit none

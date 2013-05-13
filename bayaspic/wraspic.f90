@@ -6,7 +6,7 @@ module wraspic
   private
 
   integer, parameter :: nextra = 2
-  logical, parameter :: useRrad = .true.
+  logical, parameter :: useRrad = .false.
 
 
   type(infaspic), save :: AspicModel
@@ -16,20 +16,26 @@ module wraspic
 
   public set_model, check_model, get_allprior
   public get_slowroll, get_ntot, get_derived
-
+  public test_hardprior
 
 contains
 
-  
+
+
   subroutine set_model(mname)
+    use aspicmodels, only : initialize_aspic_ptrs
+    use aspicmodels, only : get_aspic_numparams
+
     implicit none
     character(len=*), intent(in) :: mname
 
+    call initialize_aspic_ptrs(trim(adjustl(mname)))
+
     AspicModel%name = trim(adjustl(mname))
-    
-    AspicModel%nasp = 1
+    AspicModel%nasp = get_aspic_numparams()
 
     allocate(AspicModel%params(AspicModel%nasp))
+    allocate(AspicModel%cmaps(AspicModel%nasp))
 
   end subroutine set_model
 
@@ -67,25 +73,25 @@ contains
 
 
 
-  subroutine get_prior_rrad(lnRradmin,lnRradmax)
+  subroutine get_prior_lnRrad(lnRradmin,lnRradmax)
     implicit none
     real(kp) , intent(out) :: lnRradmin,lnRradmax
 
     lnRradMin = -46
     lnRradMax = 10
 
-  end subroutine get_prior_rrad
+  end subroutine get_prior_lnRrad
 
 
 
-  subroutine get_prior_rreh(lnRmin,lnRmax)
+  subroutine get_prior_lnRreh(lnRmin,lnRmax)
     implicit none
     real(kp) , intent(out) :: lnRmin,lnRmax
 
     lnRMin = -46
     lnRMax = 10
 
-  end subroutine get_prior_rreh
+  end subroutine get_prior_lnRreh
 
 
   
@@ -130,7 +136,6 @@ contains
   end function get_derived
 
 
-#ifdef ASPIC
 
   subroutine get_allprior(pmin,pmax)
     use aspicpriors, only : get_aspic_priors
@@ -154,14 +159,14 @@ contains
 
 !lnRrad or lnR
     if (useRrad) then
-       call get_prior_rrad(pmin(2),pmax(2))
+       call get_prior_lnRrad(pmin(2),pmax(2))
     else
-       call get_prior_rreh(pmin(2),pmax(2))
+       call get_prior_lnRreh(pmin(2),pmax(2))
     endif
 
 !model dependant
 
-    call get_aspic_priors(AspicModel%name,aspmin,aspmax)
+    call get_aspic_priors(AspicModel%name,aspmin,aspmax,AspicModel%cmaps)
     
     pmin(nextra+1:ntot) = aspmin(1:nasp)
     pmax(nextra+1:ntot) = aspmax(1:nasp)
@@ -188,6 +193,7 @@ contains
     real(kp), dimension(nepsmax) :: epsStar
     real(kp), dimension(naspmax) :: asparams
     character(len=lname) :: aspname
+    character(len=lname), dimension(naspmax) :: mapnames
 
     real(kp) :: bfoldstar
     real(kp) :: Pstar, lnRrad, lnRreh, lnM
@@ -196,11 +202,12 @@ contains
     real(kp) :: Vstar, lnRhoEnd, Vend
 
     integer :: nasp, ntot, neps
-
+    integer :: i
 
     ntot = get_ntot()
     nasp = AspicModel%nasp
     neps = nstar - 1
+
 
     if (size(mnParams,1).ne.ntot) then
        stop 'get_slowroll: size mismatch!'
@@ -215,8 +222,15 @@ contains
     endif
 
 !let's get everything from libaspic
-    asparams(1:nasp) = mnParams(nextra+1:ntot)
     aspname = trim(AspicModel%name)
+    forall (i=1:nasp)
+       mapnames(i) = trim(AspicModel%cmaps(i))
+    end forall
+!    asparams(1:nasp) = mnParams(nextra+1:ntot)
+
+
+    asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
+         ,mapnames(1:nasp))
 
     if (useRrad) then
        xstar = aspic_x_rrad(aspname,asparams,lnRrad,Pstar,bfoldstar)
@@ -233,7 +247,9 @@ contains
 
     Vstar = aspic_norm_potential(aspname,xstar,asparams)       
 
+!aspicmodels returns the last params if xend is itself a param
     xend = aspic_x_endinf(aspname,asparams)
+
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vstar = aspic_norm_potential(aspname,xend,asparams)
                          
@@ -266,50 +282,68 @@ contains
 
   end function  get_slowroll
 
-#else
 
-  function get_slowroll(nstar,mnParams)
-    use aspicvars, only : neps
+  function map_aspic_params(nasp,inparams,mapnames) result(outparams)
     implicit none
-    integer, intent(in) :: nstar
-    real(kp), dimension(nstar) :: get_slowroll
+    integer, intent(in) :: nasp
+    real(fmn), intent(in), dimension(nasp) :: inparams
+    character(len=*), dimension(nasp), intent(in) :: mapnames
+    real(kp), dimension(nasp) :: outparams
+
+    integer :: i
+
+    do i=1,nasp
+    
+       select case (mapnames(i))
+
+       case ('flat')
+
+          outparams(i) = inparams(i)
+
+       case ('log')
+
+          outparams(i) = 10._kp**(inparams(i))
+
+       case ('ln')
+
+          outparams(i) = exp(inparams(i))
+
+       case default
+          
+          stop 'map_aspic_params: not such functions!'
+
+       end select
+
+    end do
+   
+  end function map_aspic_params
+
+
+
+  function test_hardprior(mnParams)
+    use aspicpriors, only : check_aspic_hardprior
+    implicit none    
+    logical :: test_hardprior
     real(fmn), dimension(:), intent(in) :: mnParams
 
-    write(*,*)'ASPIC NOT DEFINED...'
-    get_slowroll = mnParams
+    real(kp), dimension(naspmax) :: asparams
+    character(len=lname) :: aspname
+    integer :: nasp, ntot
 
-  end function get_slowroll
-
-  subroutine get_allprior(pmin,pmax)    
-    implicit none
-    real(kp), dimension(:), intent(out) :: pmin, pmax
-
-    integer :: nsize, nasp
-    
-    nsize = size(pmin,1)
+    ntot = get_ntot()
     nasp = AspicModel%nasp
 
-    if (nsize.ne.size(pmax,1) &
-         .or.(nsize.ne.(nextra+size(AspicModel%params,1)))) then
-       stop 'get_allprior: size mismatch!'
+    if (size(mnParams,1).ne.ntot) then
+       stop 'test_hardprior: size mismatch!'
     endif
 
-!ln[10^10 P*]
-    call get_prior_lnA(pmin(1),pmax(1))
+    !aspic params (with xend)
+    asparams(1:nasp) = mnParams(nextra+1:ntot)
+    aspname = trim(AspicModel%name)
 
-!lnRrad or lnR
-    if (useRrad) then
-       call get_prior_rrad(pmin(2),pmax(2))
-    else
-       call get_prior_rreh(pmin(2),pmax(2))
-    endif
+    test_hardprior = check_aspic_hardprior(aspname,asparams)
 
-!model dependant    
-    pmin(nextra+1:ntot) = 0.1
-    pmax(nextra+1:ntot) = 1
+  end function test_hardprior
 
-  end subroutine get_allprior
-
-#endif
 
 end module wraspic
