@@ -20,9 +20,10 @@ contains
     character(len=*), intent(in) :: filename   
 
     logical, parameter :: logpost = .true.
-    integer, parameter :: nzeroskip = 5
+    integer, parameter :: nzeroskip = 6
 
     real(fp), parameter :: eps = exp(-10._fp)
+
 
     integer, parameter :: nunit = 210
 
@@ -193,7 +194,7 @@ contains
 
     open(nunit,file=filename,status='old')
     read(nunit,*) nw, scale
-      
+
     write(*,*)'load_weights: nw= scale= ',nw, scale
 
     allocate(weight(nw))    

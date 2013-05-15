@@ -10,7 +10,7 @@ program rbfmain
   integer(ip) :: ndata
   
   integer(ip), dimension(:), allocatable, save :: ictrs
-  integer(ip), save :: nctrs = 2400
+  integer(ip), save :: nctrs = 0
 
   integer, parameter :: ndump = 100
 
@@ -35,7 +35,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_4D_12.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_3D_20.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
@@ -43,9 +43,10 @@ program rbfmain
 
   allocate(ictrs(ndim))
   
-  ictrs = (/7,7,7,10/)
+!  ictrs = (/4,4,4,11/)
+!  ictrs = (/9,9,9/)
   nctrs = product(ictrs)
-
+  nctrs = 1350
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -71,8 +72,8 @@ program rbfmain
      allocate(xctrs(ndim,nctrs))
      allocate(weights(nctrs))
 
-!     call rbf_random_centers(xctrs)
-     call rbf_grid_centers(xctrs,ictrs)
+     call rbf_random_centers(xctrs)
+!     call rbf_grid_centers(xctrs,ictrs)
 
 !tp     
 !     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))
@@ -128,7 +129,7 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
         f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
         call livewrite('output.dat',sr1,sr2,f)
@@ -146,7 +147,7 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
         f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
         call livewrite('output2.dat',sr1,lnA,f)
@@ -155,7 +156,7 @@ program rbfmain
 
   enddo
 
-!  stop
+  stop
 
   lnA = 3.1
   sr2 = 0.04

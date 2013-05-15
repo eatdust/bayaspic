@@ -13,7 +13,7 @@ module rbflike
   real(fp), save, dimension(:), pointer :: weights => null()
   real(fp), save, dimension(:), pointer :: xpmin => null(), xpmax=>null()
 
-  logical, parameter :: display = .true.
+  logical, parameter :: display = .false.
 
   public initialize_rbf_like
   public rbflike_eval, uncubize_rbfparams, cubize_rbfparams
