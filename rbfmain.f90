@@ -46,7 +46,7 @@ program rbfmain
 !  ictrs = (/4,4,4,11/)
 !  ictrs = (/9,9,9/)
   nctrs = product(ictrs)
-  nctrs = 1350
+  nctrs = 1250
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
