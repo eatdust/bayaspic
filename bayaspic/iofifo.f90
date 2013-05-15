@@ -2,9 +2,6 @@ module iofifo
   use fifo, only : ends, qval, node
   implicit none
 
-  integer, parameter :: lenIoRank = 4
-  integer, parameter :: lenIoMax = 64
-
   private
 
   public dump_queue_vals, read_queue_vals
@@ -13,26 +10,29 @@ module iofifo
 
   logical, parameter :: display = .true.
 
+  integer, parameter :: lenIoRank = 4
+  integer, parameter :: lenIoMax = 64
 
 contains
 
-
-  function queue_filename(rank)    
+  subroutine replace_char(strg,charold,charnew)
     implicit none
-    character(len=lenIoMax) :: queue_filename
-    integer, intent(in), optional :: rank
+    character(len=*), intent(inout) :: strg
+    character, intent(in) :: charold, charnew
 
-    character(len=lenIoRank) :: cRank
+    integer :: position
+    position = 1
 
-
-    if (present(rank)) then
-       call step2char(rank,lenIoRank,cRank)
-       queue_filename = 'queue'//cRank//'.bin'
-    else
-       queue_filename = 'queue.bin'
-    endif
-
-  end function queue_filename
+    do 
+       position = scan(strg,charold)
+       if (position.ne.0) then
+          strg(position:position) = charnew
+       else
+          exit
+       endif
+    enddo
+        
+  end subroutine replace_char
 
 
 
@@ -59,24 +59,23 @@ contains
   end subroutine step2char
 
 
-  subroutine replace_char(strg,charold,charnew)
+
+  function queue_filename(rank)
     implicit none
-    character(len=*), intent(inout) :: strg
-    character, intent(in) :: charold, charnew
+    character(len=lenIoMax) :: queue_filename
+    integer, intent(in), optional :: rank
 
-    integer :: position
-    position = 1
+    character(len=lenIoRank) :: cRank
 
-    do 
-       position = scan(strg,charold)
-       if (position.ne.0) then
-          strg(position:position) = charnew
-       else
-          exit
-       endif
-    enddo
-        
-  end subroutine replace_char
+
+    if (present(rank)) then
+       call step2char(rank,lenIoRank,cRank)
+       queue_filename = 'queue'//cRank//'.bin'
+    else
+       queue_filename = 'queue.bin'
+    endif
+
+  end function queue_filename
 
 
 

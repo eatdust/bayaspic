@@ -5,9 +5,11 @@ module wraspic
 
   private
 
-  integer, parameter :: nextra = 2
-  logical, parameter :: useRrad = .false.
 
+  integer, parameter :: nextra = 2
+  integer, parameter :: ireh= 2
+  integer, parameter :: ilnA = 1
+  logical, parameter :: useRrad = .false.
 
   type(infaspic), save :: AspicModel
 
@@ -16,7 +18,9 @@ module wraspic
 
   public set_model, check_model, get_allprior
   public get_slowroll, get_ntot, get_derived
-  public test_hardprior
+  public test_aspic_hardprior, test_reheating_hardprior
+
+  logical, parameter :: display = .false.
 
 contains
 
@@ -64,7 +68,7 @@ contains
 
   subroutine get_prior_lnA(lnAmin,lnAmax)
     implicit none
-    real(kp) , intent(out) :: lnAmin,lnAmax
+    real(fmn) , intent(out) :: lnAmin,lnAmax
 
     lnAmin = 2.7
     lnAmax = 4
@@ -74,22 +78,24 @@ contains
 
 
   subroutine get_prior_lnRrad(lnRradmin,lnRradmax)
+    use cosmopar, only : lnRhoNuc
     implicit none
-    real(kp) , intent(out) :: lnRradmin,lnRradmax
+    real(fmn) , intent(out) :: lnRradmin,lnRradmax
 
-    lnRradMin = -46
-    lnRradMax = 10
+    lnRradMin = 0.25 * lnRhoNuc
+    lnRradMax = -1._kp/12._kp * lnRhoNuc
 
   end subroutine get_prior_lnRrad
 
 
 
   subroutine get_prior_lnRreh(lnRmin,lnRmax)
+    use cosmopar, only : lnRhoNuc
     implicit none
-    real(kp) , intent(out) :: lnRmin,lnRmax
+    real(fmn) , intent(out) :: lnRmin,lnRmax
 
-    lnRMin = -46
-    lnRMax = 10
+    lnRMin = 0.25_kp * lnRhoNuc
+    lnRMax = -1._kp/12._kp * lnRhoNuc
 
   end subroutine get_prior_lnRreh
 
@@ -98,7 +104,7 @@ contains
   function get_derived(i)
     implicit none
     integer, intent(in) :: i
-    real(kp) :: get_derived
+    real(fmn) :: get_derived
 
     select case(i)
 
@@ -140,7 +146,7 @@ contains
   subroutine get_allprior(pmin,pmax)
     use aspicpriors, only : get_aspic_priors
     implicit none
-    real(kp), dimension(:), intent(out) :: pmin, pmax
+    real(fmn), dimension(:), intent(out) :: pmin, pmax
 
     integer :: nsize, nasp, ntot
     real(kp), dimension(naspmax) :: aspmin,aspmax
@@ -175,6 +181,68 @@ contains
 
 
 
+  function map_power_amplitude(lnA)
+    implicit none
+    real(kp) :: map_power_amplitude
+    real(kp), intent(in) :: lnA
+    real(kp) :: Pstar
+
+!    lnA = ln[10^10 P*]
+    
+    Pstar = exp(lnA)*1d-10
+    map_power_amplitude = Pstar
+
+  end function map_power_amplitude
+
+
+
+
+  function map_aspic_params(nasp,inparams,mapnames) result(outparams)
+    implicit none
+    integer, intent(in) :: nasp
+    real(fmn), intent(in), dimension(nasp) :: inparams
+    character(len=*), dimension(nasp), intent(in) :: mapnames
+    real(kp), dimension(nasp) :: outparams
+
+    integer :: i
+
+    do i=1,nasp
+    
+       select case (mapnames(i))
+
+       case ('flat')
+
+          outparams(i) = inparams(i)
+
+       case ('log')
+
+          outparams(i) = 10._kp**(inparams(i))
+
+       case ('ln')
+
+          outparams(i) = exp(inparams(i))
+
+       case ('mlog')
+          
+          outparams(i) = -10._kp**(inparams(i))
+
+       case ('mln')
+
+          outparams(i) = -exp(inparams(i))
+
+       case default
+          
+          stop 'map_aspic_params: not such functions!'
+
+       end select
+
+    end do
+   
+  end function map_aspic_params
+
+
+
+
   function get_slowroll(nstar,mnParams)
     use srreheat, only : ln_potential_normalization
     use srreheat, only : ln_rho_endinf
@@ -187,7 +255,7 @@ contains
 
     implicit none
     integer, intent(in) :: nstar
-    real(kp), dimension(nstar) :: get_slowroll
+    real(fmn), dimension(nstar) :: get_slowroll
     real(fmn), dimension(:), intent(in) :: mnParams
 
     real(kp), dimension(nepsmax) :: epsStar
@@ -195,7 +263,7 @@ contains
     character(len=lname) :: aspname
     character(len=lname), dimension(naspmax) :: mapnames
 
-    real(kp) :: bfoldstar
+    real(kp) :: bfoldstar, lnA
     real(kp) :: Pstar, lnRrad, lnRreh, lnM
     real(kp) :: xstar, xend
     real(kp) :: epsOneEnd
@@ -213,12 +281,13 @@ contains
        stop 'get_slowroll: size mismatch!'
     endif
     
-    Pstar = mnParams(1)
+    lnA = mnParams(ilnA)
+    Pstar = map_power_amplitude(lnA)
 
     if (useRrad) then
-       lnRrad = mnParams(2)
+       lnRrad = mnParams(ireh)
     else
-       lnRreh = mnParams(2)
+       lnRreh = mnParams(ireh)
     endif
 
 !let's get everything from libaspic
@@ -251,7 +320,7 @@ contains
     xend = aspic_x_endinf(aspname,asparams)
 
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
-    Vstar = aspic_norm_potential(aspname,xend,asparams)
+    Vend = aspic_norm_potential(aspname,xend,asparams)
                          
     lnM = ln_potential_normalization(Pstar,epsStar(1),Vstar)
     lnRhoEnd = ln_rho_endinf(Pstar,epsStar(1) &
@@ -275,55 +344,38 @@ contains
     AspicModel%r = tensor_to_scalar_ratio(epsStar(1:2))
     AspicModel%alpha = scalar_running(epsStar)
 
+    if (display) call print_aspicmodel(AspicModel)
+      
+
 !output the slow-roll params for the likelihood
     get_slowroll(1) = Pstar
     get_slowroll(2) = log10(epsStar(1))
     get_slowroll(3:nstar) = epsStar(2:neps)
 
-  end function  get_slowroll
+  end function get_slowroll
 
-
-  function map_aspic_params(nasp,inparams,mapnames) result(outparams)
+  
+  subroutine print_aspicmodel(model)
     implicit none
-    integer, intent(in) :: nasp
-    real(fmn), intent(in), dimension(nasp) :: inparams
-    character(len=*), dimension(nasp), intent(in) :: mapnames
-    real(kp), dimension(nasp) :: outparams
+    type(infaspic), intent(in) :: model
 
-    integer :: i
+    write(*,*)
+    write(*,*)'AspicModel Params:'
+    write(*,*)'Pstar= asparams=  ', Model%Pstar,Model%params
+    write(*,*)'lnRrad= lnRreh= ', Model%lnRrad, Model%lnRreh
+    write(*,*)'lnRhoEnd= lnM=  ',Model%lnRhoEnd,Model%lnM
+    write(*,*)'N*=             ', Model%bfold
+    write(*,*)'ns= r= alpha=   ',Model%ns,Model%r,Model%alpha
+    write(*,*)
 
-    do i=1,nasp
-    
-       select case (mapnames(i))
-
-       case ('flat')
-
-          outparams(i) = inparams(i)
-
-       case ('log')
-
-          outparams(i) = 10._kp**(inparams(i))
-
-       case ('ln')
-
-          outparams(i) = exp(inparams(i))
-
-       case default
-          
-          stop 'map_aspic_params: not such functions!'
-
-       end select
-
-    end do
-   
-  end function map_aspic_params
+  end subroutine print_aspicmodel
 
 
 
-  function test_hardprior(mnParams)
+  function test_aspic_hardprior(mnParams)
     use aspicpriors, only : check_aspic_hardprior
     implicit none    
-    logical :: test_hardprior
+    logical :: test_aspic_hardprior
     real(fmn), dimension(:), intent(in) :: mnParams
 
     real(kp), dimension(naspmax) :: asparams
@@ -334,16 +386,105 @@ contains
     nasp = AspicModel%nasp
 
     if (size(mnParams,1).ne.ntot) then
-       stop 'test_hardprior: size mismatch!'
+       stop 'test_aspic_hardprior: size mismatch!'
     endif
 
     !aspic params (with xend)
     asparams(1:nasp) = mnParams(nextra+1:ntot)
     aspname = trim(AspicModel%name)
 
-    test_hardprior = check_aspic_hardprior(aspname,asparams)
+    test_aspic_hardprior = check_aspic_hardprior(aspname,asparams)
 
-  end function test_hardprior
+  end function test_aspic_hardprior
+
+
+
+  function test_reheating_hardprior(mnParams)   
+    use cosmopar, only : lnRhoNuc
+    implicit none    
+    logical :: test_reheating_hardprior
+    real(fmn), dimension(:), intent(in) :: mnParams
+    real(fmn) :: lnRrad, lnRreh
+
+    if (useRrad) then
+       lnRrad = mnParams(ireh)       
+       test_reheating_hardprior = check_lnrrad_hardprior(lnRrad)
+    else
+       lnRreh = mnParams(ireh)       
+       test_reheating_hardprior = check_lnrreh_hardprior(lnRreh)
+    endif
+    
+  end function test_reheating_hardprior
+
+
+
+  function check_lnrreh_hardprior(lnRreh) result(reject)
+    use cosmopar, only : lnRhoNuc
+    implicit none
+    logical :: reject
+    real(fmn), intent(in) :: lnRreh
+    real(fmn) :: lnRrehMax, lnRrehMin
+    real(fmn) :: lnRhoEnd
+
+    if (AspicModel%lnRreh.ne.lnRreh) then
+       stop 'test_lnrreh_hardprior: must be called after get_slowroll!'
+    endif
+
+    lnRhoEnd = AspicModel%lnRhoEnd
+
+    lnRrehMax = - 1._kp/12._kp * lnRhoNuc + 1._kp/3._kp * lnRhoEnd
+
+    lnRrehMin = 1._kp/4._kp * lnRhoNuc
+
+    reject = (lnRreh.lt.lnRrehMin).or.(lnRreh.gt.lnRrehMax) &
+         .or.(lnRhoEnd.lt.lnRhoNuc)
+
+    if (display) then
+       if (reject) then
+          write(*,*)
+          write(*,*)'check_lnrreh_hardprior:'
+          write(*,*)'lnRhoEnd= lnRhoNuc= ',lnrhoEnd,lnRhoNuc
+          write(*,*)'lnRreh= (max= min=)',lnRreh,lnRrehMax,lnRrehMin
+          write(*,*)
+       end if
+    end if
+
+  end function check_lnrreh_hardprior
+
+
+
+  function check_lnrrad_hardprior(lnRrad) result(reject)
+    use cosmopar, only : lnRhoNuc
+    implicit none
+    logical :: reject
+    real(fmn), intent(in) :: lnRrad
+    real(fmn) :: lnRhoEnd, lnRradMax, lnRradMin
+
+    if (AspicModel%lnRrad.ne.lnRrad) then
+       stop 'test_lnrrad_hardprior: must be called after get_slowroll!'
+    endif
+
+    lnRhoEnd = AspicModel%lnRhoEnd
+
+
+    lnRradMax = - 1._kp/12._kp * (lnRhoNuc - lnRhoEnd)
+
+    lnRradMin = 0.25_kp * ( lnRhoNuc - lnRhoEnd)
+
+    reject = (lnRrad.lt.lnRradMin).or.(lnRrad.gt.lnRradMax) &
+         .or.(lnRhoEnd.lt.lnRhoNuc)
+
+    if (display) then
+       if (reject) then
+          write(*,*)
+          write(*,*)'check_lnrrad_hardprior:'
+          write(*,*)'lnRhoEnd= lnRhoNuc= ',lnRhoEnd,lnRhoNuc
+          write(*,*)'lnRrad= (max= min=)',lnRrad,lnRradMax,lnRradMin
+          write(*,*)
+       end if
+    end if
+
+  end function check_lnrrad_hardprior
 
 
 end module wraspic

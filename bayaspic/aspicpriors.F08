@@ -20,6 +20,9 @@ contains
 
     select case (name)
 
+#define ZEROPRIOR(fooi) \
+    case ('fooi')
+
 !reminder: cpp is only used in "traditional mode" for fortran
 #define ONEPRIOR(fooi,foomin,foomax,foomap) \
     case ('fooi'); \
@@ -53,6 +56,7 @@ contains
        if (naspic.ne.3) stop 'get_aspic_priors: wrong npriors'
 
 #include "aspicpriors.pp"
+#undef ZEROPRIOR
 #undef ONEPRIOR
 #undef TWOPRIORS
 #undef THREEPRIORS
@@ -66,7 +70,7 @@ contains
 
 
 !case by case model if the prior space is not cubic
-  function check_aspic_hardprior(name,params)
+  function check_aspic_hardprior(name,params) result(reject)
 
     include 'aspicpriors.h'
 
@@ -77,18 +81,60 @@ contains
     logical :: reject
 
     real(kp), parameter :: efoldMax = 120._kp
+    real(kp) :: q
 
     reject = .false.
 
     select case (name)
+
+    case ('ii')
+       reject = params(2).lt.ii_xendmin(efoldMax,params(1))
+
+    case ('bsusybi')
+       reject = params(2).gt.bsusybi_xendmax(efoldMax,params(1))
+
+    case ('csi')
+       reject = params(2).gt.csi_xendmax(efoldMax,params(1))
+
+    case ('cnci')
+       reject = params(2).lt.cnci_xendmin(efoldMax,params(1))
+
+    case ('imi')
+       reject = params(2).lt.imi_xendmin(efoldMax,params(1))
+
+    case ('kmiii')
+       reject = (params(1).lt.kmiii_alphamin(params(2))) &
+            .or.(params(1).gt.kmiii_alphamax(params(2)))
+
+    case ('sbi')
+       reject = params(1).lt.sbi_alphamin(params(2))
+
+    case ('ssbi1')
+       reject = params(1).lt.ssbi1_alphamin(params(2))
+
+    case ('ssbi3')
+       reject = params(1).lt.ssbi3_alphamin(params(2))
+
+    case ('ssbi5')
+       reject = params(1).gt.ssbi5_alphamax(params(2))
+
+    case ('ssbi6')
+       reject = params(1).gt.ssbi6_alphamax(params(2))
        
     case ('vhi')
        reject = (params(3).gt.vhi_xendmax(efoldMax,params(1),params(2))) &
             .or.(params(3).lt.vhi_xendmin(params(1),params(2)))
        
-    end select
+    case ('dsi')
+       q = 8._kp
+       reject = (params(2).gt.dsi_mumax(efoldMax,params(1),q)) &
+            .or.(params(3).gt.dsi_xendmax(params(1),params(2),q)) &
+            .or.(params(3).lt.dsi_xendmin(efoldMax,params(1),params(2)))
 
-    check_aspic_hardprior = reject
+    case ('cndi')
+       reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
+
+    end select
 
   end function check_aspic_hardprior
 

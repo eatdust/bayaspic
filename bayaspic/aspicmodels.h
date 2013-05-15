@@ -1,4 +1,41 @@
   abstract interface
+
+!for zero potential parameter models
+     function zerop_norm_potential(x)
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_norm_potential
+       real(kp), intent(in) :: x
+     end function zerop_norm_potential
+
+     function zerop_epsilon_one(x)    
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_epsilon_one
+       real(kp), intent(in) :: x
+     end function zerop_epsilon_one
+
+     function zerop_epsilon_two(x)    
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_epsilon_two
+       real(kp), intent(in) :: x
+     end function zerop_epsilon_two
+
+     function zerop_epsilon_three(x)    
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_epsilon_three
+       real(kp), intent(in) :: x
+     end function zerop_epsilon_three
+
+     function zerop_x_endinf()
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_x_endinf
+     end function zerop_x_endinf
+
+
 !for one potential parameter models
      function onep_norm_potential(x,p1)
        use infprec, only : kp
@@ -107,6 +144,24 @@
        real(kp), intent(in) :: p1,p2,p3
        real(kp) :: threep_x_endinf
      end function threep_x_endinf
+
+
+!for zero param reheat
+     function zerop_x_rrad(lnRrad,Pstar,bfoldstar)
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_x_rrad
+       real(kp), intent(in) :: lnRrad,Pstar
+       real(kp), intent(out), optional :: bfoldstar
+     end function zerop_x_rrad
+
+     function zerop_x_rreh(lnRreh,bfoldstar)
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_x_rreh
+       real(kp), intent(in) :: lnRreh
+       real(kp), intent(out), optional :: bfoldstar
+     end function zerop_x_rreh
 
 
 !for one param reheat

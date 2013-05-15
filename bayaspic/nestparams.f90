@@ -52,7 +52,7 @@ module nestparams
   integer(imn), dimension(:), allocatable, save :: nestPWrap
   
 !need update on sampling progress?
-  logical, parameter :: nestFeedBack = .true.
+  logical, parameter :: nestFeedBack = .false.
 
 !whether to resume from a previous run
   logical, parameter :: nestResume = .false.
@@ -61,7 +61,7 @@ module nestparams
   logical, parameter ::  nestOutfile = .true.
 
 !initialize MPI routines?, relevant only for -DMPI
-  logical, parameter :: nestInitMPI = .true.
+  logical, parameter :: nestInitMPI = .false.
 
 !points with loglike < logZero will be ignored 
   real(fmn), parameter :: nestLogZero = -10.

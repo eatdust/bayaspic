@@ -8,6 +8,8 @@ module nestwrap
   character(len=*), parameter :: filecentres = 'rbfdata/centres.dat'
   character(len=*), parameter :: filebounds = 'rbfdata/bounds.dat'
 
+  integer(imn), parameter :: numDerivedParams = 7
+
   integer(imn), save :: rbfNdim = 0
   integer(imn), parameter :: pstarpos = 1
   integer(imn), parameter :: eps1pos = 2
@@ -36,7 +38,12 @@ contains
     nestNdim = rbfNdim
     nestNpars = nestNdim
     nestCdim = nestNdim
-        
+    if (rbfNdim.eq.3) then
+       nestRootName = trim(nestRootName)//'sr2'
+    elseif (rbfNdim.eq.4) then
+       nestRootName = trim(nestRootName)//'sr3'
+    endif
+
     allocate(nestPwrap(nestNdim))
     nestPwrap = 0
 
@@ -98,6 +105,7 @@ contains
     write(*,*)'nestNlive    =         ',nestNlive
     write(*,*)'nestCteEff   =         ',nestCteEff
     write(*,*)'nestZtol     =         ',nestZtol
+    write(*,*)'nestFeedBack =         ',nestFeedBack
     write(*,*)'nestResume   =         ',nestResume
     write(*,*)'nestRootName =         ',nestRootName
     write(*,*)
@@ -130,7 +138,7 @@ contains
     call set_model(modelname)
 
     nestNdim = get_ntot()
-    nestNpars = nestNdim
+    nestNpars = nestNdim + numDerivedParams
     nestCdim = nestNdim
     nestRootName = trim(nestRootName)//modelname
     
@@ -183,7 +191,8 @@ contains
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, uncubize_rbfparams, check_rbf
     use rbflike, only : rbflike_eval, cutmin_rbfparams
-    use wraspic, only : get_slowroll, get_derived, test_hardprior
+    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
@@ -196,13 +205,13 @@ contains
 
     if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
 
-!get the aspic parameters we are sampling on
+!get the physical parameters we are sampling on
     mnpars = uncubize_nestparams(nestdim,cube)
 
-!check for any hard prior
-    if (test_hardprior(mnpars)) then
+!check for any hard prior in aspic model parameters
+    if (test_aspic_hardprior(mnpars)) then
 
-       lnew = nestLogZero - 1._fmn
+       lnew = nestLogZero
 
     else
        
@@ -212,18 +221,22 @@ contains
 !if eps1<eps1min, the likelihood is flat
        rbfcuts = cutmin_rbfparams(rbfNdim,eps1pos,rbfpars)
 
-!go into cubic space for the rbf
+!go into cubic space for the rbf likelihood
        rbfcube = cubize_rbfparams(rbfNdim,rbfcuts)
 
-!get the likelihood
-       lnew = rbflike_eval(rbfcube)
+!get the likelihood, if the reheating hardprior are consistent
+       if (test_reheating_hardprior(mnpars)) then
+          lnew = nestLogZero
+       else
+          lnew = rbflike_eval(rbfcube)
+       endif
 
     endif
 
-!dump the physical params into cube
+!dump the physical params into cube for file output
     cube(1:nestdim) = mnpars(1:nestdim)
 
-!+ derived parameters
+!+ derived parameters we want to dump too
     do i=1,nestpars-nestdim
        cube(nestdim+i) = get_derived(i)
     enddo

@@ -4,7 +4,7 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=mpif90
-FCFLAGS= -O -fopenmp -DASPIC -DMPISCHED
+FCFLAGS= -O -fopenmp -DASPIC 
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
@@ -59,4 +59,4 @@ bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
 	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
 
 clean:
-	rm -f *.o *.mod ../bayaspic.$(ext)
+	rm -f *.o *.mod ../bayaspic.$(ext) ../bayslowroll.$(ext)

@@ -20,6 +20,8 @@ program bayaspic
   character(len=lmod), dimension(:), allocatable :: ModelNames
   character(len=lmod) :: name
 
+  logical, parameter :: display = .true.
+
 !restore all processes from previous run
   logical, parameter :: cpRestart = .false.
 
@@ -31,9 +33,10 @@ program bayaspic
   integer, save :: mpiPrevSize = 1
 
 
-  call initialize_listmodels()
+!  call initialize_manymodels()
+!  call initialize_onemodel('cwi')
+  call initialize_filemodels('list_oneparam.dat')
 
-  
 
 #ifdef MPISCHED
   call MPI_INIT(mpiCode)
@@ -50,7 +53,6 @@ program bayaspic
      call initialize_scheduler(nmodels)
   endif
 
-  print *,'testtt',nmodels
 
   do
 
@@ -88,18 +90,72 @@ program bayaspic
 contains
 
 
-  subroutine initialize_listmodels()
+
+  subroutine initialize_onemodel(mname)
+    implicit none
+    character(len=*), intent(in) :: mname
+    nmodels = 1
+
+    allocate(ModelNames(0:0))
+
+    ModelNames(0) = mname
+
+  end subroutine initialize_onemodel
+
+
+
+  subroutine initialize_manymodels()
     implicit none
     
     nmodels = 2
 
     allocate(ModelNames(0:nmodels-1))
 
-    ModelNames(0) = 'sfi'
+    ModelNames(0) = 'hi'
     Modelnames(1) = 'lfi'
 
+  end subroutine initialize_manymodels
 
-  end subroutine initialize_listmodels
+
+
+  subroutine initialize_filemodels(filename)
+    implicit none
+    character(len=*), intent(in) :: filename
+
+    character(len=lmod) :: mname
+    integer, parameter :: nunit = 100
+    integer :: i,counter,ioerr
+
+    counter = 0
+    open(unit=nunit,file=filename,status='old')
+    do 
+       read(nunit,*,iostat=ioerr) mname
+       if (ioerr.ne.0) exit
+       counter = counter + 1
+    enddo
+    close(nunit)
+
+    nmodels = counter
+    allocate(ModelNames(0:nmodels-1))
+
+    open(unit=nunit,file=filename,status='old')
+    do i=0,nmodels-1
+       read(nunit,*) ModelNames(i)
+    enddo
+    close(nunit)
+
+    if (display) then
+       write(*,*)
+       write(*,*)'models read from file: ',trim(filename)
+       write(*,*)'found nmodels=         ',nmodels
+       write(*,*)'models list:           '
+       do i=0,nmodels-1
+          write(*,*)'            ',trim(ModelNames(i))
+       enddo
+       write(*,*)
+    endif
+
+  end subroutine initialize_filemodels
 
 
   subroutine free_listmodels()

@@ -15,6 +15,8 @@ module aspicmodels
 !number of aspic parameters + xend if required
   integer, save :: numAspicParams = 0
 
+  procedure(zerop_x_rrad), pointer :: ptrzerop_x_rrad => null()
+  procedure(zerop_x_rreh), pointer :: ptrzerop_x_rreh => null()
   procedure(onep_x_rrad), pointer :: ptronep_x_rrad => null()
   procedure(onep_x_rreh), pointer :: ptronep_x_rreh => null()
   procedure(twop_x_rrad), pointer :: ptrtwop_x_rrad => null()
@@ -23,6 +25,12 @@ module aspicmodels
   procedure(threep_x_rreh), pointer :: ptrthreep_x_rreh => null()
   procedure(fourp_x_rrad), pointer :: ptrfourp_x_rrad => null()
   procedure(fourp_x_rreh), pointer :: ptrfourp_x_rreh => null()
+
+  procedure(zerop_norm_potential), pointer :: ptrzerop_norm_potential => null()
+  procedure(zerop_epsilon_one), pointer :: ptrzerop_epsilon_one => null()
+  procedure(zerop_epsilon_two), pointer :: ptrzerop_epsilon_two => null()
+  procedure(zerop_epsilon_three), pointer :: ptrzerop_epsilon_three => null()
+  procedure(zerop_x_endinf), pointer :: ptrzerop_x_endinf => null()
 
   procedure(onep_norm_potential), pointer :: ptronep_norm_potential => null()
   procedure(onep_epsilon_one), pointer :: ptronep_epsilon_one => null()
@@ -65,6 +73,30 @@ contains
     select case (trim(name))
 
 !reminder: cpp is only used in "traditional mode" for fortran
+#define ZEROPP_PURE(fooi) \
+    case ('fooi'); \
+       ptrzerop_x_rrad => fooi/**/_x_rrad ; \
+       ptrzerop_x_rreh => fooi/**/_x_rreh ; \
+       ptrzerop_norm_potential => fooi/**/_norm_potential ; \
+       ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
+       ptrzerop_x_endinf => fooi/**/_x_endinf ; \
+       xEndIsParam = .false. ; \
+       numAspicParams = 0
+
+#define ZEROPP_XEND(fooi) \
+    case ('fooi'); \
+       ptronep_x_rrad => fooi/**/_x_rrad ; \
+       ptronep_x_rreh => fooi/**/_x_rreh ; \
+       ptrzerop_norm_potential => fooi/**/_norm_potential ; \
+       ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
+       ptrzerop_x_endinf => fooi/**/_x_endinf ; \
+       xEndIsParam = .false. ; \
+       numAspicParams = 1
+
 #define ONEPP_PURE(fooi) \
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
@@ -139,6 +171,8 @@ contains
        numAspicParams = 4
 
 #include "aspicnames.pp"
+#undef ZEROPP_PURE
+#undef ZEROPP_XEND
 #undef ONEPP_PURE
 #undef ONEPP_XEND
 #undef TWOPP_PURE
@@ -189,7 +223,12 @@ contains
 
     if (.not.CheckAspicPtrs) return
 
-    
+    if (associated(ptrzerop_norm_potential)) ptrzerop_norm_potential => null()
+    if (associated(ptrzerop_epsilon_one)) ptrzerop_epsilon_one => null()
+    if (associated(ptrzerop_epsilon_two)) ptrzerop_epsilon_two => null()
+    if (associated(ptrzerop_epsilon_three)) ptrzerop_epsilon_two => null()
+    if (associated(ptrzerop_x_endinf)) ptrzerop_x_endinf => null()
+
     if (associated(ptronep_norm_potential)) ptronep_norm_potential => null()
     if (associated(ptronep_epsilon_one)) ptronep_epsilon_one => null()
     if (associated(ptronep_epsilon_two)) ptronep_epsilon_two => null()
@@ -208,6 +247,8 @@ contains
     if (associated(ptrthreep_epsilon_three)) ptrthreep_epsilon_three => null()
     if (associated(ptrthreep_x_endinf)) ptrthreep_x_endinf => null()
 
+    if (associated(ptrzerop_x_rrad)) ptrzerop_x_rrad => null()    
+    if (associated(ptrzerop_x_rreh)) ptrzerop_x_rreh => null()
     if (associated(ptronep_x_rrad)) ptronep_x_rrad => null()    
     if (associated(ptronep_x_rreh)) ptronep_x_rreh => null()
     if (associated(ptrtwop_x_rrad)) ptrtwop_x_rrad => null()
@@ -233,7 +274,10 @@ contains
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
    
-    if (associated(ptronep_x_rrad)) then
+    if (associated(ptrzerop_x_rrad)) then
+       aspic_x_rrad = ptrzerop_x_rrad(lnRrad,Pstar,bfoldstar)
+
+    elseif (associated(ptronep_x_rrad)) then
        aspic_x_rrad = ptronep_x_rrad(params(1),lnRrad,Pstar,bfoldstar)
 
     elseif (associated(ptrtwop_x_rrad)) then
@@ -266,7 +310,10 @@ contains
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-    if (associated(ptronep_x_rreh)) then
+    if (associated(ptrzerop_x_rreh)) then
+       aspic_x_rreh = ptrzerop_x_rreh(lnRreh,bfoldstar)
+
+    elseif (associated(ptronep_x_rreh)) then
        aspic_x_rreh = ptronep_x_rreh(params(1),lnRreh,bfoldstar)
 
     elseif (associated(ptrtwop_x_rreh)) then
@@ -298,7 +345,11 @@ contains
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-    if (associated(ptronep_norm_potential)) then
+    if (associated(ptrzerop_norm_potential)) then
+
+       aspic_norm_potential = ptrzerop_norm_potential(x)
+
+    elseif (associated(ptronep_norm_potential)) then
 
        aspic_norm_potential = ptronep_norm_potential(x &
             ,params(1))
@@ -330,7 +381,11 @@ contains
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-    if (associated(ptronep_epsilon_one)) then
+    if (associated(ptrzerop_epsilon_one)) then
+       
+       aspic_epsilon_one = ptrzerop_epsilon_one(x)
+
+    elseif (associated(ptronep_epsilon_one)) then
        
        aspic_epsilon_one = ptronep_epsilon_one(x &
             ,params(1))
@@ -359,7 +414,11 @@ contains
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-    if (associated(ptronep_epsilon_two)) then
+    if (associated(ptrzerop_epsilon_two)) then
+       
+       aspic_epsilon_two = ptrzerop_epsilon_two(x)
+
+    elseif (associated(ptronep_epsilon_two)) then
        
        aspic_epsilon_two = ptronep_epsilon_two(x &
             ,params(1))
@@ -390,7 +449,11 @@ contains
     
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-    if (associated(ptronep_epsilon_three)) then
+    if (associated(ptrzerop_epsilon_three)) then
+       
+       aspic_epsilon_three = ptrzerop_epsilon_three(x)
+
+    elseif (associated(ptronep_epsilon_three)) then
        
        aspic_epsilon_three = ptronep_epsilon_three(x &
             ,params(1))
@@ -425,7 +488,11 @@ contains
        return
     endif
 
-    if (associated(ptronep_x_endinf)) then
+    if (associated(ptrzerop_x_endinf)) then
+       
+       aspic_x_endinf = ptrzerop_x_endinf()
+
+    elseif (associated(ptronep_x_endinf)) then
        
        aspic_x_endinf = ptronep_x_endinf(params(1))
 
