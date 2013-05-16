@@ -121,6 +121,7 @@ contains
     real(fp), dimension(:), intent(in) :: x
     if (size(x,1).ne.ndim) stop 'rbflike_eval: x dim screwed!'
 
+    if (any(x.gt.1._fp).or.any(x.lt.0._fp)) stop 'rbflike_eval: uncubed input!'
 
     rbflike_eval = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
 
