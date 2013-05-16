@@ -3,8 +3,8 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=mpif90
-FCFLAGS= -O -fopenmp -DASPIC -DMPI
+FC=gfortran
+FCFLAGS= -O -fopenmp -DASPIC
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
