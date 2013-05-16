@@ -64,7 +64,7 @@ contains
 
   
   subroutine initialize_aspic_ptrs(name)
-    include 'aspic.h'
+#include <aspic.h>
     implicit none
     character(len=*), intent(in) :: name
     

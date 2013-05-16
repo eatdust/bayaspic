@@ -34,8 +34,8 @@ program bayaspic
 
 
 !  call initialize_manymodels()
-!  call initialize_onemodel('cwi')
-  call initialize_filemodels('list_oneparam.dat')
+  call initialize_onemodel('lfi')
+!  call initialize_filemodels('list_models.dat')
 
 
 #ifdef MPISCHED
@@ -61,7 +61,15 @@ program bayaspic
 !     call irq_scheduler()
  
      name = modelNames(imodel)
-     print *,'test ', name
+
+     if (display) then
+        write(*,*)
+        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
+        write(*,*)'MODEL: ',name,'        RANK= ',mpiRank
+        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
+        write(*,*)
+     end if
+        
      call nest_init_aspic(trim(name))
      call nest_sample_aspic()
 

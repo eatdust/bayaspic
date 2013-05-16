@@ -37,7 +37,7 @@ module nestparams
   integer(imn), parameter :: nestUpdInt = 1000
 
 !null evidence (set it to very high negative no. if null evidence is unknown)
-  real(fmn), parameter :: nestNullZ = -1d90
+  real(fmn), parameter :: nestNullZ = -1d99
 
 !file output name
   character(len=lenmn), save :: nestRootName = 'chains/bayesinf_'
@@ -61,10 +61,15 @@ module nestparams
   logical, parameter ::  nestOutfile = .true.
 
 !initialize MPI routines?, relevant only for -DMPI
-  logical, parameter :: nestInitMPI = .false.
+  logical, parameter :: nestInitMPI = .true.
 
-!points with loglike < logZero will be ignored 
-  real(fmn), parameter :: nestLogZero = -10.
+!should match the zero cut in rbffit, that the minimal like achievable
+!numerically
+  real(fmn), parameter :: rbfLogZero = -7
+
+!points with loglike < nestlogZero will be ignored (not disfavoured)
+  real(fmn), parameter :: nestLogZero = -1d99
+
 
  !max no. of iterations, a non-positive value means
  !infinity. MultiNest will terminate if either it has done max no. of

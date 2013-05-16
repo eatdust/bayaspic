@@ -20,7 +20,7 @@ module wraspic
   public get_slowroll, get_ntot, get_derived
   public test_aspic_hardprior, test_reheating_hardprior
 
-  logical, parameter :: display = .false.
+  logical, parameter :: display = .true.
 
 contains
 
@@ -71,7 +71,10 @@ contains
     real(fmn) , intent(out) :: lnAmin,lnAmax
 
     lnAmin = 2.7
-    lnAmax = 4
+    lnAmax = 4.
+!    lnAmin = 3.000
+!    lnAmax = 3.175
+
 
   end subroutine get_prior_lnA
 
@@ -94,8 +97,13 @@ contains
     implicit none
     real(fmn) , intent(out) :: lnRmin,lnRmax
 
-    lnRMin = 0.25_kp * lnRhoNuc
-    lnRMax = -1._kp/12._kp * lnRhoNuc
+!    lnRMin = 0.25_kp * lnRhoNuc
+!which is ~
+    lnRMin = -46
+
+!    lnRMax = -1._kp/12._kp * lnRhoNuc
+!which is ~
+    lnRMax = 15
 
   end subroutine get_prior_lnRreh
 
@@ -110,28 +118,39 @@ contains
 
     case (1)
        get_derived = AspicModel%lnM
-
-    case (2)       
-       get_derived = AspicModel%lnRhoEnd
-
-    case(3)
+   
+    case(2)
        if (useRrad) then
           get_derived = AspicModel%lnRreh
        else
           get_derived = AspicModel%lnRrad
        endif
-       
+
+    case (3)       
+       get_derived = AspicModel%lnRhoEnd
+
     case (4)
-       get_derived = AspicModel%ns
+       get_derived = AspicModel%bfold
 
     case (5)
-       get_derived = AspicModel%r
+       get_derived = AspicModel%logeps
 
     case (6)
-       get_derived = AspicModel%alpha
+       get_derived = AspicModel%eps2
 
     case (7)
-       get_derived = AspicModel%bfold
+       get_derived = AspicModel%eps3
+
+    case (8)
+       get_derived = AspicModel%ns
+
+    case (9)
+       get_derived = AspicModel%logr
+
+    case (10)
+       get_derived = AspicModel%alpha
+
+    
 
     case default
        stop 'get_derived: incorrect parameters number!'
@@ -309,10 +328,8 @@ contains
 
     epsStar(1) = aspic_epsilon_one(aspname,xstar,asparams)
     epsStar(2) = aspic_epsilon_two(aspname,xstar,asparams)
+    epsStar(3) = aspic_epsilon_three(aspname,xstar,asparams)
 
-    if (neps.eq.3) then
-       epsStar(3) = aspic_epsilon_three(aspname,xstar,asparams)
-    endif
 
     Vstar = aspic_norm_potential(aspname,xstar,asparams)       
 
@@ -336,19 +353,26 @@ contains
     AspicModel%Pstar = Pstar
     AspicModel%lnRrad = lnRrad
     AspicModel%params(1:nasp) = mnParams(nextra+1:ntot)
-    AspicModel%lnRhoEnd = lnRhoEnd
     AspicModel%lnM = lnM
     AspicModel%lnRreh = lnRreh
+    AspicModel%logeps = log10(epsStar(1))
+    AspicModel%eps2 = epsStar(2)
+    AspicModel%eps3 = epsStar(3)
+    AspicModel%lnRhoEnd = lnRhoEnd
     AspicModel%bfold = bfoldstar
-    AspicModel%ns = scalar_spectral_index(epsStar(1:neps))
-    AspicModel%r = tensor_to_scalar_ratio(epsStar(1:2))
-    AspicModel%alpha = scalar_running(epsStar)
+    AspicModel%ns = scalar_spectral_index(epsStar(1:3))
+    AspicModel%logr = log10(tensor_to_scalar_ratio(epsStar(1:2)))
+    AspicModel%alpha = scalar_running(epsStar(1:3))
 
-    if (display) call print_aspicmodel(AspicModel)
+    if (display) then
+       write(*,*)
+       write(*,*)'get_slowroll:',neps
+       call print_aspicmodel(AspicModel)
+    end if
       
 
 !output the slow-roll params for the likelihood
-    get_slowroll(1) = Pstar
+    get_slowroll(1) = lnA
     get_slowroll(2) = log10(epsStar(1))
     get_slowroll(3:nstar) = epsStar(2:neps)
 
@@ -359,13 +383,13 @@ contains
     implicit none
     type(infaspic), intent(in) :: model
 
-    write(*,*)
-    write(*,*)'AspicModel Params:'
-    write(*,*)'Pstar= asparams=  ', Model%Pstar,Model%params
-    write(*,*)'lnRrad= lnRreh= ', Model%lnRrad, Model%lnRreh
-    write(*,*)'lnRhoEnd= lnM=  ',Model%lnRhoEnd,Model%lnM
-    write(*,*)'N*=             ', Model%bfold
-    write(*,*)'ns= r= alpha=   ',Model%ns,Model%r,Model%alpha
+    write(*,*)'AspicModel Params: '
+    write(*,*)'Pstar= asparams=   ', Model%Pstar,Model%params
+    write(*,*)'lnRrad= lnRreh=    ', Model%lnRrad, Model%lnRreh
+    write(*,*)'lnM= lnRhoEnd=     ',Model%lnM,Model%lnRhoEnd
+    write(*,*)'N*-Nend=           ',Model%bfold
+    write(*,*)'log(eps1)= eps23=  ',Model%logeps, Model%eps2, Model%eps3
+    write(*,*)'ns= log(r)= alpha= ',Model%ns,Model%logr,Model%alpha
     write(*,*)
 
   end subroutine print_aspicmodel

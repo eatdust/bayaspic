@@ -8,7 +8,7 @@ module nestwrap
   character(len=*), parameter :: filecentres = 'rbfdata/centres.dat'
   character(len=*), parameter :: filebounds = 'rbfdata/bounds.dat'
 
-  integer(imn), parameter :: numDerivedParams = 7
+  integer(imn), parameter :: numDerivedParams = 10
 
   integer(imn), save :: rbfNdim = 0
   integer(imn), parameter :: pstarpos = 1
@@ -16,6 +16,7 @@ module nestwrap
 
   real(fmn), save, dimension(:), allocatable :: nestPmin, nestPmax
 
+  logical, parameter :: display = .false.
 
   public nest_init_slowroll, nest_sample_slowroll
 #ifdef ASPIC
@@ -29,7 +30,7 @@ contains
     use rbflike, only : initialize_rbf_like
     use rbflike, only : get_rbf_ndim
     use nestparams, only : nestNdim, nestNpars, nestCdim
-    use nestparams, only : nestPWrap
+    use nestparams, only : nestPWrap, nestRootName
     implicit none
        
     call initialize_rbf_like(fileweights, filecentres, filebounds)
@@ -97,7 +98,7 @@ contains
     use nestparams
     implicit none
 
-    write(*,*)'-----------------------------------------------'
+    write(*,*)'-----------------------------------------------------'
     write(*,*)'Initializing multinest with:'
     write(*,*)'nestNdim     =         ',nestNdim
     write(*,*)'nestNpars    =         ',nestNpars
@@ -110,15 +111,15 @@ contains
     write(*,*)'nestRootName =         ',nestRootName
     write(*,*)
     write(*,*)'rbfNdim      =         ',rbfNdim
-    write(*,*)'-----------------------------------------------'
+    write(*,*)'-----------------------------------------------------'
 
     if (allocated(nestPmin).and.allocated(nestPmax)) then
 
        write(*,*)
-       write(*,*)'-------------Uniform Prior bounds--------------'
+       write(*,*)'--------------PIORS ON SAMPLED PARAMS----------------'
        write(*,*)'MIN = ',nestPmin
        write(*,*)'MAX = ',nestPmax
-       write(*,*)'-----------------------------------------------'
+       write(*,*)'-----------------------------------------------------'
 
     endif
 
@@ -193,7 +194,7 @@ contains
     use rbflike, only : rbflike_eval, cutmin_rbfparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : nestLogZero
+    use nestparams, only : nestLogZero,rbfLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -223,9 +224,14 @@ contains
 
 !go into cubic space for the rbf likelihood
        rbfcube = cubize_rbfparams(rbfNdim,rbfcuts)
-
-!get the likelihood, if the reheating hardprior are consistent
-       if (test_reheating_hardprior(mnpars)) then
+       
+       if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
+!if outside rbffits box, the real likelihood is so small that we
+!cannot calculate it numerically, but we can define a junk one smaller
+!than rbfLogZero
+          lnew = rbfLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
+       elseif (test_reheating_hardprior(mnpars)) then
+! testing reheating hardprior
           lnew = nestLogZero
        else
           lnew = rbflike_eval(rbfcube)
@@ -240,6 +246,14 @@ contains
     do i=1,nestpars-nestdim
        cube(nestdim+i) = get_derived(i)
     enddo
+
+    if (display) then
+       write(*,*)
+       write(*,*)'rbf_multinest_aspic_loglike: '
+       write(*,*)'lnA= log(eps1)= eps_i=       ',rbfpars
+       write(*,*)'ln(like) =                   ',lnew
+       write(*,*)
+    end if
 
   end subroutine rbf_multinest_aspic_loglike
 #endif
@@ -288,11 +302,11 @@ contains
 
     
     write(*,*)
-    write(*,*)'***********************************'
+    write(*,*)'*****************************************************'
     write(*,*)'nest_dumper: '
     write(*,*)'nSamples= logZ= logZerr= ',nSamples, logZ, logZerr
     write(*,*)'maxLogLike= ',maxLogLike
-    write(*,*)'***********************************'
+    write(*,*)'*****************************************************'
     write(*,*)
    
 

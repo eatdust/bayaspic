@@ -14,8 +14,9 @@ module aspicvars
      real(kp), dimension(:), pointer :: params
      character(len=lname), dimension(:), pointer :: cmaps
      real(kp) :: Pstar, lnRrad, lnRreh
-     real(kp) :: lnM, lnRhoEnd, bfold
-     real(kp) :: ns, r, alpha
+     real(kp) :: lnM, logeps, eps2, eps3
+     real(kp) :: lnRhoEnd, bfold
+     real(kp) :: ns, logr, alpha
   end type infaspic
 
   public infaspic, kp, lname

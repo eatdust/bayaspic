@@ -75,7 +75,6 @@ contains
     include 'aspicpriors.h'
 
     implicit none
-    logical :: check_aspic_hardprior
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
     logical :: reject
