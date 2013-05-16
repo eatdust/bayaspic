@@ -31,7 +31,7 @@ contains
 
   end subroutine rbf_random_centers
 
-  
+
   subroutine rbf_grid_centers(xctrs,ictrs)
     use rbfprec, only : unflatten_indices
     implicit none
@@ -207,7 +207,7 @@ contains
     real ( fp ) a(m,n)
 !    real ( fp ) a_pseudo(n,m)
     real ( fp ) b(m)
-    integer ( ip ) i
+    integer ( ip ) i,j
     integer(ip) :: info
     integer(ip) :: lda
     integer(ip):: ldu
@@ -264,12 +264,16 @@ contains
        stop 'solve_svd: lapack error '
     end if
 
-    s(1:m,1:n) = 0.0D+00
+    forall(i=1:n,j=1:m)
+       s(j,i) = 0._fp
+       sp(i,j) = 0._fp
+    end forall
+
     do i = 1, min ( m, n )
        s(i,i) = sdiag(i)
     end do
 
-    sp(1:n,1:m) = 0.0D+00
+!    sp(1:n,1:m) = 0.0D+00
     do i = 1, min ( m, n )
        if ( s(i,i) /= 0.0D+00 ) then
           sp(i,i) = 1.0D+00 / s(i,i)

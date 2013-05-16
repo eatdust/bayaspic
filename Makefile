@@ -5,7 +5,7 @@ FC=gfortran
 FCFLAGS= -O3 -fopenmp -ffast-math -march=amdfam10  -fprefetch-loop-arrays -funroll-loops
 LFLAGS= -lblas -llapack
 #FC=ifort
-#FCFLAGS = -O3 -xHost -ipo -openmp -mkl
+#FCFLAGS = -O3 -xHost -openmp -mkl
 #LFLAGS =
 endif 
 

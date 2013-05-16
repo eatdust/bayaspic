@@ -35,7 +35,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_20.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_3D_18.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
@@ -44,9 +44,9 @@ program rbfmain
   allocate(ictrs(ndim))
   
 !  ictrs = (/4,4,4,11/)
-!  ictrs = (/9,9,9/)
+  ictrs = (/8,5,5/)
   nctrs = product(ictrs)
-  nctrs = 1250
+  nctrs = 1100
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -65,6 +65,8 @@ program rbfmain
 
   call cubize_rbfparamspace(xdata,xcubes)
 
+!  call regularize_zerosphere(fdata,xcubes)
+
   deallocate(xdata)
 
   if (training) then
@@ -73,12 +75,13 @@ program rbfmain
      allocate(weights(nctrs))
 
      call rbf_random_centers(xctrs)
+
 !     call rbf_grid_centers(xctrs,ictrs)
 
 !tp     
 !     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))
 
-     scale = 1._fp
+     scale = 0.01_fp
  
      print *,'scale=',scale
 
@@ -216,5 +219,42 @@ contains
 
   end subroutine vecdump
   
+
+  subroutine regularize_zerosphere(f,xcubes)
+    implicit none
+    real(fp), dimension(:), intent(inout) :: f
+    real(fp), dimension(:,:), intent(in) :: xcubes
+
+    integer(ip) :: ndim
+    real(fp) :: distance
+    real(fp) :: ZeroData,ZeroCenter,ZeroEdge
+
+    
+    integer(ip) :: i,j
+
+    ndim = size(xcubes,1)
+    ndata = size(xcubes,2)
+
+    if (size(f,1).ne.ndata) stop 'regularize_zerosphere: wrong size!'
+
+    ZeroData = minval(f)
+    ZeroCenter = ZeroData
+    ZeroEdge = ZeroCenter - 1._fp
+
+    write(*,*)'regularize_zerosphere:     '
+    write(*,*)'renormalizing Zeros=       ',ZeroData
+    write(*,*)'to: ZeroCenter= ZeroEdge=  ',ZeroCenter,ZeroEdge
+    write(*,*)
+
+    do i=1,ndata
+       distance = sum((xcubes(:,i)-0.5_fp)**2)
+       if (f(i).eq.ZeroData) then
+          f(i) = ZeroCenter + (ZeroEdge-ZeroCenter) &
+               *4._fp*distance/real(ndim,fp)
+       end if
+    enddo
+
+  end subroutine regularize_zerosphere
+
 
 end program rbfmain

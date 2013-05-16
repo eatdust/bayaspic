@@ -20,9 +20,10 @@ contains
     character(len=*), intent(in) :: filename   
 
     logical, parameter :: logpost = .true.
-    integer, parameter :: nzeroskip = 6
+    integer, parameter :: nzeroskip = 0
 
-    real(fp), parameter :: eps = exp(-10._fp)
+    real(fp), save :: eps = exp(-10._fp)
+    real(fp), save :: minNonZero = huge(1._fp)
 
 
     integer, parameter :: nunit = 210
@@ -62,6 +63,8 @@ contains
           count = count + 1
           if (count.le.nzeroskip) cycle
           count = 0
+       else
+          minNonZero = min(minNonZero,statbuffer(1))
        endif
 
        nnzero = nnzero + 1
@@ -71,6 +74,10 @@ contains
     write(*,*)'number of params:',ndim
     write(*,*)'number or records:',nrec
     write(*,*)'number of bins kept:',nnzero
+    write(*,*)'ln(minNonZero)=    ',log(minNonZero)
+
+    eps = exp(1._fp+real(int(log(minNonZero)),fp))
+
 
 !reading non-zero records
     allocate(posterior(nnzero))
