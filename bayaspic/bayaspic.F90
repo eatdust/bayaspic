@@ -1,6 +1,6 @@
 program bayaspic
   use nestprec
-  use nestwrap, only : nest_init_aspic, nest_sample_aspic
+  use nestwrap, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use scheduler, only : initialize_scheduler, free_scheduler
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
   use scheduler, only : restore_scheduler, scheduler_save_queue
@@ -33,8 +33,8 @@ program bayaspic
   integer, save :: mpiPrevSize = 1
 
 
-!  call initialize_manymodels()
-  call initialize_onemodel('lfi')
+  call initialize_manymodels()
+!  call initialize_onemodel('lfi')
 !  call initialize_filemodels('list_models.dat')
 
 
@@ -72,6 +72,7 @@ program bayaspic
         
      call nest_init_aspic(trim(name))
      call nest_sample_aspic()
+     call nest_free_aspic()
 
      if (cpSave) then
         call scheduler_save_queue(mpiRank)
@@ -115,13 +116,14 @@ contains
   subroutine initialize_manymodels()
     implicit none
     
-    nmodels = 2
+    nmodels = 3
 
     allocate(ModelNames(0:nmodels-1))
 
     ModelNames(0) = 'hi'
     Modelnames(1) = 'lfi'
-
+    Modelnames(2) = 'sfi'
+        
   end subroutine initialize_manymodels
 
 

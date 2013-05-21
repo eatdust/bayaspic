@@ -8,13 +8,13 @@ module nestparams
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000
-  integer(imn), parameter :: nestNlive = 20000
+  integer(imn), parameter :: nestNlive = 2000
 
 !sample with constant efficiency
   logical, parameter :: nestCteEff = .false.
 
 !evidence tolerance factor !1e-4
-  real(fmn), parameter :: nestZTol = 1e-4
+  real(fmn), parameter :: nestZTol = 1e-2
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
@@ -40,7 +40,8 @@ module nestparams
   real(fmn), parameter :: nestNullZ = -1d99
 
 !file output name
-  character(len=lenmn), save :: nestRootName = 'chains/bayesinf_'
+  character(len=lenmn), parameter :: nestRootPrefix = 'chains/bayesinf_'
+  character(len=lenmn), save :: nestRootName = nestRootPrefix
 
 !seed for nested sampler, -ve means take it from sys clock
   integer(imn), parameter ::  nestSeed = -1

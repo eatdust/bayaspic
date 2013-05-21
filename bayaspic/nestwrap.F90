@@ -18,9 +18,10 @@ module nestwrap
 
   logical, parameter :: display = .false.
 
+  public nest_free_slowroll
   public nest_init_slowroll, nest_sample_slowroll
 #ifdef ASPIC
-  public nest_init_aspic, nest_sample_aspic
+  public nest_init_aspic, nest_sample_aspic, nest_free_aspic
 #endif
 
 contains
@@ -30,7 +31,7 @@ contains
     use rbflike, only : initialize_rbf_like
     use rbflike, only : get_rbf_ndim
     use nestparams, only : nestNdim, nestNpars, nestCdim
-    use nestparams, only : nestPWrap, nestRootName
+    use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none
        
     call initialize_rbf_like(fileweights, filecentres, filebounds)
@@ -40,9 +41,9 @@ contains
     nestNpars = nestNdim
     nestCdim = nestNdim
     if (rbfNdim.eq.3) then
-       nestRootName = trim(nestRootName)//'sr2'
+       nestRootName = trim(nestRootPrefix)//'sr2'
     elseif (rbfNdim.eq.4) then
-       nestRootName = trim(nestRootName)//'sr3'
+       nestRootName = trim(nestRootPrefix)//'sr3'
     endif
 
     allocate(nestPwrap(nestNdim))
@@ -125,14 +126,27 @@ contains
 
   end subroutine nest_print
 
+
+  subroutine nest_free_slowroll()
+    use nestparams, only : nestPwrap    
+    implicit none
+   
+    if (allocated(nestPwrap)) deallocate(nestPwrap)
+    if (allocated(nestpmin)) deallocate(nestpmin)
+    if (allocated(nestpmax)) deallocate(nestpmax)
+
+  end subroutine nest_free_slowroll
+
+  
+
 #ifdef ASPIC
   subroutine nest_init_aspic(modelname)
     use wraspic, only : set_model, get_ntot
     use wraspic, only : get_allprior
-    use rbflike, only : initialize_rbf_like
+    use rbflike, only : initialize_rbf_like, check_rbf
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
-    use nestparams, only : nestPWrap, nestRootName
+    use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none    
     character(len=*), intent(in) :: modelname
 
@@ -141,14 +155,16 @@ contains
     nestNdim = get_ntot()
     nestNpars = nestNdim + numDerivedParams
     nestCdim = nestNdim
-    nestRootName = trim(nestRootName)//modelname
+    nestRootName = trim(nestRootPrefix)//modelname
     
     allocate(nestPmin(nestNdim))
     allocate(nestPmax(nestNdim))
 
     call get_allprior(nestPmin, nestPmax)
-        
-    call initialize_rbf_like(fileweights, filecentres, filebounds)
+
+    if (.not.check_rbf()) then
+       call initialize_rbf_like(fileweights, filecentres, filebounds)
+    endif
 
 !cut prior of P* by the one encoded in the likelihood
     nestPmin(pstarpos) = max(get_rbf_xpmin(pstarpos),nestPmin(pstarpos))
@@ -169,6 +185,20 @@ contains
   end subroutine nest_init_aspic
 
   
+  subroutine nest_free_aspic()
+    use nestparams, only : nestPwrap
+    use wraspic, only : free_model
+    implicit none
+
+    call free_model()
+    
+    if (allocated(nestPwrap)) deallocate(nestPwrap)
+    if (allocated(nestpmin)) deallocate(nestpmin)
+    if (allocated(nestpmax)) deallocate(nestpmax)
+
+  end subroutine nest_free_aspic
+
+
  
   subroutine nest_sample_aspic()
     use nested, only : nestRun

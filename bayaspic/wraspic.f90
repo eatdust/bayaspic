@@ -16,11 +16,11 @@ module wraspic
   integer, parameter :: naspmax = 3
   integer, parameter :: nepsmax = 3
 
-  public set_model, check_model, get_allprior
+  public set_model, check_model, free_model, get_allprior
   public get_slowroll, get_ntot, get_derived
   public test_aspic_hardprior, test_reheating_hardprior
 
-  logical, parameter :: display = .true.
+  logical, parameter :: display = .false.
 
 contains
 
@@ -53,6 +53,22 @@ contains
 
   end function check_model
   
+
+  subroutine free_model()
+    use aspicmodels, only : free_aspic_ptrs
+    implicit none
+
+    if (.not.check_model()) stop 'free_model: nothing allocated!'
+       
+    call free_aspic_ptrs()
+
+    if (associated(AspicModel%params)) deallocate(AspicModel%params)
+    AspicModel%params => null()
+    if (associated(AspicModel%cmaps)) deallocate(AspicModel%cmaps)
+    AspicModel%cmaps => null()
+
+  end subroutine free_model
+
 
   function get_ntot()
     implicit none
