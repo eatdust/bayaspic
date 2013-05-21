@@ -15,7 +15,7 @@ module rbflike
 
   logical, parameter :: display = .false.
 
-  public initialize_rbf_like
+  public initialize_rbf_like, free_rbf
   public rbflike_eval, uncubize_rbfparams, cubize_rbfparams
   public posterior_boundaries, cubize_rbfparamspace
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
@@ -33,6 +33,24 @@ contains
          .and. associated(xpmin) .and. associated(xpmax)
 
   end function check_rbf
+
+
+  subroutine free_rbf()
+    implicit none
+    
+
+    if (.not.check_rbf()) stop 'free_rbf: data not allocated!'
+
+    if (associated(xctrs)) deallocate(xctrs)
+    xctrs => null()
+    if (associated(weights)) deallocate(weights)
+    weights => null()
+    if (associated(xpmin)) deallocate(xpmin)
+    xpmin => null()
+    if (associated(xpmin)) deallocate(xpmax)
+    xpmax => null()
+
+  end subroutine free_rbf
 
 
   function get_rbf_ndim()
