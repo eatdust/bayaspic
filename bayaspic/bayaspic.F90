@@ -15,7 +15,7 @@ program bayaspic
   integer, save :: mpiRank = 0
   integer, save :: mpiSize = 1
 
-  integer, parameter :: lmod = 6
+  integer, parameter :: lmod = 7
   integer :: imodel, nmodels
   character(len=lmod), dimension(:), allocatable :: ModelNames
   character(len=lmod) :: name

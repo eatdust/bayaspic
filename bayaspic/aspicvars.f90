@@ -6,7 +6,7 @@ module aspicvars
 
 !  integer, parameter :: kp = kind(1._8)
 
-  integer, parameter :: lname = 6
+  integer, parameter :: lname = 7
 
   type infaspic     
      character(len=lname) :: name     
