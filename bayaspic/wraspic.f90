@@ -419,8 +419,9 @@ contains
     real(fmn), dimension(:), intent(in) :: mnParams
 
     real(kp), dimension(naspmax) :: asparams
+    character(len=lname), dimension(naspmax) :: mapnames
     character(len=lname) :: aspname
-    integer :: nasp, ntot
+    integer :: nasp, ntot, i
 
     ntot = get_ntot()
     nasp = AspicModel%nasp
@@ -429,9 +430,13 @@ contains
        stop 'test_aspic_hardprior: size mismatch!'
     endif
 
-    !aspic params (with xend)
-    asparams(1:nasp) = mnParams(nextra+1:ntot)
     aspname = trim(AspicModel%name)
+    forall (i=1:nasp)
+       mapnames(i) = trim(AspicModel%cmaps(i))
+    end forall
+
+    asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
+         ,mapnames(1:nasp))
 
     test_aspic_hardprior = check_aspic_hardprior(aspname,asparams)
 
