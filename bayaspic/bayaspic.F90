@@ -33,8 +33,8 @@ program bayaspic
   integer, save :: mpiPrevSize = 1
 
 
-  call initialize_manymodels()
-!  call initialize_onemodel('lfi')
+!  call initialize_manymodels()
+  call initialize_onemodel('lfi')
 !  call initialize_filemodels('list_models.dat')
 
 

@@ -10,7 +10,7 @@
 ZEROPRIOR(hi)
 
 ONEPRIOR(rchi,-48,-20,flat)
-ONEPRIOR(lfi,0.1,6,flat)
+ONEPRIOR(lfi,0.2,5,flat)
 ONEPRIOR(rcmi,-6,-3,log)
 ONEPRIOR(rcqi,-3,0,log)
 ONEPRIOR(ni,0,3,log)
