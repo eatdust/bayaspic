@@ -24,7 +24,7 @@ ONEPP_PURE(ai)
 ONEPP_PURE(cnai)
 ONEPP_PURE(cnbi)
 ONEPP_PURE(osti)
-ONEPP_PURE(wrhi)
+ONEPP_PURE(wri)
 
 ONEPP_XEND(rpi2)
 ONEPP_XEND(ii)

@@ -29,7 +29,7 @@ ONEPRIOR(ai,-3,-0.3,log)
 ONEPRIOR(cnai,-4,-0.2,log)
 ONEPRIOR(cnbi,-4,-0.6,log)
 ONEPRIOR(osti,1,3,log)
-ONEPRIOR(wrhi,-3,3,log)
+ONEPRIOR(wri,-3,3,log)
 
 !with xend
 
