@@ -119,7 +119,7 @@ contains
     character(len=*), intent(in) :: fileshep, filepost, filebounds
     
     call load_shepdata(fileshep,rmax)
-    call load_posterior('postcubed.dat',fdata,xcubes)
+    call load_posterior(filepost,fdata,xcubes)
     call read_boundaries(filebounds,xpmin,xpmax)
     if (size(fdata,1).ne.size(xcubes,2)) stop 'initialize_shep_like: size mismatch!'
 

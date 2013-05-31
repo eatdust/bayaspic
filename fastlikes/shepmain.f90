@@ -40,7 +40,7 @@ program shepmain
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
  
-  nctrs = 100
+  nctrs = 200
   nfits = 20
 
   print *,'ndata= ',ndata
