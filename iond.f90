@@ -1,4 +1,4 @@
-module iorbf
+module iond
   use rbfprec
   implicit none
 
@@ -7,10 +7,13 @@ module iorbf
   integer(ip), parameter :: nrecmax = 1000000
   integer, parameter :: ndimmax = 5
 
-  public read_binned_posterior
+  public read_binned_posterior, posterior_boundaries
+  public save_posterior, load_posterior, cubize_paramspace
+  public save_boundaries, read_boundaries
+
   public save_weights, load_weights
   public save_centres, load_centres
-  public save_boundaries, read_boundaries
+  public save_shepdata, load_shepdata
 
 contains
 
@@ -76,7 +79,7 @@ contains
     write(*,*)'number of bins kept:',nnzero
     write(*,*)'ln(minNonZero)=    ',log(minNonZero)
 
-    eps = exp(1._fp+real(int(log(minNonZero)),fp))
+    eps = exp(0._fp+real(int(log(minNonZero)),fp))
 
 
 !reading non-zero records
@@ -108,6 +111,114 @@ contains
     close(nunit)
 
   end subroutine read_binned_posterior
+
+  
+
+  subroutine save_posterior(filename,f,x)
+    implicit none
+    character(len=*), intent(in) :: filename   
+    real(fp), dimension(:), intent(in) :: f
+    real(fp), dimension(:,:), intent(in) :: x
+
+    integer, parameter :: nunit = 211
+
+    integer :: i,j, ndim, ndata
+
+    ndim = size(x,1)
+    ndata = size(x,2)
+    
+    if (size(f,1).ne.ndata) stop 'save_posterior: size mismatch!'
+
+    open(unit=nunit,file=filename,status='unknown')
+    
+    write(nunit,*) ndim, ndata
+    do i=1,ndata
+       write(nunit,*) f(i),(x(j,i),j=1,ndim)
+    enddo
+    
+    close(nunit)
+  end subroutine save_posterior
+
+
+  subroutine load_posterior(filename,f,x)
+    implicit none
+    character(len=*), intent(in) :: filename   
+    real(fp), dimension(:), pointer :: f
+    real(fp), dimension(:,:), pointer :: x
+
+    integer, parameter :: nunit = 211
+
+    integer :: i,j, ndim, ndata
+
+
+    if (associated(f).or.associated(x)) then
+       stop 'load_posterior: data already loaded!'
+    endif
+
+    open(unit=nunit,file=filename,status='old')
+    
+    read(nunit,*) ndim, ndata
+
+    allocate(f(ndata),x(ndim,ndata))
+
+    do i=1,ndata
+       read(nunit,*) f(i),(x(j,i),j=1,ndim)
+    enddo
+    
+    close(nunit)
+
+  end subroutine load_posterior
+
+
+
+  subroutine posterior_boundaries(xdata,xmin,xmax)
+    implicit none
+    real(fp), dimension(:,:), intent(in) :: xdata
+    real(fp), dimension(:), intent(out) :: xmin,xmax
+
+    integer(ip) :: ndim, i
+    
+    ndim = size(xdata,1)
+    
+    if ((size(xmin,1).ne.ndim).or.(size(xmax,1).ne.ndim)) then
+       stop 'posterior_boundaries: array mismatch!'
+    endif
+
+    do i=1,ndim
+       xmin(i) = minval(xdata(i,:))
+       xmax(i) = maxval(xdata(i,:))
+    enddo
+
+  end subroutine posterior_boundaries
+
+
+
+  subroutine cubize_paramspace(xdata,xcubes)
+    implicit none
+    real(fp), dimension(:,:), intent(in) :: xdata
+    real(fp), dimension(:,:), intent(out) :: xcubes
+    
+    integer(ip) :: ndim, ndata, i
+    real(fp), dimension(:), allocatable :: xmin,xmax
+
+    ndim = size(xdata,1)
+    ndata = size(xdata,2)
+
+    if ((size(xcubes,1).ne.ndim).or.(size(xcubes,2).ne.ndata)) then
+       stop 'cube_rbfparamspace: mismatch arrays!'
+    endif
+
+    allocate(xmin(ndim), xmax(ndim))
+
+    call posterior_boundaries(xdata,xmin,xmax)
+
+    do i=1,ndim       
+       xcubes(i,:) = (xdata(i,:) - xmin(i))/(xmax(i)-xmin(i))
+    enddo
+
+    deallocate(xmin,xmax)
+
+  end subroutine cubize_paramspace
 
 
 
@@ -315,4 +426,108 @@ contains
 
 
 
-end module iorbf
+  subroutine save_shepdata(filename,rmax)
+    use qshepmdata, only : A, IW
+    use qshepmdata, only : DX, XMIN, RSQ, WS
+    use qshepmdata, only : LCELL, LNEXT
+
+    implicit none
+    character(len=*), intent(in) :: filename
+    real(fp), intent(in) :: rmax
+    integer :: nunit
+
+    integer :: i,j
+    integer :: n, ntt, m, nlcell
+
+    if (.not.allocated(A)) stop 'save_shepdata: not found!'
+
+    n = size(A,1)
+    ntt = size(A,2)
+    m = size(xmin)
+    nlcell = size(LCELL,1)
+
+    nunit = 511
+    open(nunit,file=filename,status='unknown')
+    write(nunit,*) n,ntt,m,nlcell
+    write(nunit,*) rmax
+
+    do i=1,m
+       write(nunit,*) DX(i),XMIN(i)
+       write(nunit,*) (IW(i,j),j=1,5)
+    enddo
+
+    do i=1,n
+       write(nunit,*) RSQ(i),LNEXT(i)
+       write(nunit,*) (A(i,j),j=1,ntt)
+    enddo
+
+    do i=1,ntt*ntt
+       write(nunit,*) WS(i)
+    enddo
+
+    do i=1,nlcell
+       write(nunit,*) LCELL(i)
+    enddo
+
+    close(nunit)
+
+  end subroutine save_shepdata
+
+ 
+
+  subroutine load_shepdata(filename,rmax)
+    use qshepmdata, only : A, IW
+    use qshepmdata, only : DX, XMIN, RSQ, WS
+    use qshepmdata, only : LCELL, LNEXT
+
+    implicit none
+    character(len=*), intent(in) :: filename
+    real(fp), intent(out) :: rmax
+    integer :: nunit
+
+    integer :: i,j
+    integer :: n, ntt, m, nlcell
+
+    if (allocated(A)) stop 'load_shepdata: already loaded'
+
+    n = size(A,1)
+    ntt = size(A,2)
+    m = size(xmin)
+    nlcell = size(LCELL,1)
+
+    nunit = 511
+    open(nunit,file=filename,status='old')
+    read(nunit,*) n,ntt,m,nlcell
+    read(nunit,*) rmax
+
+    allocate(A(n,ntt))
+    allocate(DX(m),XMIN(m),IW(m,5))
+    allocate(RSQ(N),LNEXT(N))
+    allocate(LCELL(nlcell))
+    allocate(WS(ntt*ntt))
+    
+
+    do i=1,m
+       read(nunit,*) DX(i),XMIN(i)
+       read(nunit,*) (IW(i,j),j=1,5)
+    enddo
+
+    do i=1,n
+       read(nunit,*) RSQ(i),LNEXT(i)
+       read(nunit,*) (A(i,j),j=1,ntt)
+    enddo
+
+    do i=1,ntt*ntt
+       read(nunit,*) WS(i)
+    enddo
+
+    do i=1,nlcell
+       read(nunit,*) LCELL(i)
+    enddo
+
+    close(nunit)
+
+  end subroutine load_shepdata
+
+
+end module iond

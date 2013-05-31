@@ -1,8 +1,7 @@
-program rbfmain
+program shepmain
   use rbfprec
-  use rbfnd
+  use shepnd
   use iond
-  use rbflike
   use inoutfile
   implicit none
  
@@ -10,20 +9,18 @@ program rbfmain
   integer(ip) :: ndata
   
   integer(ip), dimension(:), allocatable, save :: ictrs
-  integer(ip), save :: nctrs = 0
+  integer(ip) :: nctrs
+  integeR(ip) :: nfits
 
   integer, parameter :: ndump = 100
 
   real(fp), dimension(:,:), pointer :: xdata => null()
   real(fp), dimension(:), pointer :: fdata => null()
-
-  real(fp), save, dimension(:,:), pointer :: xctrs => null()
-  real(fp), save, dimension(:), pointer :: weights => null()
-  real(fp) :: scale, sigma
+  real(fp), dimension(:,:), pointer:: xcubes
 
   real(fp), dimension(:), allocatable :: x
   real(fp), dimension(:), allocatable :: xnmin,xnmax  
-  real(fp), dimension(:,:), allocatable :: xcubes
+
   real(fp) :: f
 
   integer :: i,j
@@ -31,26 +28,24 @@ program rbfmain
   real(fp) :: lnAmin, lnAmax, sr1min, sr1max, sr2min, sr2max
   real(fp) :: sr3min,sr3max
 
+  real(fp) :: rmax
+
 
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_18.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_4D_10.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
-
-  allocate(ictrs(ndim))
-  
-!  ictrs = (/4,4,4,11/)
-  ictrs = (/8,5,5/)
-  nctrs = product(ictrs)
-  nctrs = 1100
+ 
+  nctrs = 100
+  nfits = 20
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
-  print *,'nctrs= ',nctrs
+  print *,'nctrs= nfits= ',nctrs,nfits
   print *,'fdata max',maxval(fdata)
   print *,'fdata min',minval(fdata)
 
@@ -65,44 +60,22 @@ program rbfmain
 
   call cubize_paramspace(xdata,xcubes)
 
+
 !  call regularize_zerosphere(fdata,xcubes)
 
   deallocate(xdata)
 
   if (training) then
 
-     allocate(xctrs(ndim,nctrs))
-     allocate(weights(nctrs))
-
-     call rbf_random_centers(xctrs)
-
-!     call rbf_grid_centers(xctrs,ictrs)
-
-!tp     
-!     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))
-
-     scale = 0.01_fp
- 
-     print *,'scale=',scale
-
-     print *,'computing weights...'
-
-     call rbf_svd_weights(ndim,ndata,nctrs,scale,rbf_polyharmonic_two,xcubes,fdata &
-       ,xctrs,weights)
-
-     call save_weights('weights.dat',scale,weights)
-     call save_centres('centres.dat',xctrs)
+     rmax = shepard_maxradius(ndim,ndata,xcubes,fdata,nctrs,nfits)
+     call save_shepdata('shepdata.dat',rmax)
+     call save_posterior('postcubed.dat',fdata,xcubes)
      call save_boundaries('bounds.dat',xnmin,xnmax)
-     print *,'done!'
-
   else
 
-     call load_weights('weights.dat',scale,weights)
-     call load_centres('centres.dat',xctrs)
-     if (size(weights,1).ne.size(xctrs,2)) stop 'weights/centres mismatch!'
-     nctrs = size(weights,1)
-
-!     call initialize_rbf_like('weights.dat','centres.dat')
+     deallocate(fdata,xcubes)
+     call load_posterior('postcubed.dat',fdata,xcubes)
+     call load_shepdata('shepdata.dat',rmax)
 
   endif
 
@@ -132,9 +105,10 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+        if (ndim.eq.4) x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
-        f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
+        f = shepard_eval(ndim,ndata,xcubes,fdata,rmax,x)
+
         call livewrite('output.dat',sr1,sr2,f)
 !        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
      enddo
@@ -150,16 +124,16 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-!        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+        if (ndim.eq.4) x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
-        f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
+        f = shepard_eval(ndim,ndata,xcubes,fdata,rmax,x)
         call livewrite('output2.dat',sr1,lnA,f)
-!        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
+
      enddo
 
   enddo
 
-  stop
+  if (ndim.lt.4) stop
 
   lnA = 3.1
   sr2 = 0.04
@@ -171,9 +145,10 @@ program rbfmain
         x(1) = (lnA-xnmin(1))/(xnmax(1)-xnmin(1))
         x(2) = (sr1-xnmin(2))/(xnmax(2)-xnmin(2))
         x(3) = (sr2-xnmin(3))/(xnmax(3)-xnmin(3))
-        x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
+        if (ndim.eq.4) x(4) = (sr3-xnmin(4))/(xnmax(4)-xnmin(4))
 
-        f = rbf_svd_eval(ndim,nctrs,scale,rbf_polyharmonic_two,xctrs,weights,x)
+        f = shepard_eval(ndim,ndata,xcubes,fdata,rmax,x)
+
 !        call livewrite('output3.dat',sr2,sr3,f)
         call livewrite('output3.dat',sr1,sr3,f)
 !        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
@@ -183,7 +158,6 @@ program rbfmain
 
   
   deallocate(xcubes,fdata)
-  deallocate(weights)
   
   deallocate(xnmin,xnmax)
   deallocate(x)
@@ -257,4 +231,4 @@ contains
   end subroutine regularize_zerosphere
 
 
-end program rbfmain
+end program shepmain

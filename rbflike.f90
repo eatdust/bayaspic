@@ -17,7 +17,6 @@ module rbflike
 
   public initialize_rbf_like, free_rbf
   public rbflike_eval, uncubize_rbfparams, cubize_rbfparams
-  public posterior_boundaries, cubize_rbfparamspace
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
   public cutmin_rbfparams, cutmax_rbfparams
   public get_rbf_xpmin, get_rbf_xpmax
@@ -115,7 +114,7 @@ contains
 
 
   subroutine initialize_rbf_like(fileweights, filecentres, filebounds)
-    use iorbf, only : load_weights, load_centres, read_boundaries
+    use iond, only : load_weights, load_centres, read_boundaries
     implicit none   
     character(len=*), intent(in) :: fileweights, filecentres
     character(len=*), intent(in), optional :: filebounds
@@ -146,27 +145,7 @@ contains
   end function rbflike_eval
 
 
-
-
-  subroutine posterior_boundaries(xdata,xmin,xmax)
-    implicit none
-    real(fp), dimension(:,:), intent(in) :: xdata
-    real(fp), dimension(:), intent(out) :: xmin,xmax
-
-    integer(ip) :: ndim, i
-    
-    ndim = size(xdata,1)
-    
-    if ((size(xmin,1).ne.ndim).or.(size(xmax,1).ne.ndim)) then
-       stop 'posterior_boundaries: array mismatch!'
-    endif
-
-    do i=1,ndim
-       xmin(i) = minval(xdata(i,:))
-       xmax(i) = maxval(xdata(i,:))
-    enddo
-
-  end subroutine posterior_boundaries
+ 
 
 
   function cutmin_rbfparams(ndim,icut,uncubed)
@@ -244,33 +223,7 @@ contains
     uncubize_rbfparams = xpmin + (xpmax-xpmin)*cubed
 
   end function uncubize_rbfparams
-
-
  
-  subroutine cubize_rbfparamspace(xdata,xcubes)
-    implicit none
-    real(fp), dimension(:,:), intent(in) :: xdata
-    real(fp), dimension(:,:), intent(out) :: xcubes
-    
-    integer(ip) :: ndim, ndata, i
-    real(fp) :: xmin,xmax
-
-    ndim = size(xdata,1)
-    ndata = size(xdata,2)
-
-    if ((size(xcubes,1).ne.ndim).or.(size(xcubes,2).ne.ndata)) then
-       stop 'cube_rbfparamspace: mismatch arrays!'
-    endif
-
-    do i=1,ndim
-       xmin = minval(xdata(i,:))
-       xmax = maxval(xdata(i,:))
-       xcubes(i,:) = (xdata(i,:) - xmin)/(xmax-xmin)
-    enddo
-
-
-  end subroutine cubize_rbfparamspace
-
 
 
 end module rbflike
