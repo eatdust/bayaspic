@@ -10,12 +10,12 @@ INCLUDE=-I/usr/local/include/aspic
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
 endif 
 
-OBJ=rbfprec.o iorbf.o rbfnd.o rbflike.o
 
-RBFDIR = ../rbflikes
+LIKEDIR = ../fastlikes
 NESTDIR = ..
 
-OBJSRBF =  rbfprec.o iorbf.o rbfnd.o rbflike.o
+OBJSLIKE =  rbfprec.o shepprec.o qshepmdata.o iond.o rbfnd.o rbflike.o \
+	qshepmd.o shepnd.o sheplike.o
 
 #with -DASPIC
 OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
@@ -26,21 +26,25 @@ OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
 
-OBJFILES = nestprec.o $(OBJSASPIC) $(OBJSRBF) $(OBJSNEST) \
+OBJFILES = nestprec.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
 	nestparams.o nestwrap.o
 
 FCFLAGS+=$(INCLUDE)
 
-bayaspic.$(ext): $(OBJFILES)  $(OBJSMPI) bayaspic.o
+
+bayaspic.$(ext): $(OBJFILES) $(OBJSMPI) bayaspic.o
 	$(FC) $(FCFLAGS) $(OBJFILES) $(OBJSMPI) bayaspic.o -o ../$@ $(LFLAGS) 
 
 bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
 	$(FC) $(FCFLAGS) $(OBJFILES) bayslowroll.o -o ../$@ $(LFLAGS) 
 
-%.o: $(RBFDIR)/%.f90
+aspicmodels.o: aspicmodels.h aspicnames.pp
+aspicpriors.o: aspicpriors.h aspicpriors.pp
+
+%.o: $(LIKEDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<
 
-%.o: $(RBFDIR)/%.F90
+%.o: $(LIKEDIR)/%.F90
 	$(FC) $(FCFLAGS)  -c$<
 
 %.o: $(NESTDIR)/%.f90

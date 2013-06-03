@@ -64,9 +64,10 @@ module nestparams
 !initialize MPI routines?, relevant only for -DMPI
   logical, parameter :: nestInitMPI = .true.
 
-!should match the zero cut in rbffit, that the minimal like achievable
+!should match the zero cut in rbffit, or shepfit, that the minimal like achievable
 !numerically
   real(fmn), parameter :: rbfLogZero = -7
+  real(fmn), parameter :: shepLogZero = -8
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)
   real(fmn), parameter :: nestLogZero = -1d99

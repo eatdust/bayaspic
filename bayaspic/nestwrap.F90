@@ -6,17 +6,31 @@ module nestwrap
  
   character(len=*), parameter :: fileweights = 'rbfdata/weights.dat'
   character(len=*), parameter :: filecentres = 'rbfdata/centres.dat'
-  character(len=*), parameter :: filebounds = 'rbfdata/bounds.dat'
+  character(len=*), parameter :: filerbfbounds = 'rbfdata/bounds.dat'
+
+  character(len=*), parameter :: fileshep = 'shepdata/shepdata.dat'
+  character(len=*), parameter :: filepost = 'shepdata/postcubed.dat'
+  character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
   integer(imn), parameter :: numDerivedParams = 10
 
-  integer(imn), save :: rbfNdim = 0
+  integer(imn), save :: fitNdim = 0
   integer(imn), parameter :: pstarpos = 1
   integer(imn), parameter :: eps1pos = 2
 
   real(fmn), save, dimension(:), allocatable :: nestPmin, nestPmax
 
   logical, parameter :: display = .false.
+
+!the name of the fastlike method we call
+
+! radial basis functions
+!  character(len=*), parameter :: fastLikeName = 'rbf'
+
+! inverse shepard method
+  character(len=*), parameter :: fastLikeName = 'shep'
+
+! todo skynet
 
   public nest_free_slowroll
   public nest_init_slowroll, nest_sample_slowroll
@@ -30,19 +44,36 @@ contains
    subroutine nest_init_slowroll()
     use rbflike, only : initialize_rbf_like
     use rbflike, only : get_rbf_ndim
+    use sheplike, only : initialize_shep_like
+    use sheplike, only : get_shep_ndim
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none
-       
-    call initialize_rbf_like(fileweights, filecentres, filebounds)
+    
+    select case(fastLikeName)
+    
+    case ('rbf')
 
-    rbfNdim = get_rbf_ndim()
-    nestNdim = rbfNdim
+       call initialize_rbf_like(fileweights, filecentres, filerbfbounds)
+       fitNdim = get_rbf_ndim()
+
+    case ('shep')
+
+       call initialize_shep_like(fileshep, filepost, fileshepbounds)
+       fitNdim = get_shep_ndim()
+
+    case default
+
+       stop 'nest_init_slowroll: fast like not found!'
+
+    end select
+       
+    nestNdim = fitNdim
     nestNpars = nestNdim
     nestCdim = nestNdim
-    if (rbfNdim.eq.3) then
+    if (fitNdim.eq.3) then
        nestRootName = trim(nestRootPrefix)//'sr2'
-    elseif (rbfNdim.eq.4) then
+    elseif (fitNdim.eq.4) then
        nestRootName = trim(nestRootPrefix)//'sr3'
     endif
 
@@ -64,10 +95,28 @@ contains
     integer(imn) :: context
     integer(imn) :: maxNode 			
 
-    call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
-         nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
-         nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
-         ,rbf_multinest_slowroll_loglike,nest_dumper,context)
+    select case (fastLikeName)
+
+    case ('rbf')
+
+       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+            ,rbf_multinest_slowroll_loglike,nest_dumper,context)
+
+    case ('shep')
+
+       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+            ,shep_multinest_slowroll_loglike,nest_dumper,context)
+
+    case default
+
+       stop 'nest_sample_slowroll: fast like not found!'
+
+    end select
+
 
   end subroutine nest_sample_slowroll
 
@@ -95,6 +144,28 @@ contains
 
 
 
+  subroutine shep_multinest_slowroll_loglike(cube,nestdim,nestpars,lnew,context)
+    use shepprec, only : fp
+    use sheplike, only : uncubize_shepparams, check_shep
+    use sheplike, only : sheplike_eval
+    implicit none   
+    integer(imn) :: nestdim, nestpars
+    real(fmn), dimension(nestpars) :: cube
+    real(fmn) :: lnew
+    integer(imn) :: context
+    real(fp), dimension(nestdim) :: shepcube
+
+    if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'
+    
+    shepcube(1:nestdim) = cube(1:nestdim)
+
+    lnew = sheplike_eval(shepcube)
+    
+    cube(1:nestdim) = real(uncubize_shepparams(nestdim,shepcube),fmn)
+    
+  end subroutine shep_multinest_slowroll_loglike
+
+
   subroutine nest_print()
     use nestparams
     implicit none
@@ -109,9 +180,20 @@ contains
     write(*,*)'nestZtol     =         ',nestZtol
     write(*,*)'nestFeedBack =         ',nestFeedBack
     write(*,*)'nestResume   =         ',nestResume
-    write(*,*)'nestRootName =         ',nestRootName
+    write(*,*)'nestRootName =         ',trim(nestRootName)
     write(*,*)
-    write(*,*)'rbfNdim      =         ',rbfNdim
+    write(*,*)'fast like is :         ',fastLikeName
+
+    select case (fastLikeName)
+    case ('rbf')
+       write(*,*)'logZeroMin   =         ',rbfLogZero
+    case ('shep')
+       write(*,*)'logZeroMin   =         ',shepLogZero
+    case default
+       stop 'internal error!'
+    end select
+
+    write(*,*)'fitNdim      =         ',fitNdim
     write(*,*)'-----------------------------------------------------'
 
     if (allocated(nestPmin).and.allocated(nestPmax)) then
@@ -145,6 +227,8 @@ contains
     use wraspic, only : get_allprior
     use rbflike, only : initialize_rbf_like, check_rbf
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
+    use sheplike, only : initialize_shep_like, check_shep
+    use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none    
@@ -162,19 +246,42 @@ contains
 
     call get_allprior(nestPmin, nestPmax)
 
-    if (.not.check_rbf()) then
-       call initialize_rbf_like(fileweights, filecentres, filebounds)
-    endif
+    select case (fastLikeName)
+
+    case ('rbf')
+
+       if (.not.check_rbf()) then
+          call initialize_rbf_like(fileweights, filecentres, filerbfbounds)
+       endif
 
 !cut prior of P* by the one encoded in the likelihood
-    nestPmin(pstarpos) = max(get_rbf_xpmin(pstarpos),nestPmin(pstarpos))
-    nestPmax(pstarpos) = min(get_rbf_xpmax(pstarpos),nestPmax(pstarpos))
+       nestPmin(pstarpos) = max(get_rbf_xpmin(pstarpos),nestPmin(pstarpos))
+       nestPmax(pstarpos) = min(get_rbf_xpmax(pstarpos),nestPmax(pstarpos))
+    
+       fitNdim = get_rbf_ndim()
 
-    rbfNdim = get_rbf_ndim()
+    case ('shep')
 
-    if (nestNdim.ne.rbfNdim) then
-       write(*,*)'nest_inif: '
-       write(*,*)'nestdim= rbfdim= ',nestNdim, rbfNdim    
+       if (.not.check_shep()) then
+          call initialize_shep_like(fileshep, filepost, fileshepbounds)
+       endif
+
+!cut prior of P* by the one encoded in the likelihood
+       nestPmin(pstarpos) = max(get_shep_xpmin(pstarpos),nestPmin(pstarpos))
+       nestPmax(pstarpos) = min(get_shep_xpmax(pstarpos),nestPmax(pstarpos))
+    
+       fitNdim = get_shep_ndim()
+
+    case default
+
+       stop 'nest_init_aspic: fast like not found!'
+
+    end select
+
+
+    if (nestNdim.ne.fitNdim) then
+       write(*,*)'nest_init_aspic: '
+       write(*,*)'nestdim= fastlikedim= ',nestNdim, fitNdim    
     endif    
        
     allocate(nestPwrap(nestNdim))
@@ -209,10 +316,27 @@ contains
     integer(imn) :: context
     integer(imn) :: maxNode 			
 
-    call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
-         nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
-         nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
-         ,rbf_multinest_aspic_loglike,nest_dumper,context)
+    select case (fastLikeName)
+
+    case ('rbf')
+
+       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+            ,rbf_multinest_aspic_loglike,nest_dumper,context)
+
+    case ('shep')
+
+       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+            ,shep_multinest_aspic_loglike,nest_dumper,context)
+
+    case default
+
+       stop 'nest_sample_aspic: fast like not found!'
+
+    end select
 
   end subroutine nest_sample_aspic
 
@@ -231,7 +355,7 @@ contains
     real(fmn) :: lnew
     integer(imn) :: context,i
     real(fmn), dimension(nestdim) :: mnpars
-    real(fp), dimension(rbfNdim) :: rbfcube, rbfpars, rbfcuts
+    real(fp), dimension(fitNdim) :: rbfcube, rbfpars, rbfcuts
 
 
     if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
@@ -247,13 +371,13 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       rbfpars = get_slowroll(rbfNdim,mnpars)
+       rbfpars = get_slowroll(fitNdim,mnpars)
 
 !if eps1<eps1min, the likelihood is flat
-       rbfcuts = cutmin_rbfparams(rbfNdim,eps1pos,rbfpars)
+       rbfcuts = cutmin_rbfparams(fitNdim,eps1pos,rbfpars)
 
 !go into cubic space for the rbf likelihood
-       rbfcube = cubize_rbfparams(rbfNdim,rbfcuts)
+       rbfcube = cubize_rbfparams(fitNdim,rbfcuts)
        
        if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
 !if outside rbffits box, the real likelihood is so small that we
@@ -261,7 +385,7 @@ contains
 !than rbfLogZero
           lnew = rbfLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
        elseif (test_reheating_hardprior(mnpars)) then
-! testing reheating hardprior
+! reheating hardprior, ignoring those points
           lnew = nestLogZero
        else
           lnew = rbflike_eval(rbfcube)
@@ -286,6 +410,78 @@ contains
     end if
 
   end subroutine rbf_multinest_aspic_loglike
+
+
+  subroutine shep_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
+    use shepprec, only : fp
+    use sheplike, only : cubize_shepparams, uncubize_shepparams, check_shep
+    use sheplike, only : sheplike_eval, cutmin_shepparams
+    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
+    use nestparams, only : nestLogZero,shepLogZero
+    implicit none   
+    integer(imn) :: nestdim, nestpars
+    real(fmn), dimension(nestpars) :: cube
+    real(fmn) :: lnew
+    integer(imn) :: context,i
+    real(fmn), dimension(nestdim) :: mnpars
+    real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts
+
+
+    if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'
+
+!get the physical parameters we are sampling on
+    mnpars = uncubize_nestparams(nestdim,cube)
+
+!check for any hard prior in aspic model parameters
+    if (test_aspic_hardprior(mnpars)) then
+
+       lnew = nestLogZero
+
+    else
+       
+!use aspic to get the slowroll parameters
+       sheppars = get_slowroll(fitNdim,mnpars)
+
+!if eps1<eps1min, the likelihood is flat
+       shepcuts = cutmin_shepparams(fitNdim,eps1pos,sheppars)
+
+!go into cubic space for the shep likelihood
+       shepcube = cubize_shepparams(fitNdim,shepcuts)
+       
+       if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
+!if outside shepfits box, the real likelihood is so small that we
+!cannot calculate it numerically, but we can define a junk one smaller
+!than shepLogZero
+          lnew = shepLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
+       elseif (test_reheating_hardprior(mnpars)) then
+! reheating hardprior, those points are ignored
+          lnew = nestLogZero
+       else
+          lnew = sheplike_eval(shepcube)
+       endif
+
+    endif
+
+!dump the physical params into cube for file output
+    cube(1:nestdim) = mnpars(1:nestdim)
+
+!+ derived parameters we want to dump too
+    do i=1,nestpars-nestdim
+       cube(nestdim+i) = get_derived(i)
+    enddo
+
+    if (display) then
+       write(*,*)
+       write(*,*)'shep_multinest_aspic_loglike: '
+       write(*,*)'lnA= log(eps1)= eps_i=       ',sheppars
+       write(*,*)'ln(like) =                   ',lnew
+       write(*,*)
+    end if
+
+  end subroutine shep_multinest_aspic_loglike
+
+
 #endif
 
   function uncubize_nestparams(nestdim,nestcube)
