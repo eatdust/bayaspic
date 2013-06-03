@@ -116,9 +116,8 @@ contains
 
 
 
-  function get_rbf_fmin(i)
+  function get_rbf_fmin()
     implicit none
-    integer, intent(in) :: i
     real(fp) :: get_rbf_fmin
 
     if (fmin.eq.huge(1._fp)) then
@@ -130,9 +129,8 @@ contains
   end function get_rbf_fmin
 
 
-  function get_rbf_fmax(i)
+  function get_rbf_fmax()
     implicit none
-    integer, intent(in) :: i
     real(fp) :: get_rbf_fmax
 
     if (fmax.eq.-huge(1._fp)) then

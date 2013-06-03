@@ -115,9 +115,8 @@ contains
   end function get_shep_xpmax
 
 
-  function get_shep_fmin(i)
+  function get_shep_fmin()
     implicit none
-    integer, intent(in) :: i
     real(fp) :: get_shep_fmin
 
     if (fmin.eq.huge(1._fp)) then
@@ -129,9 +128,8 @@ contains
   end function get_shep_fmin
 
 
-  function get_shep_fmax(i)
+  function get_shep_fmax()
     implicit none
-    integer, intent(in) :: i
     real(fp) :: get_shep_fmax
 
     if (fmax.eq.-huge(1._fp)) then
