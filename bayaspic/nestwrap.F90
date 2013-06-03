@@ -43,9 +43,9 @@ contains
 
    subroutine nest_init_slowroll()
     use rbflike, only : initialize_rbf_like
-    use rbflike, only : get_rbf_ndim
+    use rbflike, only : get_rbf_ndim, get_rbf_fmin
     use sheplike, only : initialize_shep_like
-    use sheplike, only : get_shep_ndim
+    use sheplike, only : get_shep_ndim, get_shep_fmin
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none
@@ -56,11 +56,13 @@ contains
 
        call initialize_rbf_like(fileweights, filecentres, filerbfbounds)
        fitNdim = get_rbf_ndim()
+       fitLogZero = get_rbf_fmin()
 
     case ('shep')
 
        call initialize_shep_like(fileshep, filepost, fileshepbounds)
        fitNdim = get_shep_ndim()
+       fitLogZero = get_shep_fmin()
 
     case default
 
@@ -183,16 +185,7 @@ contains
     write(*,*)'nestRootName =         ',trim(nestRootName)
     write(*,*)
     write(*,*)'fast like is :         ',fastLikeName
-
-    select case (fastLikeName)
-    case ('rbf')
-       write(*,*)'logZeroMin   =         ',rbfLogZero
-    case ('shep')
-       write(*,*)'logZeroMin   =         ',shepLogZero
-    case default
-       stop 'internal error!'
-    end select
-
+    write(*,*)'logZeroMin   =         ',fitLogZero
     write(*,*)'fitNdim      =         ',fitNdim
     write(*,*)'-----------------------------------------------------'
 
@@ -225,9 +218,9 @@ contains
   subroutine nest_init_aspic(modelname)
     use wraspic, only : set_model, get_ntot
     use wraspic, only : get_allprior
-    use rbflike, only : initialize_rbf_like, check_rbf
+    use rbflike, only : initialize_rbf_like, check_rbf, get_rbf_fmin
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
-    use sheplike, only : initialize_shep_like, check_shep
+    use sheplike, only : initialize_shep_like, check_shep, get_shep_fmin
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
@@ -259,6 +252,7 @@ contains
        nestPmax(pstarpos) = min(get_rbf_xpmax(pstarpos),nestPmax(pstarpos))
     
        fitNdim = get_rbf_ndim()
+       fitLogZero = get_rbf_fmin()
 
     case ('shep')
 
@@ -271,6 +265,7 @@ contains
        nestPmax(pstarpos) = min(get_shep_xpmax(pstarpos),nestPmax(pstarpos))
     
        fitNdim = get_shep_ndim()
+       fitLogZero = get_shep_fmin()
 
     case default
 
@@ -348,7 +343,7 @@ contains
     use rbflike, only : rbflike_eval, cutmin_rbfparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : nestLogZero,rbfLogZero
+    use nestparams, only : fitLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -382,8 +377,8 @@ contains
        if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
 !if outside rbffits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than rbfLogZero
-          lnew = rbfLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
+!than fitLogZero
+          lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
        elseif (test_reheating_hardprior(mnpars)) then
 ! reheating hardprior, ignoring those points
           lnew = nestLogZero
@@ -418,7 +413,7 @@ contains
     use sheplike, only : sheplike_eval, cutmin_shepparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : nestLogZero,shepLogZero
+    use nestparams, only : nestLogZero,fitLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -452,8 +447,8 @@ contains
        if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
 !if outside shepfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than shepLogZero
-          lnew = shepLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
+!than fitLogZero
+          lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
        elseif (test_reheating_hardprior(mnpars)) then
 ! reheating hardprior, those points are ignored
           lnew = nestLogZero
