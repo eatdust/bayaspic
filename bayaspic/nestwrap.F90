@@ -343,7 +343,7 @@ contains
     use rbflike, only : rbflike_eval, cutmin_rbfparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : fitLogZero
+    use nestparams, only : fitLogZero, nestLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
