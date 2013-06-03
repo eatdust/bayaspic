@@ -79,6 +79,10 @@ contains
     write(*,*)'number of bins kept:',nnzero
     write(*,*)'ln(minNonZero)=    ',log(minNonZero)
 
+!rbf
+!    eps = exp(1._fp+real(int(log(minNonZero)),fp))
+
+!shep
     eps = exp(0._fp+real(int(log(minNonZero)),fp))
 
 
