@@ -12,6 +12,8 @@ module sheplike
   real(fp), save, dimension(:,:), pointer :: xcubes => null()
   real(fp), save, dimension(:), pointer :: fdata => null()
   real(fp), save, dimension(:), pointer :: xpmin => null(), xpmax=>null()
+  real(fp), save :: fmin = huge(1._fp)
+  real(fp), save :: fmax = -huge(1._fp)
 
   logical, parameter :: display = .false.
 
@@ -20,6 +22,7 @@ module sheplike
   public check_shep, get_shep_ndim, get_shep_ndata
   public cutmin_shepparams, cutmax_shepparams
   public get_shep_xpmin, get_shep_xpmax
+  public get_shep_fmin, get_shep_fmax
 
 contains
 
@@ -112,6 +115,34 @@ contains
   end function get_shep_xpmax
 
 
+  function get_shep_fmin(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_shep_fmin
+
+    if (fmin.eq.huge(1._fp)) then
+       stop 'get_shep_fmin: not initialized!'
+    endif
+    
+    get_shep_fmin = fmin
+
+  end function get_shep_fmin
+
+
+  function get_shep_fmax(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_shep_fmax
+
+    if (fmax.eq.-huge(1._fp)) then
+       stop 'get_shep_fmax: not initialized!'
+    endif
+    
+    get_shep_fmax = fmax
+
+  end function get_shep_fmax
+
+
 
   subroutine initialize_shep_like(fileshep, filepost, filebounds)
     use iond, only : load_shepdata, load_posterior, read_boundaries
@@ -120,8 +151,11 @@ contains
     
     call load_shepdata(fileshep,rmax)
     call load_posterior(filepost,fdata,xcubes)
-    call read_boundaries(filebounds,xpmin,xpmax)
-    if (size(fdata,1).ne.size(xcubes,2)) stop 'initialize_shep_like: size mismatch!'
+    call read_boundaries(filebounds,xpmin,xpmax,fmin,fmax)
+
+    if (size(fdata,1).ne.size(xcubes,2)) then
+       stop 'initialize_shep_like: size mismatch!'
+    endif
 
     ndim = size(xcubes,1)
     ndata = size(fdata,1)

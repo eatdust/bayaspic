@@ -12,6 +12,8 @@ module rbflike
   real(fp), save, dimension(:,:), pointer :: xctrs => null()
   real(fp), save, dimension(:), pointer :: weights => null()
   real(fp), save, dimension(:), pointer :: xpmin => null(), xpmax=>null()
+  real(fp), save :: fmin = huge(1._fp)
+  real(fp), save :: fmax = -huge(1._fp)
 
   logical, parameter :: display = .false.
 
@@ -20,6 +22,7 @@ module rbflike
   public check_rbf, get_rbf_ndim, get_rbf_nctrs
   public cutmin_rbfparams, cutmax_rbfparams
   public get_rbf_xpmin, get_rbf_xpmax
+  public get_rbf_fmin, get_rbf_fmax
 
 contains
 
@@ -113,16 +116,48 @@ contains
 
 
 
+  function get_rbf_fmin(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_rbf_fmin
+
+    if (fmin.eq.huge(1._fp)) then
+       stop 'get_rbf_fmin: not initialized!'
+    endif
+    
+    get_rbf_fmin = fmin
+
+  end function get_rbf_fmin
+
+
+  function get_rbf_fmax(i)
+    implicit none
+    integer, intent(in) :: i
+    real(fp) :: get_rbf_fmax
+
+    if (fmax.eq.-huge(1._fp)) then
+       stop 'get_rbf_fmax: not initialized!'
+    endif
+    
+    get_rbf_fmax = fmax
+
+  end function get_rbf_fmax
+
+
+
   subroutine initialize_rbf_like(fileweights, filecentres, filebounds)
     use iond, only : load_weights, load_centres, read_boundaries
     implicit none   
     character(len=*), intent(in) :: fileweights, filecentres
-    character(len=*), intent(in), optional :: filebounds
+    character(len=*), intent(in) :: filebounds
     
     call load_weights(fileweights,scale,weights)
     call load_centres(filecentres,xctrs)
-    if (present(filebounds)) call read_boundaries(filebounds,xpmin,xpmax)
-    if (size(weights,1).ne.size(xctrs,2)) stop 'weights/centres mismatch!'
+    call read_boundaries(filebounds,xpmin,xpmax,fmin,fmax)
+
+    if (size(weights,1).ne.size(xctrs,2)) then
+       stop 'weights/centres mismatch!'
+    endif
 
     ndim = size(xctrs,1)
     nctrs = size(weights,1)

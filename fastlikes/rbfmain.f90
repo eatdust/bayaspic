@@ -24,7 +24,7 @@ program rbfmain
   real(fp), dimension(:), allocatable :: x
   real(fp), dimension(:), allocatable :: xnmin,xnmax  
   real(fp), dimension(:,:), allocatable :: xcubes
-  real(fp) :: f
+  real(fp) :: f, fmin, fmax
 
   integer :: i,j
   real(fp) :: lnA, sr1, sr2, sr3
@@ -51,8 +51,10 @@ program rbfmain
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
   print *,'nctrs= ',nctrs
-  print *,'fdata max',maxval(fdata)
-  print *,'fdata min',minval(fdata)
+  fmax = maxval(fdata)
+  fmin = minval(fdata)
+  print *,'fdata max',fmax
+  print *,'fdata min',fmin
 
   allocate(xnmin(ndim), xnmax(ndim))
   allocate(xcubes(ndim,ndata))
@@ -92,7 +94,7 @@ program rbfmain
 
      call save_weights('weights.dat',scale,weights)
      call save_centres('centres.dat',xctrs)
-     call save_boundaries('bounds.dat',xnmin,xnmax)
+     call save_boundaries('bounds.dat',xnmin,xnmax,fmin,fmax)
      print *,'done!'
 
   else

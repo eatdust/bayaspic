@@ -21,7 +21,7 @@ program shepmain
   real(fp), dimension(:), allocatable :: x
   real(fp), dimension(:), allocatable :: xnmin,xnmax  
 
-  real(fp) :: f
+  real(fp) :: f, fmin, fmax
 
   integer :: i,j
   real(fp) :: lnA, sr1, sr2, sr3
@@ -34,20 +34,22 @@ program shepmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_12.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_3D_12cut.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
  
-  nctrs = 50
-  nfits = 20
+  nctrs = 100
+  nfits = 100
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
   print *,'nctrs= nfits= ',nctrs,nfits
-  print *,'fdata max',maxval(fdata)
-  print *,'fdata min',minval(fdata)
+  fmax = maxval(fdata)
+  fmin = minval(fdata)
+  print *,'fdata max',fmax
+  print *,'fdata min',fmin
 
   allocate(xnmin(ndim), xnmax(ndim))
   allocate(xcubes(ndim,ndata))
@@ -70,7 +72,7 @@ program shepmain
      rmax = shepard_maxradius(ndim,ndata,xcubes,fdata,nctrs,nfits)
      call save_shepdata('shepdata.dat',rmax)
      call save_posterior('postcubed.dat',fdata,xcubes)
-     call save_boundaries('bounds.dat',xnmin,xnmax)
+     call save_boundaries('bounds.dat',xnmin,xnmax,fmin,fmax)
   else
 
      deallocate(fdata,xcubes)
