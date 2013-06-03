@@ -80,10 +80,10 @@ contains
     write(*,*)'ln(minNonZero)=    ',log(minNonZero)
 
 !rbf
-!    eps = exp(1._fp+real(int(log(minNonZero)),fp))
+    eps = exp(1._fp+real(int(log(minNonZero)),fp))
 
 !shep
-    eps = exp(0._fp+real(int(log(minNonZero)),fp))
+!    eps = exp(0._fp+real(int(log(minNonZero)),fp))
 
 
 !reading non-zero records
@@ -382,10 +382,11 @@ contains
 
 
 
-  subroutine save_boundaries(filename,xmin,xmax)
+  subroutine save_boundaries(filename,xmin,xmax,fmin,fmax)
     implicit none
     character(len=*), intent(in) :: filename
     real(fp), dimension(:), intent(in) :: xmin,xmax
+    real(fp), intent(in) :: fmin,fmax
 
     integer :: nunit
     integer(ip) :: j, ndim
@@ -399,16 +400,18 @@ contains
     write(nunit,*) ndim
     write(nunit,*)(xmin(j),j=1,ndim)
     write(nunit,*)(xmax(j),j=1,ndim)
+    write(nunit,*)fmin
+    write(nunit,*)fmax
     close(nunit)
 
   end subroutine save_boundaries
 
 
-  subroutine read_boundaries(filename,xmin,xmax)
+  subroutine read_boundaries(filename,xmin,xmax,fmin,fmax)
     implicit none
     character(len=*), intent(in) :: filename
     real(fp), dimension(:), pointer, intent(inout) :: xmin,xmax
-
+    real(fp), intent(inout) :: fmin,fmax
     integer :: nunit
     integer(ip) :: j, ndim
 
@@ -423,6 +426,10 @@ contains
 
     read(nunit,*)(xmin(j),j=1,ndim)
     read(nunit,*)(xmax(j),j=1,ndim)
+
+    read(nunit,*)fmin
+    read(nunit,*)fmax
+
 
     close(nunit)
 
