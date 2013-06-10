@@ -35,7 +35,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_18.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_3D_25.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
@@ -44,9 +44,11 @@ program rbfmain
   allocate(ictrs(ndim))
   
 !  ictrs = (/4,4,4,11/)
-  ictrs = (/8,5,5/)
+  ictrs = (/12,18,12/)
+!  ictrs = (/12,20,16/)
+
   nctrs = product(ictrs)
-  nctrs = 1100
+!  nctrs = 1400
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -76,9 +78,9 @@ program rbfmain
      allocate(xctrs(ndim,nctrs))
      allocate(weights(nctrs))
 
-     call rbf_random_centers(xctrs)
+!     call rbf_random_centers(xctrs)
 
-!     call rbf_grid_centers(xctrs,ictrs)
+     call rbf_grid_centers(xctrs,ictrs)
 
 !tp     
 !     scale = 0.5_fp/real(nctrs,fp)**(1._fp/real(ndim,fp))
