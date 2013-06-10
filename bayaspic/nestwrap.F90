@@ -30,7 +30,6 @@ module nestwrap
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
 
-! todo skynet
 
   public nest_free_slowroll
   public nest_init_slowroll, nest_sample_slowroll
@@ -48,6 +47,7 @@ contains
     use sheplike, only : get_shep_ndim, get_shep_fmin
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
+    use nestparams, only : fitLogZero
     implicit none
     
     select case(fastLikeName)
@@ -185,7 +185,7 @@ contains
     write(*,*)'nestRootName =         ',trim(nestRootName)
     write(*,*)
     write(*,*)'fast like is :         ',fastLikeName
-    write(*,*)'logZeroMin   =         ',fitLogZero
+    write(*,*)'lnZeroMin    =         ',fitLogZero
     write(*,*)'fitNdim      =         ',fitNdim
     write(*,*)'-----------------------------------------------------'
 
@@ -224,6 +224,7 @@ contains
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
+    use nestparams, only : fitLogZero
     implicit none    
     character(len=*), intent(in) :: modelname
 
