@@ -80,10 +80,10 @@ contains
     write(*,*)'ln(minNonZero)=    ',log(minNonZero)
 
 !rbf
-    eps = exp(1._fp+real(int(log(minNonZero)),fp))
+!    eps = exp(1._fp+real(int(log(minNonZero)),fp))
 
 !shep
-!    eps = exp(0._fp+real(int(log(minNonZero)),fp))
+    eps = exp(0._fp+real(nint(log(minNonZero)),fp))
 
 
 !reading non-zero records
