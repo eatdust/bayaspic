@@ -265,6 +265,22 @@ contains
 
           outparams(i) = -exp(inparams(i))
 
+       case ('inv')
+
+          outparams(i) = 1._kp/inparams(i)
+
+       case ('invSqrt')
+
+          outparams(i) = 1._kp/sqrt(inparams(i))
+
+       case ('iif')
+
+          outparams(i) = 4._kp*(1./inparams(i)-1.)
+
+       case ('iiloglambda')
+
+          outparams(i) = 2._kp/(10._kp**(inparams(i))-1.)
+          
        case default
           
           stop 'map_aspic_params: not such functions!'

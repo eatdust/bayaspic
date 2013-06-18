@@ -34,7 +34,7 @@ program bayaspic
 
 
 !  call initialize_manymodels()
-  call initialize_onemodel('hi')
+  call initialize_onemodel('pli')
 !  call initialize_filemodels('list_models.dat')
 
 
