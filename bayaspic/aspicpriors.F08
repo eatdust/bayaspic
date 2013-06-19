@@ -89,8 +89,24 @@ contains
     case ('ii')
        reject = params(2).lt.ii_xendmin(efoldMax,params(1))
 
+    case ('lmi2')
+       reject = params(3).lt.lmi2_xini_min(params(1),params(2))*1.1_kp &
+             .or. params(3).gt. 100._kp*lmi2_xini_min(params(1),params(2))
+
     case ('bsusybi')
        reject = params(2).gt.bsusybi_xendmax(efoldMax,params(1))
+
+    case ('gmssmi')
+       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(900._kp*60._kp**2)
+
+    case ('gripi')
+       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(576._kp*60._kp**2)
+
+    case ('ti')
+       reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
+
+    case ('psni')
+       reject = params(1).gt.0.1_kp*params(2)**2
 
     case ('csi')
        reject = params(2).gt.csi_xendmax(efoldMax,params(1))
@@ -98,15 +114,15 @@ contains
     case ('cnci')
        reject = params(2).lt.cnci_xendmin(efoldMax,params(1))
 
+    case ('sbi')
+       reject = params(1).lt.sbi_alphamin(params(2))*(1._kp+epsilon(1._kp))
+
     case ('imi')
        reject = params(2).lt.imi_xendmin(efoldMax,params(1))
 
     case ('kmiii')
        reject = (params(1).lt.kmiii_alphamin(params(2))) &
             .or.(params(1).gt.kmiii_alphamax(params(2)))
-
-    case ('sbi')
-       reject = params(1).lt.sbi_alphamin(params(2))
 
     case ('ssbi1')
        reject = params(1).lt.ssbi1_alphamin(params(2))
@@ -132,6 +148,18 @@ contains
 
     case ('cndi')
        reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
+
+    case ('rmi1')
+       reject = params(3).gt.rmi1_numacc_xendmax(70._kp,params(1),params(2))
+
+    case ('rmi2')
+       reject = params(3).lt.rmi2_numacc_xendmin(70._kp,params(1),params(2))
+
+    case ('rmi3')
+       reject = params(3).gt.rmi3_numacc_xendmax(params(1),params(2))
+
+    case ('rmi4')
+       reject = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
 
     end select
 

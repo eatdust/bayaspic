@@ -233,6 +233,7 @@ contains
 
 
   function map_aspic_params(nasp,inparams,mapnames) result(outparams)
+    include 'aspicpriors.h'
     implicit none
     integer, intent(in) :: nasp
     real(fmn), intent(in), dimension(nasp) :: inparams
@@ -273,6 +274,15 @@ contains
 
           outparams(i) = 1._kp/sqrt(inparams(i))
 
+       case ('logOfxMinusOne')
+  
+          outparams(i) = 1._kp+10._kp**(inparams(i))
+
+       case ('logOfOneMinusX')
+  
+          outparams(i) = 1._kp-10._kp**(inparams(i))
+
+
        case ('iif')
 
           outparams(i) = 4._kp*(1./inparams(i)-1.)
@@ -288,6 +298,37 @@ contains
        end select
 
     end do
+
+! SPECIAL CASES
+    
+    if (nasp .gt. 1 .and. mapnames(1) .eq. 'lmio') then
+    	outparams(1) = 2._kp/(inparams(1)+1._kp)
+        outparams(2) = 2._kp*((inparams(1)+1._kp)/(2._kp* &
+                       sqrt(2._kp*inparams(1)*inparams(2))))** &
+                       (2._kp/(inparams(1)+1._kp))
+    endif
+
+    if (nasp .gt. 1 .and. mapnames(1) .eq. 'twi') then
+        outparams(1) = 10._kp**(inparams(1))
+        outparams(2) = 10._kp**(inparams(2))
+        outparams(2) = outparams(2)*outparams(1)
+
+    endif
+
+    if (nasp .gt. 1 .and. mapnames(1) .eq. 'csi') then
+	outparams(1) = 10._kp**(inparams(1))
+        outparams(2) = inparams(2)*csi_xendmax(59._kp,outparams(1))
+    endif
+
+    if (nasp .gt. 2 .and. mapnames(2) .eq. 'cnci') then
+	outparams(1) = 10._kp**(inparams(1))
+        outparams(2) = inparams(2)*cnci_xendmin(58._kp,outparams(1))
+    endif
+
+    if (nasp .gt. 2 .and. mapnames(2) .eq. 'imi') then
+	outparams(1) = inparams(1)
+        outparams(2) = inparams(2)*imi_xendmin(65._kp,outparams(1))
+    endif
    
   end function map_aspic_params
 
