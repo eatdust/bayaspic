@@ -34,7 +34,7 @@ ONEPRIOR(esi,0.1,6.,flat)
 !ONEPRIOR(esi,sqrt(2./3.),sqrt(2./3.),flat)
 
 
-ONEPRIOR(pli,0.,1.2,flat)
+ONEPRIOR(pli,0.,1.0,flat)
 !ONEPRIOR(pli,-4.,-0.1,log)
 
 ONEPRIOR(kmii,0.382,4,log)
