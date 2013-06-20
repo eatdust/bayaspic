@@ -44,7 +44,7 @@ ONEPRIOR(hf1i,-3,3,log)
 
 ONEPRIOR(li,-0.1_kp,0.1_kp,flat)
 ONEPRIOR(li+,-3._kp,-1._kp,log)
-ONEPRIOR(li-,-3._kp,-1._kp,mlog)
+ONEPRIOR(li-,-2.5_kp,-1._kp,mlog)
 
 
 ONEPRIOR(rpi1,1.,1.5,flat)
