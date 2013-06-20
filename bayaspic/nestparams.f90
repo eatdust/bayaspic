@@ -53,7 +53,7 @@ module nestparams
   integer(imn), dimension(:), allocatable, save :: nestPWrap
   
 !need update on sampling progress?
-  logical, parameter :: nestFeedBack = .true.
+  logical, parameter :: nestFeedBack = .false.
 
 !whether to resume from a previous run
   logical, parameter :: nestResume = .false.

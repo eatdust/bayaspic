@@ -5,6 +5,7 @@ module aspicpriors
   private
 
   public get_aspic_priors, check_aspic_hardprior
+  public redefine_aspic_params
 
 contains
 
@@ -89,8 +90,24 @@ contains
     case ('ii')
        reject = params(2).lt.ii_xendmin(efoldMax,params(1))
 
+    case ('lmi2')
+       reject = params(3).lt.lmi2_xini_min(params(1),params(2))*1.1_kp &
+             .or. params(3).gt. 100._kp*lmi2_xini_min(params(1),params(2))
+
     case ('bsusybi')
        reject = params(2).gt.bsusybi_xendmax(efoldMax,params(1))
+
+    case ('gmssmiB', 'gmssmiD', 'gmssmiF', 'gmssmiH')
+       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(900._kp*60._kp**2)
+
+    case ('gripiB', 'gripiD', 'gripiF', 'gripiH')
+       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(576._kp*60._kp**2)
+
+    case ('tiB', 'tiD', 'tiF')
+       reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
+
+    case ('psniB')
+       reject = params(1).gt.0.1_kp*params(2)**2
 
     case ('csi')
        reject = params(2).gt.csi_xendmax(efoldMax,params(1))
@@ -98,15 +115,15 @@ contains
     case ('cnci')
        reject = params(2).lt.cnci_xendmin(efoldMax,params(1))
 
+    case ('sbi')
+       reject = params(1).lt.sbi_alphamin(params(2))*(1._kp+epsilon(1._kp))
+
     case ('imi')
        reject = params(2).lt.imi_xendmin(efoldMax,params(1))
 
     case ('kmiii')
        reject = (params(1).lt.kmiii_alphamin(params(2))) &
             .or.(params(1).gt.kmiii_alphamax(params(2)))
-
-    case ('sbi')
-       reject = params(1).lt.sbi_alphamin(params(2))
 
     case ('ssbi1')
        reject = params(1).lt.ssbi1_alphamin(params(2))
@@ -133,9 +150,78 @@ contains
     case ('cndi')
        reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
 
+    case ('rmi1')
+       reject = params(3).gt.rmi1_numacc_xendmax(70._kp,params(1),params(2))
+
+    case ('rmi2')
+       reject = params(3).lt.rmi2_numacc_xendmin(70._kp,params(1),params(2))
+
+    case ('rmi3')
+       reject = params(3).gt.rmi3_numacc_xendmax(params(1),params(2))
+
+    case ('rmi4')
+       reject = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
+
     end select
 
   end function check_aspic_hardprior
+
+
+
+!redefinition of aspic params (called after change of priors, see wraspic)
+  function redefine_aspic_params(name,nasp,newparams) result(asparams)
+    include 'aspicpriors.h'
+    implicit none   
+    character(len=*), intent(in) :: name
+    integer, intent(in) :: nasp
+    real(kp), dimension(nasp), intent(in) :: newparams
+    real(kp), dimension(nasp) :: asparams
+
+    asparams = newparams
+
+    select case (name)
+
+    case ('lmio')
+       asparams(1) = 2._kp/(newparams(1)+1._kp)
+       asparams(2) = 2._kp*((newparams(1)+1._kp)/(2._kp* &
+            sqrt(2._kp*newparams(1)*newparams(2))))** &
+            (2._kp/(newparams(1)+1._kp))
+
+    case ('twi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)*newparams(1)
+
+    case ('csi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * csi_xendmax(59._kp,asparams(1))
+       
+    case ('cnci')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * cnci_xendmin(58._kp,asparams(1))
+
+    case ('imi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * imi_xendmin(65._kp,asparams(1))
+
+    case ('gmssmiA', 'gmssmiB', 'gmssmiC', 'gmssmiD')
+       asparams(1) = 1._kp + newparams(1)
+       asparams(2) = newparams(2)
+
+    case ('gmssmiE', 'gmssmiF', 'gmssmiG', 'gmssmiH')
+       asparams(1) = 1._kp - newparams(1)
+       asparams(2) = newparams(2)
+
+    case ('iif')
+       asparams(1) = 4._kp * (newparams(1) - 1._kp)
+       asparams(2) = newparams(2)
+
+    case ('iilambda')
+       asparams(1) = 2._kp/(newparams(1) - 1._kp)
+       asparams(2) = newparams(2)
+
+    end select
+
+  end function redefine_aspic_params
 
 
 end module aspicpriors

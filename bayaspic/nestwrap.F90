@@ -226,15 +226,34 @@ contains
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     use nestparams, only : fitLogZero
     implicit none    
+    integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
+    character(len=len(modelname)) :: name, subname
 
-    call set_model(modelname)
+    character, parameter :: separator=' '
 
+    lenmod = len(modelname)
+
+    cpos = scan(modelname,separator)
+
+    if (cpos.eq.0) then
+       name = trim(adjustl(modelname))
+       nestRootName = trim(nestRootPrefix)//name
+       call set_model(name)
+
+    else
+       name = trim(adjustl(modelname(1:cpos-1)))
+       subname = trim(adjustl(modelname(cpos:lenmod)))
+       nestRootName = trim(nestRootPrefix)//trim(name)//subname
+       call set_model(name,subname)
+
+    endif
+
+   
     nestNdim = get_ntot()
     nestNpars = nestNdim + numDerivedParams
     nestCdim = nestNdim
-    nestRootName = trim(nestRootPrefix)//modelname
-    
+
     allocate(nestPmin(nestNdim))
     allocate(nestPmax(nestNdim))
 
@@ -284,7 +303,7 @@ contains
     nestPwrap = 0
 
     call nest_print()
-
+    
   end subroutine nest_init_aspic
 
   

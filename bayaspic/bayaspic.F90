@@ -15,7 +15,7 @@ program bayaspic
   integer, save :: mpiRank = 0
   integer, save :: mpiSize = 1
 
-  integer, parameter :: lmod = 7
+  integer, parameter :: lmod = 16
   integer :: imodel, nmodels
   character(len=lmod), dimension(:), allocatable :: ModelNames
   character(len=lmod) :: name
@@ -34,7 +34,7 @@ program bayaspic
 
 
 !  call initialize_manymodels()
-  call initialize_onemodel('pli')
+  call initialize_onemodel('li -')
 !  call initialize_filemodels('list_models.dat')
 
 
@@ -120,9 +120,9 @@ contains
 
     allocate(ModelNames(0:nmodels-1))
 
-    ModelNames(0) = 'hi'
-    Modelnames(1) = 'lfi'
-    Modelnames(2) = 'sfi'
+    ModelNames(0) = 'lfi'
+    Modelnames(1) = 'mlfi'
+    Modelnames(2) = 'rcmi'
         
   end subroutine initialize_manymodels
 

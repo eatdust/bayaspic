@@ -26,16 +26,23 @@ contains
 
 
 
-  subroutine set_model(mname)
+  subroutine set_model(mname,msubname)
     use aspicmodels, only : initialize_aspic_ptrs
     use aspicmodels, only : get_aspic_numparams
 
     implicit none
     character(len=*), intent(in) :: mname
+    character(len=*), intent(in), optional :: msubname
 
     call initialize_aspic_ptrs(trim(adjustl(mname)))
 
     AspicModel%name = trim(adjustl(mname))
+    if (present(msubname)) then
+       AspicModel%extname = trim(adjustl(mname))//trim(adjustl(msubname))
+    else
+       AspicModel%extname = AspicModel%name
+    endif
+
     AspicModel%nasp = get_aspic_numparams()
 
     allocate(AspicModel%params(AspicModel%nasp))
@@ -207,7 +214,7 @@ contains
 
 !model dependant
 
-    call get_aspic_priors(AspicModel%name,aspmin,aspmax,AspicModel%cmaps)
+    call get_aspic_priors(AspicModel%extname,aspmin,aspmax,AspicModel%cmaps)
     
     pmin(nextra+1:ntot) = aspmin(1:nasp)
     pmax(nextra+1:ntot) = aspmax(1:nasp)
@@ -233,11 +240,12 @@ contains
 
 
   function map_aspic_params(nasp,inparams,mapnames) result(outparams)
+    use aspicpriors, only : redefine_aspic_params
     implicit none
     integer, intent(in) :: nasp
     real(fmn), intent(in), dimension(nasp) :: inparams
     character(len=*), dimension(nasp), intent(in) :: mapnames
-    real(kp), dimension(nasp) :: outparams
+    real(kp), dimension(nasp) :: outparams, scalparams
 
     integer :: i
 
@@ -247,50 +255,47 @@ contains
 
        case ('flat')
 
-          outparams(i) = inparams(i)
+          scalparams(i) = inparams(i)
 
        case ('log')
 
-          outparams(i) = 10._kp**(inparams(i))
+          scalparams(i) = 10._kp**(inparams(i))
 
        case ('ln')
 
-          outparams(i) = exp(inparams(i))
+          scalparams(i) = exp(inparams(i))
 
        case ('mlog')
           
-          outparams(i) = -10._kp**(inparams(i))
+          scalparams(i) = -10._kp**(inparams(i))
 
        case ('mln')
 
-          outparams(i) = -exp(inparams(i))
+          scalparams(i) = -exp(inparams(i))
 
        case ('inv')
 
-          outparams(i) = 1._kp/inparams(i)
+          scalparams(i) = 1._kp/inparams(i)
 
-       case ('invSqrt')
+       case ('invsqrt')
 
-          outparams(i) = 1._kp/sqrt(inparams(i))
+          scalparams(i) = 1._kp/sqrt(inparams(i))
 
-       case ('iif')
-
-          outparams(i) = 4._kp*(1./inparams(i)-1.)
-
-       case ('iiloglambda')
-
-          outparams(i) = 2._kp/(10._kp**(inparams(i))-1.)
-          
+       
        case default
           
-          stop 'map_aspic_params: not such functions!'
+          stop 'map_aspic_params: not such priors!'
 
        end select
 
     end do
+
+!some models have redefined parameters, this is called after the prior
+!scaling
+    outparams =  redefine_aspic_params(AspicModel%extname,nasp,scalparams)
+   
    
   end function map_aspic_params
-
 
 
 
@@ -436,7 +441,7 @@ contains
 
     real(kp), dimension(naspmax) :: asparams
     character(len=lname), dimension(naspmax) :: mapnames
-    character(len=lname) :: aspname
+    character(len=lname) :: extname
     integer :: nasp, ntot, i
 
     ntot = get_ntot()
@@ -446,7 +451,8 @@ contains
        stop 'test_aspic_hardprior: size mismatch!'
     endif
 
-    aspname = trim(AspicModel%name)
+    extname = trim(AspicModel%extname)
+
     forall (i=1:nasp)
        mapnames(i) = trim(AspicModel%cmaps(i))
     end forall
@@ -454,7 +460,7 @@ contains
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
          ,mapnames(1:nasp))
 
-    test_aspic_hardprior = check_aspic_hardprior(aspname,asparams)
+    test_aspic_hardprior = check_aspic_hardprior(extname,asparams)
 
   end function test_aspic_hardprior
 
