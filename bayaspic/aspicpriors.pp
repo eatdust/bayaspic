@@ -171,14 +171,14 @@ TWOPRIORS(gmssmiJ,0.9,1.1,flat,0.00002,0.0002,flat)
 !TWOPRIORS(gripi,0.9,1.1,flat,-3.,3.,log)
 !TWOPRIORS(gripi,0.9,1.1,flat,0.00002,0.0002,flat)
 
-TWOPRIORS(gripiA,-4.,-1.,logOfxMinusOne,-3.,3.,log)
-TWOPRIORS(gripiB,-16.,-1.,logOfxMinusOne,-3.,3.,log)
-TWOPRIORS(gripiC,-4.,-1.,logOfxMinusOne,0.00002,0.0002,flat)
-TWOPRIORS(gripiD,-16.,-1.,logOfxMinusOne,0.00002,0.0002,flat)
-TWOPRIORS(gripiE,-4.,-1.,logOfOneMinusX,-3.,3.,log)
-TWOPRIORS(gripiF,-16.,-1.,logOfOneMinusX,-3.,3.,log)
-TWOPRIORS(gripiG,-4.,-1.,logOfOneMinusX,0.00002,0.0002,flat)
-TWOPRIORS(gripiH,-16.,-1.,logOfOneMinusX,0.00002,0.0002,flat)
+TWOPRIORS(gripiA,-4.,-1.,log,-3.,3.,log)
+TWOPRIORS(gripiB,-16.,-1.,log,-3.,3.,log)
+TWOPRIORS(gripiC,-4.,-1.,log,0.00002,0.0002,flat)
+TWOPRIORS(gripiD,-16.,-1.,log,0.00002,0.0002,flat)
+TWOPRIORS(gripiE,-4.,-1.,log,-3.,3.,log)
+TWOPRIORS(gripiF,-16.,-1.,log,-3.,3.,log)
+TWOPRIORS(gripiG,-4.,-1.,log,0.00002,0.0002,flat)
+TWOPRIORS(gripiH,-16.,-1.,log,0.00002,0.0002,flat)
 TWOPRIORS(gripiI,0.9,1.1,flat,-3.,3.,log)
 TWOPRIORS(gripiJ,0.9,1.1,flat,0.00002,0.0002,flat)
 
@@ -236,7 +236,8 @@ THREEPRIORS(vhi,1.01,6,flat,0.,3,log,0,1,flat)
 
 THREEPRIORS(dsi,1.01,6,flat,-9,-7,log,-1,4,log)
 
-THREEPRIORS(cndi,-2,-1,log,1.1,6,flat,0,100.,flat)
+!last params is xend/xendmax
+THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
 
 !witout xend
 

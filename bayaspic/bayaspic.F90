@@ -34,7 +34,7 @@ program bayaspic
 
 
 !  call initialize_manymodels()
-  call initialize_onemodel('li -')
+  call initialize_onemodel('cndi')
 !  call initialize_filemodels('list_models.dat')
 
 

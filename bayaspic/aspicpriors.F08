@@ -7,6 +7,8 @@ module aspicpriors
   public get_aspic_priors, check_aspic_hardprior
   public redefine_aspic_params
 
+  real(kp), parameter :: efoldMax = 120._kp
+
 contains
 
   subroutine get_aspic_priors(name,pmin,pmax,mapname)
@@ -80,7 +82,6 @@ contains
     real(kp), dimension(:), intent(in) :: params
     logical :: reject
 
-    real(kp), parameter :: efoldMax = 120._kp
     real(kp) :: q
 
     reject = .false.
@@ -147,8 +148,8 @@ contains
             .or.(params(3).gt.dsi_xendmax(params(1),params(2),q)) &
             .or.(params(3).lt.dsi_xendmin(efoldMax,params(1),params(2)))
 
-    case ('cndi')
-       reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
+!    case ('cndi')
+!       reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
 
     case ('rmi1')
        reject = params(3).gt.rmi1_numacc_xendmax(70._kp,params(1),params(2))
@@ -219,6 +220,11 @@ contains
        asparams(1) = 2._kp/(newparams(1) - 1._kp)
        asparams(2) = newparams(2)
 
+    case ('cndi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = newparams(3) &
+            * cndi_xendmax(efoldMax,asparams(1),asparams(2))
     end select
 
   end function redefine_aspic_params
