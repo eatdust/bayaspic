@@ -80,28 +80,36 @@ contains
     real(kp), dimension(:), intent(in) :: params
     logical :: reject
 
-    real(kp), parameter :: efoldMax = 120._kp
-    real(kp) :: q
+    real(kp) :: q, eps2max, efoldMax
+
+    efoldMax = 120._kp
 
     reject = .false.
 
     select case (name)
 
-    case ('ii')
+    case ('ii', 'iif', 'iilambda')
        reject = params(2).lt.ii_xendmin(efoldMax,params(1))
 
-    case ('lmi2')
-       reject = params(3).lt.lmi2_xini_min(params(1),params(2))*1.1_kp &
-             .or. params(3).gt. 100._kp*lmi2_xini_min(params(1),params(2))
+    case ('lmi1o', 'lmi1p')
+       eps2max=0.1_kp
+       reject = params(2).gt.lmi1_betamax(params(1),eps2max)
 
-    case ('bsusybi')
+    case ('lmi2o', 'lmi2p')
+       efoldMax=80._kp
+       reject = params(3).lt.lmi2_xend_min(params(1),params(2),efoldMax) &
+             .or. params(3).gt. 100._kp*lmi2_xend_min(params(1),params(2),efoldMax) 
+       reject = reject .or. params(3).gt.(100._kp/params(2))**(1._kp/params(1)) !Such that exp(-beta xend^gamma)>10^(-100) to make it numerically tractable
+
+    case ('bsusybif', 'bsusybil')
+       efoldMax = 120._kp
        reject = params(2).gt.bsusybi_xendmax(efoldMax,params(1))
 
     case ('gmssmiB', 'gmssmiD', 'gmssmiF', 'gmssmiH')
-       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(900._kp*60._kp**2)
+       reject = abs(1._kp-params(1)).gt.params(2)**4*acos(-1._kp)**2/(900._kp*60._kp**2)
 
     case ('gripiB', 'gripiD', 'gripiF', 'gripiH')
-       reject = abs(1._kp-params(1)).lt.params(2)**4*acos(-1._kp)**2/(576._kp*60._kp**2)
+       reject = abs(1._kp-params(1)).gt.params(2)**4*acos(-1._kp)**2/(576._kp*60._kp**2)
 
     case ('tiB', 'tiD', 'tiF')
        reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
@@ -181,16 +189,17 @@ contains
 
     select case (name)
 
-    case ('lmio')
+    case ('lmi1o', 'lmi2o')
        asparams(1) = 2._kp/(newparams(1)+1._kp)
        asparams(2) = 2._kp*((newparams(1)+1._kp)/(2._kp* &
-            sqrt(2._kp*newparams(1)*newparams(2))))** &
+            sqrt(2._kp*newparams(1)*10._kp**(newparams(2)))))** &
             (2._kp/(newparams(1)+1._kp))
 
     case ('twi')
+
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)*newparams(1)
-
+ 
     case ('csi')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * csi_xendmax(59._kp,asparams(1))
@@ -211,12 +220,24 @@ contains
        asparams(1) = 1._kp - newparams(1)
        asparams(2) = newparams(2)
 
+    case ('gripiA', 'gripiB', 'gripiC', 'gripiD')
+       asparams(1) = 1._kp + newparams(1)
+       asparams(2) = newparams(2)
+
+    case ('gripiE', 'gripiF', 'gripiG', 'gripiH')
+       asparams(1) = 1._kp - newparams(1)
+       asparams(2) = newparams(2)
+
     case ('iif')
        asparams(1) = 4._kp * (newparams(1) - 1._kp)
        asparams(2) = newparams(2)
 
     case ('iilambda')
        asparams(1) = 2._kp/(newparams(1) - 1._kp)
+       asparams(2) = newparams(2)
+
+    case ('psnift')
+       asparams(1) = newparams(1)*newparams(2)**2
        asparams(2) = newparams(2)
 
     end select
