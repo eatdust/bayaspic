@@ -253,13 +253,15 @@ THREEPRIORS(gmlfi,2,2,flat,2,2,flat,-5,1,log)
 !THREEPRIORS(gmlfi,4,4,flat,3,3,flat,-5,1,log)
 
 THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
-THREEPRIORS(lpi1_41,4,4,flat,1,1,flat,-3,3,log)
-THREEPRIORS(lpi1_43,4,4,flat,3,3,flat,-3,3,log)
+THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
+THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
 
-THREEPRIORS(lpi2,1,6,flat,1,6,flat,-3,3,log)
-THREEPRIORS(lpi2_41,4,4,flat,1,1,flat,-3,3,log)
-THREEPRIORS(lpi2_43,4,4,flat,3,3,flat,-3,3,log)
+THREEPRIORS(lpi22,1,6,flat,2,2,flat,1.5,3.5,log)
+THREEPRIORS(lpi24,1,6,flat,4,4,flat,1.5,3.5,log)
+THREEPRIORS(lpi26,1,6,flat,6,6,flat,1.5,3.5,log)
 
-THREEPRIORS(lpi3,1,6,flat,1,6,flat,-3,3,log)
-THREEPRIORS(lpi3_41,4,4,flat,1,1,flat,-3,3,log)
-THREEPRIORS(lpi3_43,4,4,flat,3,3,flat,-3,3,log)
+THREEPRIORS(lpi32,1,6,flat,2,2,flat,1.5,3.5,log)
+THREEPRIORS(lpi34,1,6,flat,4,4,flat,1.5,3.5,log)
+THREEPRIORS(lpi36,1,6,flat,6,6,flat,1.5,3.5,log)
+
+
