@@ -1,5 +1,5 @@
 module aspicvars  
-  use infprec, only : kp
+  use infprec, only : kp, pi
   implicit none
 
   private
@@ -20,7 +20,7 @@ module aspicvars
      real(kp) :: ns, logr, alpha
   end type infaspic
 
-  public infaspic, kp, lname
+  public infaspic, kp, pi, lname
 
 
 end module aspicvars

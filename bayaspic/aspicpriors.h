@@ -1,6 +1,6 @@
 use iisr, only : ii_xendmin
-use lmi1sr, only : lmi1_betamax
-use lmi2sr, only : lmi2_xini_min, lmi2_xend_min
+use lmicommon, only : lmi_epstwo_potmax
+use lmi2sr, only : lmi2_xendmin
 use bsusybisr, only : bsusybi_xendmax
 use csisr, only : csi_xendmax
 use cncisr, only : cnci_xendmin

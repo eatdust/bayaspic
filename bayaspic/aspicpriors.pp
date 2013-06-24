@@ -126,7 +126,7 @@ TWOPRIORS(sfi4l,4._kp,4._kp,flat,0._kp,2._kp,log)
 TWOPRIORS(kmiii,2._kp,16._kp,log,9._kp,15._kp,log)
 
 TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,-2._kp,2._kp,log)
-TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,flat)
+TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 
 TWOPRIORS(gmssmiA,-4._kp,-1._kp,log,-3._kp,3._kp,log)
 TWOPRIORS(gmssmiB,-20._kp,-1._kp,log,-3._kp,3._kp,log)
@@ -183,9 +183,9 @@ TWOPRIORS(ssbi6,-5,1,mlog,-5,1,log)
 
 
 !with xend
+THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
+THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 
-THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,-2._kp,2._kp,log,-5._kp,10._kp,log)
-THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,flat,-5._kp,10._kp,log)
 
 THREEPRIORS(rmi1,0.05,0.2,flat,-2,0,log,1./exp(1.),1.,flat)
 THREEPRIORS(rmi2,0.05,0.2,flat,-2,0,log,1,exp(1.),flat)
