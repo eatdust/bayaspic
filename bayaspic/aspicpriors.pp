@@ -198,7 +198,7 @@ THREEPRIORS(dsi,1.01,6,flat,-9,-7,log,-1,4,log)
 
 !last params is xend/xendmax
 THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
-
+THREEPRIORS(cndi+,-2,-1,log,1.1,6,flat,0,1,flat)
 
 
 !witout xend
@@ -218,12 +218,12 @@ THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
 THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
 THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
 
-THREEPRIORS(lpi22,1,6,flat,2,2,flat,1.5,3.5,log)
-THREEPRIORS(lpi24,1,6,flat,4,4,flat,1.5,3.5,log)
-THREEPRIORS(lpi26,1,6,flat,6,6,flat,1.5,3.5,log)
+THREEPRIORS(lpi22,1,6,flat,2,2,flat,2,5,log)
+THREEPRIORS(lpi24,1,6,flat,4,4,flat,2,5,log)
+THREEPRIORS(lpi26,1,6,flat,6,6,flat,2,5,log)
 
-THREEPRIORS(lpi32,1,6,flat,2,2,flat,1.5,3.5,log)
-THREEPRIORS(lpi34,1,6,flat,4,4,flat,1.5,3.5,log)
-THREEPRIORS(lpi36,1,6,flat,6,6,flat,1.5,3.5,log)
+THREEPRIORS(lpi32,1,6,flat,2,2,flat,2,5,log)
+THREEPRIORS(lpi34,1,6,flat,4,4,flat,2,5,log)
+THREEPRIORS(lpi36,1,6,flat,6,6,flat,2,5,log)
 
 

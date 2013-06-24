@@ -61,7 +61,7 @@ module nestparams
 !whether to write output files
   logical, parameter ::  nestOutfile = .true.
 
-!initialize MPI routines?, relevant only for -DMPI
+!initialize MPI routines?, relevant only for -DMPINEST
   logical, parameter :: nestInitMPI = .true.
 
 !should match the zero cut in rbffit, or shepfit, that the minimal

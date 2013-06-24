@@ -154,9 +154,6 @@ contains
             .or.(params(3).gt.dsi_xendmax(params(1),params(2),q)) &
             .or.(params(3).lt.dsi_xendmin(efoldNum,params(1),params(2)))
 
-!    case ('cndi')
-!       reject = params(3).gt.cndi_xendmax(efoldMax,params(1),params(2))
-
     case ('rmi1')
 !       reject = params(3).gt.rmi1_numacc_xendmax(70._kp,params(1),params(2))
        reject = params(3).gt.rmi1_numacc_xendmax(efoldNum,params(1),params(2))
@@ -254,7 +251,7 @@ contains
        asparams(2) = newparams(2)
 
 
-    case ('cndi')
+    case ('cndi','cndi+')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = newparams(3) &
