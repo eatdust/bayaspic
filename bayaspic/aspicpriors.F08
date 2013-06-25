@@ -10,6 +10,8 @@ module aspicpriors
 !hard prior: all model are assumed to support, at lest, this number of efolds
   real(kp), parameter :: efoldNum = 120._kp
 
+!dsi correction power
+  real(kp), parameter :: qDSI = 8._kp
 
 contains
 
@@ -83,7 +85,7 @@ contains
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
     logical :: reject
-    real(kp) :: q, eps2max
+    real(kp) :: eps2max
 
     reject = .false.
 
@@ -143,17 +145,7 @@ contains
 
     case ('ssbi6')
        reject = params(1).gt.ssbi6_alphamax(params(2))
-       
-    case ('vhi')
-       reject = (params(3).gt.vhi_xendmax(efoldNum,params(1),params(2))) &
-            .or.(params(3).lt.vhi_xendmin(params(1),params(2)))
-       
-    case ('dsi')
-       q = 8._kp
-       reject = (params(2).gt.dsi_mumax(efoldNum,params(1),q)) &
-            .or.(params(3).gt.dsi_xendmax(params(1),params(2),q)) &
-            .or.(params(3).lt.dsi_xendmin(efoldNum,params(1),params(2)))
-
+              
     case ('rmi1')
 !       reject = params(3).gt.rmi1_numacc_xendmax(70._kp,params(1),params(2))
        reject = params(3).gt.rmi1_numacc_xendmax(efoldNum,params(1),params(2))
@@ -167,6 +159,9 @@ contains
 
     case ('rmi4')
        reject = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
+
+    case ('dsio', 'dsi2')
+       reject = params(2) .gt. dsi_mumax(efoldNum,params(1),qDsi)
 
     end select
 
@@ -205,9 +200,7 @@ contains
        asparams(2) = newparams(2)
        asparams(3) = newparams(3) * lmi2_xendmin(efoldNum,asparams(1),asparams(2))
 
-
     case ('twi')
-
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)*newparams(1)
  
@@ -250,7 +243,6 @@ contains
        asparams(1) = 2._kp/(newparams(1) - 1._kp)
        asparams(2) = newparams(2)
 
-
     case ('cndi','cndi+')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
@@ -261,7 +253,27 @@ contains
        asparams(1) = newparams(1)*newparams(2)**2
        asparams(2) = newparams(2)
 
+    case ('vhi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = vhi_xendmin(asparams(1),asparams(2)) &
+            + newparams(3) * (vhi_xendmax(efoldNum,asparams(1),asparams(2)) &
+            - vhi_xendmin(asparams(1),asparams(2)))
 
+    case ('dsi')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * dsi_mumax(efoldNum,asparams(1),qDSI)
+       asparams(3) = dsi_xendmin(efoldNum,asparams(1),asparams(2)) &
+            + newparams(3) * ( dsi_xendmax(asparams(1),asparams(2),qDSI) &
+            - dsi_xendmin(efoldNum,asparams(1),asparams(2)) )
+
+    case ('dsio', 'dsi2')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = dsi_xendmin(efoldNum,asparams(1),asparams(2)) &
+            + newparams(3) * ( dsi_xendmax(asparams(1),asparams(2),qDSI) &
+            - dsi_xendmin(efoldNum,asparams(1),asparams(2)) )
+            
     end select
 
   end function redefine_aspic_params

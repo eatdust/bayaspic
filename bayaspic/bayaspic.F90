@@ -26,7 +26,7 @@ program bayaspic
   logical, parameter :: cpRestart = .false.
 
 !save queues each time one element is done
-  logical, parameter :: cpSave = .false.
+  logical, parameter :: cpSave = .true.
 
 
 !if zero, assume same mpiSize between runs.
@@ -34,7 +34,7 @@ program bayaspic
 
 
 !  call initialize_manymodels()
-  call initialize_onemodel('cndi +')
+  call initialize_onemodel('dsi o')
 !  call initialize_filemodels('list_models.dat')
 
 
@@ -116,18 +116,20 @@ contains
   subroutine initialize_manymodels()
     implicit none
     
-    nmodels = 8
+    nmodels = 4
 
     allocate(ModelNames(0:nmodels-1))
 
-    ModelNames(0) = 'lpi1 41'
-    Modelnames(1) = 'lpi1 43'
-    Modelnames(2) = 'lpi2 2'
-    Modelnames(3) = 'lpi2 4'
-    Modelnames(4) = 'lpi2 6'
-    Modelnames(5) = 'lpi3 2'
-    Modelnames(6) = 'lpi3 4'
-    Modelnames(7) = 'lpi3 6'
+    ModelNames(0) = 'vhi'
+    Modelnames(1) = 'vhi 12'
+    Modelnames(2) = 'vhi 1'
+    Modelnames(3) = 'vhi 2'
+!    Modelnames(2) = 'gmlfi 13'
+!    Modelnames(3) = 'gmlfi 21'
+!    Modelnames(4) = 'gmlfi 22'
+!    Modelnames(5) = 'gmlfi 23'
+!    Modelnames(6) = 'gmlfi 31'
+!    Modelnames(7) = 'gmlfi 32'
     
         
   end subroutine initialize_manymodels

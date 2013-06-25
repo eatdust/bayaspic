@@ -192,9 +192,19 @@ THREEPRIORS(rmi2,0.05,0.2,flat,-2,0,log,1,exp(1.),flat)
 THREEPRIORS(rmi3,-0.2,-0.05,flat,-2,0,log,1./exp(1.),1,flat)
 THREEPRIORS(rmi4,-0.2,-0.05,flat,-2,0,log,1,exp(1.),flat)
 
-THREEPRIORS(vhi,1.01,6,flat,0.,3,log,0,1,flat)
+!last params is y with with xend=xendmin+y*(xendmax-xendmin)
+THREEPRIORS(vhi,1+epsilon(1._kp),6,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi1,1,1,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi2,2,2,flat,0,3,log,0,1,flat)
 
-THREEPRIORS(dsi,1.01,6,flat,-9,-7,log,-1,4,log)
+
+!second param is mu/mumax, last is y with xend=xendmin+y*(xendmax-xendmin)
+THREEPRIORS(dsi,1+epsilon(1._kp),6,flat,-5,0,log,-5,-0.7,log)
+!second param is mu/Mpl + hard prior mu<mumax, last param is y, as for
+! dsi
+THREEPRIORS(dsio,1+epsilon(1._kp),6,flat,1d-9,1d-6,flat,-5,-0.7,log)
+THREEPRIORS(dsi2,2,2,flat,1d-9,1d-6,flat,-5,-0.7,log)
 
 !last params is xend/xendmax
 THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
@@ -203,16 +213,18 @@ THREEPRIORS(cndi+,-2,-1,log,1.1,6,flat,0,1,flat)
 
 !witout xend
 
+THREEPRIORS(gmlfi,1,6,flat,1,6,flat,-5,1,log)
+THREEPRIORS(gmlfi2313,2._kp/3._kp,2._kp/3._kp,flat,1._kp/3._kp,1._kp/3._kp,flat,-5,1,log)
+THREEPRIORS(gmlfi2343,2._kp/3._kp,2._kp/3._kp,flat,4._kp/3._kp,4._kp/3._kp,flat,-5,1,log)
+THREEPRIORS(gmlfi11,1,1,flat,1,1,flat,-5,1,log)
+THREEPRIORS(gmlfi12,1,1,flat,2,2,flat,-5,1,log)
+THREEPRIORS(gmlfi13,1,1,flat,3,3,flat,-5,1,log)
+THREEPRIORS(gmlfi21,2,2,flat,1,1,flat,-5,1,log)
 THREEPRIORS(gmlfi22,2,2,flat,2,2,flat,-5,1,log)
-!THREEPRIORS(gmlfi,1,6,flat,1,6,flat,-5,1,log)
-!THREEPRIORS(gmlfi21,2,2,flat,1,1,flat,-5,1,log)
-!THREEPRIORS(gmlfi23,2,2,flat,3,3,flat,-5,1,log)
-!THREEPRIORS(gmlfi31,3,3,flat,1,1,flat,-5,1,log)
-!THREEPRIORS(gmlfi32,3,3,flat,2,2,flat,-5,1,log)
-!THREEPRIORS(gmlfi33,3,3,flat,3,3,flat,-5,1,log)
-!THREEPRIORS(gmlfi41,4,4,flat,1,1,flat,-5,1,log)
-!THREEPRIORS(gmlfi42,4,4,flat,2,2,flat,-5,1,log)
-!THREEPRIORS(gmlfi43,4,4,flat,3,3,flat,-5,1,log)
+THREEPRIORS(gmlfi23,2,2,flat,3,3,flat,-5,1,log)
+THREEPRIORS(gmlfi31,3,3,flat,1,1,flat,-5,1,log)
+THREEPRIORS(gmlfi32,3,3,flat,2,2,flat,-5,1,log)
+THREEPRIORS(gmlfi33,3,3,flat,3,3,flat,-5,1,log)
 
 THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
 THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
