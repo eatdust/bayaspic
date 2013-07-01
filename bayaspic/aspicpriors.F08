@@ -110,14 +110,24 @@ contains
     case ('gripiB', 'gripiD', 'gripiF', 'gripiH')
        reject = abs(1._kp-params(1)).gt.params(2)**4*pi**2/(576._kp*60._kp**2)
 
-    case ('tiB', 'tiD', 'tiF')
+    case ('tiB1', 'tiD1', 'tiF1')
        reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
+
+    case ('tiB2')
+       reject = abs(1._kp-2._kp*params(1)).gt.0.2_kp*params(2)**2
+
+    case ('tiB3', 'tiD2', 'tiF2')
+       reject = abs(1._kp-2._kp*params(1)).gt.1._kp*params(2)**2
+
+    case ('tiD3', 'tiF3')
+       reject = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
 
     case ('psniB')
        reject = params(1).gt.0.1_kp*params(2)**2
 
     case ('csi')
-       reject = params(2).gt.csi_xendmax(efoldNum,params(1))
+       reject = params(2).gt.csi_xendmax(efoldNum,params(1)) &
+            .or. params(2).gt.csi_xendmax(efoldNum,params(1))-1._kp/params(1)
 
     case ('cnci')
        reject = params(2).lt.cnci_xendmin(efoldNum,params(1))
@@ -125,18 +135,22 @@ contains
     case ('sbi')
        reject = params(1).lt.sbi_alphamin(params(2))*(1._kp+epsilon(1._kp))
 
-    case ('imi')
+    case ('imi', 'imi1', 'imi2', 'imi3', 'imi4', 'imi5', 'imi6')
        reject = params(2).lt.imi_xendmin(efoldNum,params(1))
 
-    case ('kmiii')
-       reject = (params(1).lt.kmiii_alphamin(params(2))) &
-            .or.(params(1).gt.kmiii_alphamax(params(2)))
-
     case ('ssbi1')
-       reject = params(1).lt.ssbi1_alphamin(params(2))
+       ! The two conditions are equivalent, but the 2nd works better numerically
+       !reject = params(1).lt.ssbi1_alphamin(params(2))
+      reject = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), & 
+               params(1),params(2)).lt.1._kp
 
     case ('ssbi3')
-       reject = params(1).lt.ssbi3_alphamin(params(2))
+      reject = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), & 
+               params(1),params(2)).lt.1._kp) .or. &
+               (ssbi3_epstwo_potmax(params(1),params(2)) .gt. 0.1_kp)
+
+    case ('ssbi4')
+      reject = ssbi4_epstwo_potmax(params(1),params(2)) .gt. 0.1_kp
 
     case ('ssbi5')
        reject = params(1).gt.ssbi5_alphamax(params(2))
@@ -173,6 +187,9 @@ contains
 
     end select
 
+!   print*,'p=',params(1),'xend=',params(2)
+ !  pause
+
   end function check_aspic_hardprior
 
 
@@ -189,6 +206,10 @@ contains
     asparams = newparams
 
     select case (name)
+
+    case ('kmiii')
+       asparams(1) = newparams(1)*newparams(2)**(5._kp/3._kp)
+       asparams(2) = newparams(2)**(2._kp/3._kp)
 
     case ('lmi1o')
        asparams(1) = 2._kp/(newparams(1)+1._kp)
@@ -209,10 +230,15 @@ contains
        asparams(3) = newparams(3) * lmi2_xendmin(efoldNum,asparams(1),asparams(2))
 
 
-    case ('twi')
+    case ('twiA')
 
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)*newparams(1)
+
+    case ('twiB')
+
+       asparams(1) = 10._kp**(-5._kp)/sqrt(newparams(1))
+       asparams(2) = newparams(2)*asparams(1)
  
     case ('csi')
        asparams(1) = newparams(1)
@@ -224,7 +250,7 @@ contains
 !       asparams(2) = newparams(2) * cnci_xendmin(58._kp,asparams(1))
        asparams(2) = newparams(2) * cnci_xendmin(efoldNum,asparams(1))
 
-    case ('imi')
+    case ('imi', 'imi1', 'imi2', 'imi3', 'imi4', 'imi5', 'imi6')
        asparams(1) = newparams(1)
 !       asparams(2) = newparams(2) * imi_xendmin(65._kp,asparams(1))
        asparams(2) = newparams(2) * imi_xendmin(efoldNum,asparams(1))
@@ -260,7 +286,7 @@ contains
        asparams(3) = newparams(3) &
             * cndi_xendmax(efoldNum,asparams(1),asparams(2))
 
-    case ('psnift')
+    case ('psnift1', 'psnift2', 'psnift3', 'psnift4')
        asparams(1) = newparams(1)*newparams(2)**2
        asparams(2) = newparams(2)
 

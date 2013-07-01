@@ -89,17 +89,26 @@ TWOPRIORS(ii,0._kp,10._kp,flat,-1._kp,4._kp,log)
 TWOPRIORS(iif,0.1_kp,1._kp,inv,-1._kp,4._kp,log)
 TWOPRIORS(iilambda,0.1_kp,4._kp,log,-1._kp,4._kp,log)
 
+
 !second param phiend/phi0
-TWOPRIORS(twi,-4._kp,-1._kp,log,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp),log)
+TWOPRIORS(twiA,-4._kp,-1._kp,log,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp),log)
+!first param is N=10^(-10) (phi0/Mp)^(-2)
+TWOPRIORS(twiB,1._kp,100._kp,flat,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp),log)
 
 TWOPRIORS(bsusybif,0._kp,0.3_kp,flat,-200._kp,-0._kp,flat)
 TWOPRIORS(bsusybil,-3._kp,-1._kp,log,-200._kp,-0._kp,flat)
 
 TWOPRIORS(csi,-5,-1,log,0.,1.,flat)
 
-TWOPRIORS(cnci,-5,-1,log,1,100,flat)
+TWOPRIORS(cnci,-5,-1,log,1,10,flat)
 
-TWOPRIORS(imi,1,6,flat,1,100,flat)
+TWOPRIORS(imi,1._kp,6._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi1,1._kp,1._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi2,2._kp,2._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi3,3._kp,3._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi4,4._kp,4._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi5,5._kp,5._kp,flat,1._kp,100._kp,flat)
+TWOPRIORS(imi6,6._kp,6._kp,flat,1._kp,100._kp,flat)
 
 
 
@@ -123,7 +132,8 @@ TWOPRIORS(sfi4,4._kp,4._kp,flat,-1._kp,2._kp,log)
 TWOPRIORS(sfi4s,4._kp,4._kp,flat,-1._kp,0._kp,log)
 TWOPRIORS(sfi4l,4._kp,4._kp,flat,0._kp,2._kp,log)
 
-TWOPRIORS(kmiii,2._kp,16._kp,log,9._kp,15._kp,log)
+!Warning: 1st param is alpha/(beta V) and 2nd is V
+TWOPRIORS(kmiii,0.2_kp,5._kp,flat,5._kp,7._kp,log)
 
 TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,-2._kp,2._kp,log)
 TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
@@ -150,35 +160,52 @@ TWOPRIORS(gripiH,-28._kp,-1._kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gripiI,0.9_kp,1.1_kp,flat,-3._kp,3._kp,log)
 TWOPRIORS(gripiJ,0.9_kp,1.1_kp,flat,0.00002_kp,0.0002_kp,flat)
 
-TWOPRIORS(tiA,0.5_kp,0.6_kp,flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiB,0.5_kp,0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiC,0.4_kp,0.5_kp,flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiD,0.5_kp-10._kp**(-7._kp),0.5_kp,flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiE,0.4_kp,0.6_kp,flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiF,0.5_kp-10._kp**(-7._kp),0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
+!TWOPRIORS(tiA,0.5_kp,0.6_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiB1,0.5_kp,0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiB2,0.5_kp,0.5_kp+2.*10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiB3,0.5_kp,0.5_kp+10._kp**(-6._kp),flat,-5._kp,-3._kp,log)
+!TWOPRIORS(tiC,0.4_kp,0.5_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiD1,0.5_kp-10._kp**(-7._kp),0.5_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiD2,0.5_kp-10._kp**(-6._kp),0.5_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiD3,0.5_kp-10._kp**(-5._kp),0.5_kp,flat,-5._kp,-3._kp,log)
+!TWOPRIORS(tiE,0.4_kp,0.6_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiF1,0.5_kp-10._kp**(-7._kp),0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiF2,0.5_kp-10._kp**(-6._kp),0.5_kp+10._kp**(-6._kp),flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiF3,0.5_kp-10._kp**(-5._kp),0.5_kp+5.*10._kp**(-5._kp),flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiOneHalf,0.5_kp,0.5_kp,flat,-5._kp,-3._kp,log)
 
 TWOPRIORS(bei,-3._kp,3._kp,log,-1.5_kp,3._kp,log)
 
-TWOPRIORS(psni,-5._kp,-1._kp,log,-2._kp,1._kp,log)
+!TWOPRIORS(psni,-5._kp,-1._kp,log,-2._kp,1._kp,log)
 
 !first param alpha/f**2
-TWOPRIORS(psnift,-5._kp,-1._kp,log,-2._kp,1._kp,log)
+TWOPRIORS(psnift1,-5._kp,-1._kp,log,-2._kp,1._kp,log)
+TWOPRIORS(psnift2,-3._kp,-1._kp,log,-2._kp,1._kp,log)
+TWOPRIORS(psnift3,-2._kp,-1._kp,log,-2._kp,1._kp,log)
+TWOPRIORS(psnift4,-1.5_kp,-1._kp,log,-2._kp,1._kp,log)
 
-TWOPRIORS(ncki,-5,-1,log,0.1,5.,flat)
-!TWOPRIORS(ncki,-5,-1,log,-5.,-0.1,flat)
+TWOPRIORS(ncki+,-4._kp,-1._kp,log,0.05_kp,0.2_kp,flat)
+TWOPRIORS(ncki-,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
 
 TWOPRIORS(oi,-3._kp,-1._kp,log,-3._kp,-1._kp,log)
 
-TWOPRIORS(sbi,-5._kp,-1._kp,log,-5._kp,-1._kp,log)
+TWOPRIORS(sbi,-5._kp,-2._kp,log,-4._kp,-1._kp,log)
 
-TWOPRIORS(ssbi1,-5,1,log,-5,1,log)
-TWOPRIORS(ssbi2,-5,-1,mlog,-5,-1,mlog)
-TWOPRIORS(ssbi3,-5,1,log,-5,1,mlog)
-TWOPRIORS(ssbi4,-5,1,log,-5,1,mlog)
-TWOPRIORS(ssbi5,-5,-1,mlog,-5,-1,log)
-TWOPRIORS(ssbi6,-5,1,mlog,-5,1,log)
+TWOPRIORS(ssbi1,-3._kp,1._kp,log,-5._kp,1._kp,log)
+TWOPRIORS(ssbi2,-5._kp,-1._kp,mlog,-5._kp,1._kp,mlog)
+TWOPRIORS(ssbi3,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
+TWOPRIORS(ssbi4,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
+TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
+TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
 
+TWOPRIORS(bi,2._kp,10._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(biPH,2._kp,10._kp,flat,-3._kp,3._kp,log)
+TWOPRIORS(bi1,1._kp,1._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(bi2,2._kp,2._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(bi3,3._kp,3._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(bi4,4._kp,4._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(bi5,5._kp,5._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(bi6,6._kp,6._kp,flat,-3._kp,0._kp,log)
 
 
 
