@@ -33,8 +33,8 @@ program bayaspic
   integer, save :: mpiPrevSize = 1
 
 
-!  call initialize_manymodels()
-  call initialize_onemodel('dsi o')
+  call initialize_manymodels()
+!  call initialize_onemodel('rmi4')
 !  call initialize_filemodels('list_models.dat')
 
 
@@ -120,16 +120,11 @@ contains
 
     allocate(ModelNames(0:nmodels-1))
 
-    ModelNames(0) = 'vhi'
-    Modelnames(1) = 'vhi 12'
-    Modelnames(2) = 'vhi 1'
-    Modelnames(3) = 'vhi 2'
-!    Modelnames(2) = 'gmlfi 13'
-!    Modelnames(3) = 'gmlfi 21'
-!    Modelnames(4) = 'gmlfi 22'
-!    Modelnames(5) = 'gmlfi 23'
-!    Modelnames(6) = 'gmlfi 31'
-!    Modelnames(7) = 'gmlfi 32'
+    Modelnames(0) = 'rmi1'
+    Modelnames(1) = 'rmi2'
+    Modelnames(2) = 'rmi3'
+    Modelnames(3) = 'rmi4'
+!    Modelnames(4) = 'gripi'
     
         
   end subroutine initialize_manymodels

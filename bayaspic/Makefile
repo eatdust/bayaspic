@@ -3,11 +3,11 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=gfortran
-FCFLAGS= -O -fopenmp -DASPIC
+FC=mpif90
+FCFLAGS= -O -fopenmp -DASPIC -DMPISCHED
 F08FLAGS = -ffree-line-length-none
-INCLUDE=-I/usr/local/include/aspic
-LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
+INCLUDE=-I/usr/local/include/aspicq
+LFLAGS= -lblas -llapack -L/usr/local/lib -laspicq
 endif 
 
 

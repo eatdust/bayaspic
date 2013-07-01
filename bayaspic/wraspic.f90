@@ -460,7 +460,7 @@ contains
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
          ,mapnames(1:nasp))
 
-    test_aspic_hardprior = check_aspic_hardprior(extname,asparams)
+    test_aspic_hardprior = check_aspic_hardprior(extname,asparams(1:nasp))
 
   end function test_aspic_hardprior
 

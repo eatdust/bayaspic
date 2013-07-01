@@ -13,8 +13,10 @@ use ssbi5sr, only : ssbi5_alphamax
 use ssbi6sr, only : ssbi6_alphamax
 use rmi1sr, only : rmi1_numacc_xendmax
 use rmi2sr, only : rmi2_numacc_xendmin
-use rmi3sr, only : rmi3_numacc_xendmax
-use rmi4sr, only : rmi4_numacc_xendmin
+use rmi3sr, only : rmi3_numacc_xendmax, rmi3_numacc_xendmin
+use rmi4sr, only : rmi4_numacc_xendmin, rmi4_xendmax
 use vhisr, only : vhi_xendmin, vhi_xendmax
 use dsisr, only : dsi_mumax, dsi_xendmin, dsi_xendmax
 use cndisr, only : cndi_xendmax
+use gmssmisr, only : gmssmi_epstwomin, gmssmi_alphamin
+use gripisr, only : gripi_epstwomin, gripi_alphamin
