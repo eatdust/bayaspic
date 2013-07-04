@@ -33,11 +33,12 @@ program bayaspic
   integer, save :: mpiPrevSize = 1
 
 
-  call initialize_manymodels()
 
 !  call initialize_onemodel('sfi')
+!  call initialize_manymodels()
 
-!  call initialize_filemodels('list_models.dat')
+  call initialize_filemodels('list_models.dat')
+
 
 
 #ifdef MPISCHED
@@ -45,7 +46,7 @@ program bayaspic
   call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
   call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
 #endif
-
+  
 
   if (mpiPrevSize.eq.0) mpiPrevSize = mpiSize
 
@@ -141,13 +142,19 @@ contains
     character(len=*), intent(in) :: filename
 
     character(len=lmod) :: mname
+    character(len=2) :: cmod
+    character(len=len(cmod)+3) :: fmod
+
     integer, parameter :: nunit = 100
     integer :: i,counter,ioerr
+
+    write(cmod,'(I2)')lmod
+    fmod = '(A'//trim(cmod)//')'
 
     counter = 0
     open(unit=nunit,file=filename,status='old')
     do 
-       read(nunit,*,iostat=ioerr) mname
+       read(nunit,fmod,iostat=ioerr) mname
        if (ioerr.ne.0) exit
        counter = counter + 1
     enddo
@@ -158,18 +165,18 @@ contains
 
     open(unit=nunit,file=filename,status='old')
     do i=0,nmodels-1
-       read(nunit,*) ModelNames(i)
+       read(nunit,fmod) ModelNames(i)
     enddo
     close(nunit)
 
-    if (display) then
+    if ((display)) then
        write(*,*)
        write(*,*)'models read from file: ',trim(filename)
        write(*,*)'found nmodels=         ',nmodels
        write(*,*)'models list:           '
-       do i=0,nmodels-1
-          write(*,*)'            ',trim(ModelNames(i))
-       enddo
+!       do i=0,nmodels-1
+!          write(*,*)'            ',trim(ModelNames(i))
+!       enddo
        write(*,*)
     endif
 

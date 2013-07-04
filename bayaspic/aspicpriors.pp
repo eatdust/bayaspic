@@ -41,13 +41,13 @@ ONEPRIOR(plip,0._kp,1.1_kp,flat)
 ONEPRIOR(pli,-4._kp,0._kp,log)
 
 ONEPRIOR(kmii,0.382_kp,4._kp,log)
-ONEPRIOR(kmiiV>0,2.4095_kp,2.7183_kp,flat)
+ONEPRIOR(kmiivp,2.4095_kp,2.7183_kp,flat)
 
 ONEPRIOR(hf1i,-3._kp,3._kp,log)
 
 ONEPRIOR(li,-0.1_kp,0.1_kp,flat)
-ONEPRIOR(li+,-3._kp,-1._kp,log)
-ONEPRIOR(li-,-2.8_kp,-1._kp,mlog)
+ONEPRIOR(lip,-3._kp,-1._kp,log)
+ONEPRIOR(lin,-2.8_kp,-1._kp,mlog)
 
 ONEPRIOR(rpi1,1._kp,1.5_kp,flat)
 
@@ -58,7 +58,7 @@ ONEPRIOR(mhis,-2._kp,0._kp,log)
 ONEPRIOR(mhil,0._kp,2._kp,log)
 
 ONEPRIOR(rgi,-4._kp,4._kp,log)
-ONEPRIOR(rgi1Over16,0.0625_kp,0.0625_kp,log)
+ONEPRIOR(rgi116,0.0625_kp,0.0625_kp,log)
 ONEPRIOR(rgis,-4._kp,0._kp,log)
 ONEPRIOR(rgil,0._kp,4._kp,log)
 
@@ -165,7 +165,7 @@ TWOPRIORS(tiD3,0.5_kp-10._kp**(-5._kp),0.5_kp,flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiF1,0.5_kp-10._kp**(-7._kp),0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiF2,0.5_kp-10._kp**(-6._kp),0.5_kp+10._kp**(-6._kp),flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiF3,0.5_kp-10._kp**(-5._kp),0.5_kp+5.*10._kp**(-5._kp),flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiOneHalf,0.5_kp,0.5_kp,flat,-5._kp,-3._kp,log)
+TWOPRIORS(ti12,0.5_kp,0.5_kp,flat,-5._kp,-3._kp,log)
 
 TWOPRIORS(bei,-3._kp,3._kp,log,-1.5_kp,3._kp,log)
 
@@ -177,8 +177,8 @@ TWOPRIORS(psnift2,-3._kp,-1._kp,log,-2._kp,1._kp,log)
 TWOPRIORS(psnift3,-2._kp,-1._kp,log,-2._kp,1._kp,log)
 TWOPRIORS(psnift4,-1.5_kp,-1._kp,log,-2._kp,1._kp,log)
 
-TWOPRIORS(ncki+,-4._kp,-1._kp,log,0.05_kp,0.2_kp,flat)
-TWOPRIORS(ncki-,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
+TWOPRIORS(nckip,-4._kp,-1._kp,log,0.05_kp,0.2_kp,flat)
+TWOPRIORS(nckim,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
 
 TWOPRIORS(oi,-3._kp,-1._kp,log,-3._kp,-1._kp,log)
 
@@ -192,7 +192,7 @@ TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
 TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
 
 TWOPRIORS(bi,2._kp,10._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(biPH,2._kp,10._kp,flat,-3._kp,3._kp,log)
+TWOPRIORS(biph,2._kp,10._kp,flat,-3._kp,3._kp,log)
 TWOPRIORS(bi1,1._kp,1._kp,flat,-3._kp,0._kp,log)
 TWOPRIORS(bi2,2._kp,2._kp,flat,-3._kp,0._kp,log)
 TWOPRIORS(bi3,3._kp,3._kp,flat,-3._kp,0._kp,log)
@@ -231,7 +231,7 @@ THREEPRIORS(dsi2,2,2,flat,1d-9,1d-6,flat,-5,-0.7,log)
 
 !last params is xend/xendmax
 THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
-THREEPRIORS(cndi+,-2,-1,log,1.1,6,flat,0,1,flat)
+
 
 
 !witout xend
