@@ -202,6 +202,42 @@ contains
   end subroutine nest_print
 
 
+  subroutine nest_dump_priors(extname)
+    use nestparams, only : nestNdim, nestRootname
+    implicit none
+    character(len=*), intent(in) :: extname
+    integer, parameter :: nunit = 412
+    
+    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
+       stop 'nest_dump_priors: prior not allocated!'
+    endif
+
+    open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
+    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
+    write(nunit,*)'limits[lnRreh]=',nestPmin(2),nestPmax(2)
+
+    select case (nestNdim-2)
+    case (0)
+    case (1)
+       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
+    case(2)
+       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
+       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
+    case(3)
+       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
+       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
+       write(nunit,*)'limits[c3]=',nestPmin(5),nestPmax(5)
+    case default
+       stop 'nest_dump_priors: case not implemented!'
+    end select
+
+    close(nunit)
+
+
+  end subroutine nest_dump_priors
+
+
+
   subroutine nest_free_slowroll()
     use nestparams, only : nestPwrap    
     implicit none
@@ -301,6 +337,8 @@ contains
        
     allocate(nestPwrap(nestNdim))
     nestPwrap = 0
+
+    call nest_dump_priors(trim(name)//subname)
 
     call nest_print()
     
