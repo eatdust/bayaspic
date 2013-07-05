@@ -48,6 +48,9 @@ contains
     allocate(AspicModel%params(AspicModel%nasp))
     allocate(AspicModel%cmaps(AspicModel%nasp))
 
+    AspicModel%params = 0._kp
+    AspicModel%cmaps = 'undefined'
+
   end subroutine set_model
 
 
@@ -251,7 +254,7 @@ contains
 
     do i=1,nasp
     
-       select case (mapnames(i))
+       select case (trim(mapnames(i)))
 
        case ('flat')
 

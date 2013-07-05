@@ -45,9 +45,8 @@ ONEPRIOR(kmiivp,2.4095_kp,2.7183_kp,flat)
 
 ONEPRIOR(hf1i,-3._kp,3._kp,log)
 
-ONEPRIOR(li,-0.1_kp,0.1_kp,flat)
-ONEPRIOR(lip,-3._kp,-1._kp,log)
-ONEPRIOR(lin,-2.8_kp,-1._kp,mlog)
+ONEPRIOR(lip,0.005_kp,0.1_kp,flat)
+ONEPRIOR(lin,-0.3_kp,-0.1_kp,flat)
 
 ONEPRIOR(rpi1,1._kp,1.5_kp,flat)
 

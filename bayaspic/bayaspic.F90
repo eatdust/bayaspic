@@ -34,10 +34,10 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('sfi')
+  call initialize_onemodel('li n')
 !  call initialize_manymodels()
 
-  call initialize_filemodels('list_models.dat')
+!  call initialize_filemodels('list_models.dat')
 
 
 
@@ -119,18 +119,20 @@ contains
   subroutine initialize_manymodels()
     implicit none
     
-    nmodels = 8
+    nmodels = 1
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'hi'
-    Modelnames(1) = 'rchi o'
-    Modelnames(2) = 'rchi'
-    Modelnames(3) = 'lfi'
-    Modelnames(4) = 'lfi 23'
-    Modelnames(5) = 'lfi 1'
-    Modelnames(6) = 'lfi 2'
-    Modelnames(7) = 'lfi 3'
+    Modelnames(0) = 'li p'
+!    Modelnames(1) = 'li p'
+!    Modelnames(2) = 'li n'
+
+!    Modelnames(2) = 'rchi'
+!    Modelnames(3) = 'lfi'
+!    Modelnames(4) = 'lfi 23'
+!    Modelnames(5) = 'lfi 1'
+!    Modelnames(6) = 'lfi 2'
+!    Modelnames(7) = 'lfi 3'
     
         
   end subroutine initialize_manymodels

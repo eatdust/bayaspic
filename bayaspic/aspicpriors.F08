@@ -29,7 +29,7 @@ contains
     use aspicmodels, only : get_aspic_numparams
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(out) :: pmin, pmax
-    character(len=lname), dimension(:), intent(out) :: mapname
+    character(len=lname), dimension(:), intent(inout) :: mapname
 
     integer :: naspic
 
@@ -131,6 +131,9 @@ contains
     case ('gripiopA','gripiopB','gripiomA','gripiomB','gripiomC')
        reject = (gripi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
             .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)))
+
+    case ('lip', 'lin')
+       reject = params(1).lt.li_alphamin(efoldNum)
 
     case ('tiB1', 'tiD1', 'tiF1')
        reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2

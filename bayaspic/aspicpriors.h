@@ -22,3 +22,4 @@ use dsisr, only : dsi_mumax, dsi_xendmin, dsi_xendmax
 use cndisr, only : cndi_xendmax
 use gmssmisr, only : gmssmi_epstwomin, gmssmi_alphamin
 use gripisr, only : gripi_epstwomin, gripi_alphamin
+use lisr, only : li_alphamin
