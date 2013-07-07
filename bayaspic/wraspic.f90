@@ -49,7 +49,7 @@ contains
     allocate(AspicModel%cmaps(AspicModel%nasp))
 
     AspicModel%params = 0._kp
-    AspicModel%cmaps = 'undefined'
+    AspicModel%cmaps ='undefined'
 
   end subroutine set_model
 
@@ -218,7 +218,8 @@ contains
 !model dependant
 
     call get_aspic_priors(AspicModel%extname,aspmin,aspmax,AspicModel%cmaps)
-    
+
+
     pmin(nextra+1:ntot) = aspmin(1:nasp)
     pmax(nextra+1:ntot) = aspmax(1:nasp)
 
@@ -286,7 +287,8 @@ contains
 
        
        case default
-          
+
+          write(*,*)'mapname= ',mapnames(i)
           stop 'map_aspic_params: not such priors!'
 
        end select
@@ -352,10 +354,9 @@ contains
 !let's get everything from libaspic
     aspname = trim(AspicModel%name)
     forall (i=1:nasp)
-       mapnames(i) = trim(AspicModel%cmaps(i))
+       mapnames(i) = AspicModel%cmaps(i)
     end forall
 !    asparams(1:nasp) = mnParams(nextra+1:ntot)
-
 
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
          ,mapnames(1:nasp))
@@ -457,7 +458,7 @@ contains
     extname = trim(AspicModel%extname)
 
     forall (i=1:nasp)
-       mapnames(i) = trim(AspicModel%cmaps(i))
+       mapnames(i) = AspicModel%cmaps(i)
     end forall
 
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
