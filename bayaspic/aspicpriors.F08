@@ -148,8 +148,7 @@ contains
        reject = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
 
     case ('csi')
-       reject = params(2).gt.csi_xendmax(efoldNum,params(1)) &
-            .or. params(2).gt.csi_xendmax(efoldNum,params(1))-1._kp/params(1)
+       reject = params(2).lt.(1._kp-1._kp/params(1)/csi_xendmax(efoldNum,params(1)))
 
     case ('cnci')
        reject = params(2).lt.cnci_xendmin(efoldNum,params(1))
