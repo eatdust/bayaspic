@@ -1,4 +1,5 @@
 use iisr, only : ii_xendmin
+use sbisr, only : sbi_alphamin
 use lmicommon, only : lmi_epstwo_potmax
 use lmi2sr, only : lmi2_xendmin
 use bsusybisr, only : bsusybi_xendmax

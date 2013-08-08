@@ -45,8 +45,9 @@ ONEPRIOR(kmiivp,2.4095_kp,2.7183_kp,flat)
 
 ONEPRIOR(hf1i,-3._kp,3._kp,log)
 
-ONEPRIOR(lip,0.005_kp,0.1_kp,flat)
-ONEPRIOR(lin,-0.3_kp,-0.1_kp,flat)
+ONEPRIOR(li,-0.3_kp,0.3_kp,flat)
+ONEPRIOR(lip,log10(0.003_kp),log10(0.3_kp),log)
+ONEPRIOR(lin,-0.4_kp,-0.1_kp,flat)
 
 ONEPRIOR(rpi1,1._kp,1.5_kp,flat)
 
@@ -66,6 +67,7 @@ ONEPRIOR(mssmio,0.00002_kp,0.0002_kp,flat)
 
 ONEPRIOR(ripip,-3._kp,3._kp,log)
 ONEPRIOR(ripio,0.00002_kp,0.0002_kp,flat)
+ONEPRIOR(ripiS,10._kp,50._kp,flat)
 
 ONEPRIOR(ai,-3._kp,log(0.512378_kp)/log(10._kp),log)
 
@@ -150,6 +152,7 @@ TWOPRIORS(gripiopB,-15_kp,-10_kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiomA,-15_kp,-5_kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiomB,-15_kp,-8_kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiomC,-15_kp,-10_kp,log,0.02_kp,0.2_kp,flat)
+TWOPRIORS(gripiS,0.98_kp,1.02_kp,flat,10._kp,50._kp,flat)
 
 
 !TWOPRIORS(tiA,0.5_kp,0.6_kp,flat,-5._kp,-3._kp,log)
@@ -182,6 +185,7 @@ TWOPRIORS(nckim,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
 TWOPRIORS(oi,-3._kp,-1._kp,log,-3._kp,-1._kp,log)
 
 TWOPRIORS(sbi,-5._kp,-2._kp,log,-4._kp,-1._kp,log)
+TWOPRIORS(sbialphamin,1._kp,1._kp,flat,-4._kp,-1._kp,log) !alpha is set to alphamin(beta)
 
 TWOPRIORS(ssbi1,-3._kp,1._kp,log,-5._kp,1._kp,log)
 TWOPRIORS(ssbi2,-5._kp,-1._kp,mlog,-5._kp,1._kp,mlog)
@@ -189,6 +193,13 @@ TWOPRIORS(ssbi3,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi4,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
 TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
+
+TWOPRIORS(ssbi1f,0.001,10._kp,flat,0.00001_kp,10._kp,flat)
+TWOPRIORS(ssbi2f,-0.1_kp,-0.00001_kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi3f,0.00001_kp,10._kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi4f,0.00001,10._kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
+TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
 TWOPRIORS(bi,2._kp,10._kp,flat,-3._kp,0._kp,log)
 TWOPRIORS(biph,2._kp,10._kp,flat,-3._kp,3._kp,log)
@@ -206,19 +217,29 @@ THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 
 !you may need quadruple precision for aspic for some of these
-!two. Inflation can occur at the top of the potential with hyper-fine
+!two (four). Inflation can occur at the top of the potential with hyper-fine
 !tuned conditions (and ns=1...)
 THREEPRIORS(rmi1,0.01,0.2,flat,-2,0,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi1l,-3.,-1.,log,-2,0,log,exp(-1._kp),1._kp,flat)
+
 THREEPRIORS(rmi2,0.01,0.2,flat,-2,0,log,1._kp,exp(1._kp),flat)
+THREEPRIORS(rmi2l,-3,-1,log,-2,0,log,1._kp,exp(1._kp),flat)
+
 THREEPRIORS(rmi3,-0.2,-0.01,flat,-2,0,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi3l,-3,-1,mlog,-2,0,log,exp(-1._kp),1._kp,flat)
+
 !the last params is y such that xend = 1 + y(xendmax-1)
 THREEPRIORS(rmi4,-0.2,-0.01,flat,-2,0,log,0._kp,1._kp,flat)
+THREEPRIORS(rmi4l,-3,-1,mlog,-2,0,log,0._kp,1._kp,flat)
 
-!last params is y with with xend=xendmin+y*(xendmax-xendmin)
+!last params is y with xend=xendmin+y*(xendmax-xendmin)
 THREEPRIORS(vhi,1+epsilon(1._kp),6,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhil1,0,0.9,flat,0,3,log,0,1,flat) ! One needs quadruple precision for vhi l1
 THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi1,1,1,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi2,2,2,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi3,3,3,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi4,4,4,flat,0,3,log,0,1,flat)
 
 
 !second param is mu/mumax, last is y with xend=xendmin+y*(xendmax-xendmin)
@@ -251,6 +272,7 @@ THREEPRIORS(gmlfi33,3,3,flat,3,3,flat,-5,1,log)
 THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
 THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
 THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
+THREEPRIORS(lpi142,4,4,flat,2,2,flat,-3,3,log)
 
 THREEPRIORS(lpi22,1,6,flat,2,2,flat,2,5,log)
 THREEPRIORS(lpi24,1,6,flat,4,4,flat,2,5,log)

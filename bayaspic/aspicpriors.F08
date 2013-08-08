@@ -120,7 +120,7 @@ contains
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
 
     case ('gmssmiopA','gmssmiopB','gmssmiomA','gmssmiomB')
-       reject = (gmssmi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
+       reject = (abs(gmssmi_epstwomin(params(1),params(2))).gt.eps2MinMax) &
             .or. (params(1).lt.gmssmi_alphamin(efoldMini,params(2)))
 
     case ('gripi')
@@ -132,8 +132,11 @@ contains
        reject = (gripi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
             .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)))
 
-    case ('lip', 'lin')
+    case ('lin')
        reject = params(1).lt.li_alphamin(efoldNum)
+
+    case ('li')
+       reject = params(1) .gt. -0.1_kp .and. params(1) .lt. 0.003_kp 
 
     case ('tiB1', 'tiD1', 'tiF1')
        reject = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
@@ -148,7 +151,8 @@ contains
        reject = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
 
     case ('csi')
-       reject = params(2).lt.(1._kp-1._kp/params(1)/csi_xendmax(efoldNum,params(1)))
+       reject = params(2).gt.csi_xendmax(efoldNum,params(1)) &
+            .or. params(2).lt.csi_xendmax(efoldNum,params(1))-1._kp/params(1)
 
     case ('cnci')
        reject = params(2).lt.cnci_xendmin(efoldNum,params(1))
@@ -159,36 +163,36 @@ contains
     case ('imi', 'imi1', 'imi2', 'imi3', 'imi4', 'imi5', 'imi6')
        reject = params(2).lt.imi_xendmin(efoldNum,params(1))
 
-    case ('ssbi1')
+    case ('ssbi1', 'ssbi1f')
 !otherwise inflation does not stop
       reject = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), & 
                params(1),params(2)).lt.1._kp
 
-    case ('ssbi3')
+    case ('ssbi3', 'ssbi3f')
       reject = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), & 
                params(1),params(2)).lt.1._kp) .or. &
                (ssbi3_epstwo_potmax(params(1),params(2)) .gt. eps2MinMax)
 
-    case ('ssbi4')
+    case ('ssbi4', 'ssbi4f')
       reject = ssbi4_epstwo_potmax(params(1),params(2)) .gt. eps2MinMax
 
-    case ('ssbi5')
+    case ('ssbi5','ssbi5f')
        reject = params(1).gt.ssbi5_alphamax(params(2))
 
-    case ('ssbi6')
+    case ('ssbi6','ssbi6f')
        reject = params(1).gt.ssbi6_alphamax(params(2))
               
-    case ('rmi1')
+    case ('rmi1', 'rmi1l')
        reject = params(3).gt.rmi1_numacc_xendmax(efoldNum,params(1),params(2))
 
-    case ('rmi2')
+    case ('rmi2', 'rmi2l')
        reject = params(3).lt.rmi2_numacc_xendmin(efoldNum,params(1),params(2))
 
-    case ('rmi3')
+    case ('rmi3', 'rmi3l')
        reject = (params(3).gt.rmi3_numacc_xendmax(params(1),params(2))) &
             .or. (params(3).lt.rmi3_numacc_xendmin(efoldNum,params(1),params(2)))
 
-    case ('rmi4')
+    case ('rmi4', 'rmi4l')
        reject = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
 
     case ('dsio', 'dsi2')
@@ -212,6 +216,10 @@ contains
     asparams = newparams
 
     select case (name)
+
+    case ('sbialphamin')
+       asparams(1) = sbi_alphamin(newparams(2))
+       asparams(2) = newparams(2)
 
     case ('kmiii')
        asparams(1) = newparams(1)*newparams(2)**(5._kp/3._kp)
@@ -257,7 +265,7 @@ contains
 
     case ('gmssmiopA','gmssmiopB')
        asparams(1) = 1._kp + newparams(1)
-       asparams(2) = newparams(2)      
+       asparams(2) = newparams(2)    
 
     case ('gmssmiomA','gmssmiomB')
        asparams(1) = 1._kp - newparams(1)
@@ -289,13 +297,13 @@ contains
        asparams(1) = newparams(1)*newparams(2)**2
        asparams(2) = newparams(2)
 
-    case ('rmi4')
+    case ('rmi4', 'rmi4l')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = 1._kp + newparams(3) &
             * (rmi4_xendmax(efoldNum,asparams(1),asparams(2)) - 1._kp)
 
-    case ('vhi')
+    case ('vhi','vhi12','vhi1','vhi2','vhi3','vhi4','vhil1')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = vhi_xendmin(asparams(1),asparams(2)) &
