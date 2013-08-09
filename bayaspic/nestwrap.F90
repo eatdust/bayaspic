@@ -556,7 +556,7 @@ contains
 
   subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
        , maxLogLike, logZ, logZerr, context)
-
+    use nestparams, only : nestRootName
     implicit none
 ! number of samples in posterior array
     integer :: nSamples				
@@ -583,6 +583,7 @@ contains
     write(*,*)
     write(*,*)'*****************************************************'
     write(*,*)'nest_dumper: '
+    write(*,*)'nestRoot: ',trim(nestRootName)
     write(*,*)'nSamples= logZ= logZerr= ',nSamples, logZ, logZerr
     write(*,*)'maxLogLike= ',maxLogLike
     write(*,*)'*****************************************************'
