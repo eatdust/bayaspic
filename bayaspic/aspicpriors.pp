@@ -185,7 +185,8 @@ TWOPRIORS(nckim,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
 TWOPRIORS(oi,-3._kp,-1._kp,log,-3._kp,-1._kp,log)
 
 TWOPRIORS(sbi,-5._kp,-2._kp,log,-4._kp,-1._kp,log)
-TWOPRIORS(sbialphamin,1._kp,1._kp,flat,-4._kp,-1._kp,log) !alpha is set to alphamin(beta)
+!alpha is set to alphamin(beta)
+TWOPRIORS(sbialphamin,1._kp,1._kp,flat,-4._kp,-1._kp,log)
 
 TWOPRIORS(ssbi1,-3._kp,1._kp,log,-5._kp,1._kp,log)
 TWOPRIORS(ssbi2,-5._kp,-1._kp,mlog,-5._kp,1._kp,mlog)
@@ -234,7 +235,8 @@ THREEPRIORS(rmi4l,-3,-1,mlog,-2,0,log,0._kp,1._kp,flat)
 
 !last params is y with xend=xendmin+y*(xendmax-xendmin)
 THREEPRIORS(vhi,1+epsilon(1._kp),6,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhil1,0,0.9,flat,0,3,log,0,1,flat) ! One needs quadruple precision for vhi l1
+! One needs quadruple precision for vhi l1
+THREEPRIORS(vhil1,0,0.9,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi1,1,1,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi2,2,2,flat,0,3,log,0,1,flat)
@@ -271,8 +273,9 @@ THREEPRIORS(gmlfi33,3,3,flat,3,3,flat,-5,1,log)
 
 THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
 THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
-THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
 THREEPRIORS(lpi142,4,4,flat,2,2,flat,-3,3,log)
+THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
+
 
 THREEPRIORS(lpi22,1,6,flat,2,2,flat,2,5,log)
 THREEPRIORS(lpi24,1,6,flat,4,4,flat,2,5,log)
