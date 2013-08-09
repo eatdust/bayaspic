@@ -84,7 +84,7 @@ ONEPRIOR(wrio,1._kp,1._kp,flat)
 
 !with xend
 
-TWOPRIORS(rpi2,1.,1.5,flat,1,2,log)
+TWOPRIORS(rpi2,1.,1.5,flat,0.5,2,log)
 
 TWOPRIORS(ii,0._kp,10._kp,flat,-1._kp,4._kp,log)
 TWOPRIORS(iif,0.1_kp,1._kp,inv,-1._kp,4._kp,log)
