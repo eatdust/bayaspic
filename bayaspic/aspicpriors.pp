@@ -62,9 +62,11 @@ ONEPRIOR(rgi116,0.0625_kp,0.0625_kp,log)
 ONEPRIOR(rgis,-4._kp,0._kp,log)
 ONEPRIOR(rgil,0._kp,4._kp,log)
 
+!ripi requires quad-precision
 ONEPRIOR(mssmip,-3._kp,3._kp,log)
 ONEPRIOR(mssmio,0.00002_kp,0.0002_kp,flat)
 
+!ripi requires quad-precision
 ONEPRIOR(ripip,-3._kp,3._kp,log)
 ONEPRIOR(ripio,0.00002_kp,0.0002_kp,flat)
 ONEPRIOR(ripiS,10._kp,50._kp,flat)
@@ -138,14 +140,14 @@ TWOPRIORS(kmiii,0.2_kp,5._kp,flat,5._kp,7._kp,log)
 TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,-2._kp,2._kp,log)
 TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 
-!you may need to compile aspic in quadruple precision for those
-!fine-tuned bastards
+!gmssmi requires aspic quad-precision
 TWOPRIORS(gmssmi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
 TWOPRIORS(gmssmiopA,-28_kp,-18_kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiopB,-28_kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomA,-28_kp,-18_kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomB,-28_kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
 
+!grippi requires aspic quad-precision
 TWOPRIORS(gripi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
 TWOPRIORS(gripiopA,-15_kp,-5_kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiopB,-15_kp,-10_kp,log,0.02_kp,0.2_kp,flat)
@@ -217,7 +219,7 @@ TWOPRIORS(bi6,6._kp,6._kp,flat,-3._kp,0._kp,log)
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 
-!you may need quadruple precision for aspic for some of these
+!rmi1* requires quadruple precision for aspic for some of these
 !two (four). Inflation can occur at the top of the potential with hyper-fine
 !tuned conditions (and ns=1...)
 THREEPRIORS(rmi1,0.01,0.2,flat,-2,0,log,exp(-1._kp),1._kp,flat)
@@ -235,7 +237,8 @@ THREEPRIORS(rmi4l,-3,-1,mlog,-2,0,log,0._kp,1._kp,flat)
 
 !last params is y with xend=xendmin+y*(xendmax-xendmin)
 THREEPRIORS(vhi,1+epsilon(1._kp),6,flat,0,3,log,0,1,flat)
-! One needs quadruple precision for vhi l1
+
+!vhi l1 requires quadruple precision for aspic
 THREEPRIORS(vhil1,0,0.9,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0,3,log,0,1,flat)
 THREEPRIORS(vhi1,1,1,flat,0,3,log,0,1,flat)
