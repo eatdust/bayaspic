@@ -61,18 +61,6 @@ lmi1 p
 lmi1 o
 twi A
 twi B
-gmssmi
-gmssmi opA
-gmssmi opB
-gmssmi omA
-gmssmi omB
-gripi
-gripi opA
-gripi opB
-gripi omA
-gripi omB
-gripi omC
-gripi S
 bsusybi g
 bsusybi l
 ti B1
@@ -124,21 +112,6 @@ bi 3
 bi 4
 bi 5
 bi 6
-rmi1
-rm1 l
-rmi2
-rmi2 l
-rmi3
-rmi3 l
-rmi4
-rmi4 l
-vhi
-vhi l1
-vhi l2
-vhi 1
-vhi 2
-vhi 3
-vhi 4
 dsi
 dsi o
 dsi 2
