@@ -135,28 +135,44 @@ contains
     integer, intent(in) :: ntodo    
     type(qval) :: qbuffer
     integer :: nwork, rank, qsize
-    integer :: i
+    integer :: i,j
 
     nwork = get_mpi_size()
     rank = get_mpi_rank()
     
     if (mod(ntodo,nwork).ne.0) then
        write(*,*)'ntodo= nwork= ',ntodo,nwork,mod(ntodo,nwork)
-       stop 'create_new_queues: morron; do a proper integer division!'
+       write(*,*) 'create_new_queues: queue will be of unequal sizes!'
     endif
 
-    
-    qsize = ntodo/nwork
 
-!create a qsize queue in each of the mpi processeses
-!clear the boundaries
+!old interleaving of equal sizes    
+!    qsize = ntodo/nwork
+!!create a qsize queue in each of the mpi processeses
+!!clear the boundaries
+!    call nullify_queue_ends(qbounds)
+
+!!interleaves 0,1,2..nqsize-1 into the queue
+!    do i = 0,qsize-1
+!       qbuffer%id = rank + i*nwork
+!       call push_in_back(qbounds, qbuffer)
+!    end do
+
+
+!new allows for queues of unequal sizes
+       
     call nullify_queue_ends(qbounds)
-
-!interleaves 0,1,2..nqsize-1 into the queue
-    do i = 0,qsize-1
-       qbuffer%id = rank + i*nwork
+    
+    j=rank
+    qsize = 0
+    do while (j.le.ntodo-1)
+       qbuffer%id = j
        call push_in_back(qbounds, qbuffer)
-    end do
+       qsize = qsize + 1
+       j = j + nwork
+    enddo
+
+
 
 !for debugging only
 !    qbuffer%id=125
