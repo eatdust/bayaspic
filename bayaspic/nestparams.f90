@@ -56,7 +56,7 @@ module nestparams
   logical, parameter :: nestFeedBack = .false.
 
 !whether to resume from a previous run
-  logical, parameter :: nestResume = .false.
+  logical, parameter :: nestResume = .true.
 
 !whether to write output files
   logical, parameter ::  nestOutfile = .true.

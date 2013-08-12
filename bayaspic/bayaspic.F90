@@ -30,7 +30,7 @@ program bayaspic
 
 
 !if zero, assume same mpiSize between runs.
-  integer, save :: mpiPrevSize = 1
+  integer, save :: mpiPrevSize = 0
 
 
 
