@@ -61,7 +61,7 @@ lmi1 p
 lmi1 o
 twi A
 twi B
-bsusybi g
+bsusybi f
 bsusybi l
 ti B1
 ti B2
