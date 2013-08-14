@@ -33,7 +33,7 @@ module nestwrap
 
   public nest_free_slowroll
   public nest_init_slowroll, nest_sample_slowroll
-#ifdef ASPIC
+#if defined ASPIC || ASPICQ
   public nest_init_aspic, nest_sample_aspic, nest_free_aspic
 #endif
 
@@ -250,7 +250,7 @@ contains
 
   
 
-#ifdef ASPIC
+#if defined ASPIC || ASPICQ
   subroutine nest_init_aspic(modelname)
     use wraspic, only : set_model, get_ntot
     use wraspic, only : get_allprior
