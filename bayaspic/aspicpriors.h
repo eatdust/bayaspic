@@ -25,3 +25,5 @@ use cndisr, only : cndi_xendmax
 use gmssmisr, only : gmssmi_epstwomin, gmssmi_alphamin
 use gripisr, only : gripi_epstwomin, gripi_alphamin
 use lisr, only : li_alphamin
+use bisr, only : bi_x_epsoneunity, bi_x_trajectory
+use kkltisr, only : kklti_x_epsoneunity, kklti_x_trajectory

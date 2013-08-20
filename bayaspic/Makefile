@@ -3,8 +3,9 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DMPISCHED
+FC=gfortran
+FCFLAGS= -O2 -fopenmp -DASPIC
+#-DMPISCHED
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
@@ -38,7 +39,7 @@ bayaspic.$(ext): $(OBJFILES) $(OBJSMPI) bayaspic.o
 bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
 	$(FC) $(FCFLAGS) $(OBJFILES) bayslowroll.o -o ../$@ $(LFLAGS) 
 
-aspicmodels.o: aspicmodels.h aspicnames.pp
+aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
 nestwrap.o: nestparams.o
 

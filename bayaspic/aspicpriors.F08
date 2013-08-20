@@ -72,11 +72,30 @@ contains
        mapname(3) = 'foo3map' ; \
        if (naspic.ne.3) stop 'get_aspic_priors: wrong npriors'
 
+#define FOURPRIORS(fooi,foo1min,foo1max,foo1map,foo2min,foo2max,foo2map \
+       ,foo3min,foo3max,foo3map,foo4min,foo4max,foo4map) \
+    case ('fooi'); \
+       pmin(1) = foo1min ; \
+       pmax(1) = foo1max ; \
+       mapname(1) = 'foo1map' ; \
+       pmin(2) = foo2min ; \
+       pmax(2) = foo2max ; \
+       mapname(2) = 'foo2map' ; \
+       pmin(3) = foo3min ; \
+       pmax(3) = foo3max ; \
+       mapname(3) = 'foo3map' ; \
+       pmin(4) = foo4min ; \
+       pmax(4) = foo4max ; \
+       mapname(4) = 'foo4map' ; \
+       if (naspic.ne.4) stop 'get_aspic_priors: wrong npriors'
+
+
 #include "aspicpriors.pp"
 #undef ZEROPRIOR
 #undef ONEPRIOR
 #undef TWOPRIORS
 #undef THREEPRIORS
+#undef FOURPRIORS
 
     case default
        stop 'get_aspic_priors: model not found!'
@@ -100,7 +119,7 @@ contains
 
     select case (name)
 
-    case ('ii', 'iif', 'iilambda')
+    case ('ii','iif','iilambda')
        reject = params(2).lt.ii_xendmin(efoldNum,params(1))
 
     case ('lmi1o', 'lmi1p')
@@ -198,6 +217,14 @@ contains
     case ('dsio', 'dsi2')
        reject = params(2) .gt. dsi_mumax(efoldNum,params(1),qDsi)
 
+    case ('bistg')
+!enforce the hard prior bound xini<xuv (asparams(4) is xuv)
+       reject = params(4).lt.bi_x_trajectory(-efoldNum,params(3),params(1),params(2))
+
+    case ('kkltistg')
+!enforce the hard prior bound xini<xuv (asparams(4) is xuv)
+       reject = params(4).lt.kklti_x_trajectory(-efoldNum,params(3),params(1),params(2))
+
     end select
 
   end function check_aspic_hardprior
@@ -205,7 +232,7 @@ contains
 
 
 !redefinition of aspic params (called after change of priors, see wraspic)
-  function redefine_aspic_params(name,nasp,newparams) result(asparams)
+  function redefine_aspic_params(name,nasp,newparams) result(asparams)    
     include 'aspicpriors.h'
     implicit none   
     character(len=*), intent(in) :: name
@@ -321,13 +348,45 @@ contains
             + newparams(3) * ( dsi_xendmax(asparams(1),asparams(2),qDSI) &
             - dsi_xendmin(efoldNum,asparams(1),asparams(2)) )
 
-    case ('dsio', 'dsi2')
+    case ('dsio','dsi2')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = dsi_xendmin(efoldNum,asparams(1),asparams(2)) &
             + newparams(3) * ( dsi_xendmax(asparams(1),asparams(2),qDSI) &
             - dsi_xendmin(efoldNum,asparams(1),asparams(2)) )
             
+    case ('bi','bis','bi1s','bi2s','bi3s','bi4s','bi5s','bi6s')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+!overload xend with xeps1 for the pheno bi models
+       asparams(3) = bi_x_epsoneunity(asparams(1),asparams(2))
+!unused
+       asparams(4) = 0._kp
+
+    case ('kklti','kkltis','kklti1s','kklti2s','kklti3s','kklti4s','kklti5s','kklti6s')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+!overload xend with xeps1 for the pheno kklti models
+       asparams(3) = kklti_x_epsoneunity(asparams(1),asparams(2))
+!unused
+       asparams(4) = 0._kp
+        
+    case ('bistg')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+!overload xend with max(xeps1,xstg)
+       asparams(3) = max(bi_x_epsoneunity(asparams(1),asparams(2)),newparams(3))
+!multinest param is phiuv, we map it to xuv = phiuv/mu
+       asparams(4) = newparams(4)/newparams(2)
+
+    case ('kkltistg')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+!overload xend with max(xeps1,xstg)
+       asparams(3) = max(kklti_x_epsoneunity(asparams(1),asparams(2)),newparams(3))
+!multinest param is phiuv, we map it to xuv = phiuv/mu
+       asparams(4) = newparams(4)/newparams(2)
+
     end select
 
   end function redefine_aspic_params

@@ -118,7 +118,7 @@ TWOPRIORS(imi6,6._kp,6._kp,flat,1._kp,100._kp,flat)
 !witout xend
 
 TWOPRIORS(cwil,4._kp*exp(1._kp),4._kp*exp(1._kp),flat,-5._kp,-3._kp,log)
-TWOPRIORS(cwif,4._kp*exp(1._kp),4._kp*exp(1._kp),flat,5._kp*10.**(-5._kp),5._kp*10.**(-4._kp),flat)
+TWOPRIORS(cwif,4._kp*exp(1._kp),4._kp*exp(1._kp),flat,5._kp*10._kp**(-5._kp),5._kp*10._kp**(-4._kp),flat)
 
 TWOPRIORS(sfi,2._kp,10._kp,flat,-1._kp,2._kp,log)
 TWOPRIORS(sfis,2._kp,10._kp,flat,-1._kp,0._kp,log)
@@ -203,16 +203,6 @@ TWOPRIORS(ssbi4f,0.00001,10._kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
-TWOPRIORS(bi,2._kp,10._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(biph,2._kp,10._kp,flat,-3._kp,3._kp,log)
-TWOPRIORS(bi1,1._kp,1._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(bi2,2._kp,2._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(bi3,3._kp,3._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(bi4,4._kp,4._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(bi5,5._kp,5._kp,flat,-3._kp,0._kp,log)
-TWOPRIORS(bi6,6._kp,6._kp,flat,-3._kp,0._kp,log)
-
-
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
@@ -257,7 +247,6 @@ THREEPRIORS(dsi2,2,2,flat,1d-9,1d-6,flat,-5,-0.7,log)
 THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
 
 
-
 !witout xend
 
 THREEPRIORS(gmlfi,1,6,flat,1,6,flat,-5,1,log)
@@ -286,5 +275,28 @@ THREEPRIORS(lpi26,1,6,flat,6,6,flat,2,5,log)
 THREEPRIORS(lpi32,1,6,flat,2,2,flat,2,5,log)
 THREEPRIORS(lpi34,1,6,flat,4,4,flat,2,5,log)
 THREEPRIORS(lpi36,1,6,flat,6,6,flat,2,5,log)
+
+
+!with xend and xini
+
+!bi/kklti within string scenarios. The parameters are p=4, mu<<Mpl, xstg and
+!the last is phiuv=xuv*mu
+FOURPRIORS(bistg,4,4,flat,-6,log10(2._kp),log,0,3,log,-2,log10(2._kp),log)
+FOURPRIORS(kkltistg,4,4,flat,-6,log10(2._kp),log,0,3,log,-2,log10(2._kp),log)
+
+!bi/kklti pheno, xstg and xuv have no role and they are fixed to
+!unphysical values (xstg=-1,xuv=-1). Inflation ends at xeps1
+
+FOURPRIORS(kklti,2._kp,10._kp,flat,-3._kp,3._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(kkltis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+
+FOURPRIORS(bi,2._kp,10._kp,flat,-3._kp,3._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi1s,1._kp,1._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi2s,2._kp,2._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi3s,3._kp,3._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi4s,4._kp,4._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi5s,5._kp,5._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
+FOURPRIORS(bi6s,6._kp,6._kp,flat,-3._kp,0._kp,log,-1,-1,flat,-1,-1,flat)
 
 

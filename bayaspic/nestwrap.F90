@@ -223,10 +223,15 @@ contains
     case(2)
        write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
        write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
-    case(3)
+    case (3)
        write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
        write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
        write(nunit,*)'limits[c3]=',nestPmin(5),nestPmax(5)
+    case (4)
+       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
+       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
+       write(nunit,*)'limits[c3]=',nestPmin(5),nestPmax(5)
+       write(nunit,*)'limits[c4]=',nestPmin(6),nestPmax(6)
     case default
        stop 'nest_dump_priors: case not implemented!'
     end select

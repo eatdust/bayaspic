@@ -11,6 +11,8 @@ module aspicmodels
 
 !if xend is the last model parameter
   logical, save :: xEndIsParam = .false.
+!if xini or xuv is a model parameter
+  logical, save :: xIniIsParam = .false.
 
 !number of aspic parameters + xend if required
   integer, save :: numAspicParams = 0
@@ -87,7 +89,6 @@ contains
        ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        ptrzerop_x_endinf => fooi/**/_x_endinf ; \
-       xEndIsParam = .false. ; \
        numAspicParams = 0
 
 #define ZEROPP_XEND(fooi) \
@@ -98,8 +99,8 @@ contains
        ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
-       ptrzerop_x_endinf => fooi/**/_x_endinf ; \
-       xEndIsParam = .false. ; \
+       ptrzerop_x_endinf => null() ; \
+       xEndIsParam = .true. ; \
        numAspicParams = 1
 
 #define ONEPP_PURE(fooi) \
@@ -111,7 +112,6 @@ contains
        ptronep_epsilon_two => fooi/**/_epsilon_two ; \
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
        ptronep_x_endinf => fooi/**/_x_endinf ; \
-       xEndIsParam = .false. ; \
        numAspicParams = 1
 
 
@@ -151,6 +151,20 @@ contains
        xEndIsParam = .true. ;\
        numAspicParams = 3
 
+#define TWOPP_XEND_XINI(fooi) \
+    case ('fooi') ; \
+       ptrthreep_x_rrad => fooi/**/_x_rrad ; \
+       ptrthreep_x_rreh => fooi/**/_x_rreh ; \
+       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
+       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrtwop_epsilon_three => fooi/**/_epsilon_three ;\
+       ptrtwop_x_endinf => null() ; \
+       xEndIsParam = .true. ;\
+       xIniIsParam = .true. ;\
+       numAspicParams = 4
+
+
 #define THREEPP_PURE(fooi) \
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
@@ -175,15 +189,18 @@ contains
        xEndIsParam = .true. ;\
        numAspicParams = 4
 
-#include "aspicnames.pp"
+
+#include "aspicmodels.pp"
 #undef ZEROPP_PURE
 #undef ZEROPP_XEND
 #undef ONEPP_PURE
 #undef ONEPP_XEND
 #undef TWOPP_PURE
 #undef TWOPP_XEND
+#undef TWOPP_XEND_XINI
 #undef THREEPP_PURE
 #undef THREEPP_XEND
+
 
     case default
        stop 'initialize_aspic_ptrs: model not found!'
@@ -488,8 +505,15 @@ contains
     
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
+!if xini is a parameter, it is the last one and xend the before to
+!last. Otherwise, xend is the last one.
+       
     if (xEndIsParam) then
-       aspic_x_endinf = params(size(params,1))
+       if (xIniIsParam) then
+          aspic_x_endinf = params(size(params,1)-1)
+       else
+          aspic_x_endinf = params(size(params,1))
+       endif
        return
     endif
 
