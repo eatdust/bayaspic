@@ -1,10 +1,11 @@
 !write down the prior associated with the aspic models. Syntax is of
 !the form: (p1min,p1max,maptype1,p2min,p2max,maptype2...). If the end
-!of inflation is an additional parameter, it is assumed to be the last
-!one. Maptype denotes the relation between the aspic parameters and
-!the one we are sampling on, "flat" means they are identical, "log"
-!means we are sampling on the log10, "ln" means we are sampling on the
-!log Neper, "mlog" means -log() as "mln" for -ln(), "inv" means
+!of inflation is an additional parameter, it is assumed to come after
+!the potential parameters, as any other additional and non-potential
+!parameters. Maptype denotes the relation between the aspic parameters
+!and the one we are sampling on, "flat" means they are identical,
+!"log" means we are sampling on the log10, "ln" means we are sampling
+!on the log Neper, "mlog" means -log() as "mln" for -ln(), "inv" means
 !inverse 1/(), "invsqrt" means the square root of the inverse 1/sqrt()
 !etc...  The prior bounds are assumed to be on the multinest sampling
 !parameters.

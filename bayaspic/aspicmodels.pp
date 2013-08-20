@@ -1,6 +1,8 @@
 !write down the list of aspic models sorted according to the number of
-!potential parameters and if the end of inflation is a model parameter
-!or not. XEND means it is an extra param, as opposed to PURE.
+!potential parameters distinguished from the total number of
+!parameters. PURE means the model has only potential parameters. XEND
+!means that the field value at which inflation ends is an extra param,
+!XEND_XINI means that both XEND and XINI are extra model parameters.
 
 ZEROPP_PURE(hi)
 

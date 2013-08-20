@@ -374,7 +374,8 @@ contains
 
     Vstar = aspic_norm_potential(aspname,xstar,asparams)       
 
-!aspicmodels returns the last params if xend is itself a param
+!aspicmodels returns the correct values of xend, even if it is a model
+!parameters
     xend = aspic_x_endinf(aspname,asparams(1:nasp))
 
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
