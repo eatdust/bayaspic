@@ -13,7 +13,7 @@ module wraspic
 
   type(infaspic), save :: AspicModel
 
-  integer, parameter :: naspmax = 3
+  integer, parameter :: naspmax = 4
   integer, parameter :: nepsmax = 3
 
   public set_model, check_model, free_model, get_allprior
@@ -44,6 +44,8 @@ contains
     endif
 
     AspicModel%nasp = get_aspic_numparams()
+
+    if (AspicModel%nasp.gt.naspmax) stop 'set_model: naspmax too small!'
 
     allocate(AspicModel%params(AspicModel%nasp))
     allocate(AspicModel%cmaps(AspicModel%nasp))
@@ -219,6 +221,9 @@ contains
 
     call get_aspic_priors(AspicModel%extname,aspmin,aspmax,AspicModel%cmaps)
 
+!sanity check
+    if ((ntot-nextra).ne.nasp) stop 'get_allprior: size array mismatch!'
+    
 
     pmin(nextra+1:ntot) = aspmin(1:nasp)
     pmax(nextra+1:ntot) = aspmax(1:nasp)
