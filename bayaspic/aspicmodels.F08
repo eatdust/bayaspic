@@ -248,13 +248,13 @@ contains
     if (associated(ptrzerop_norm_potential)) ptrzerop_norm_potential => null()
     if (associated(ptrzerop_epsilon_one)) ptrzerop_epsilon_one => null()
     if (associated(ptrzerop_epsilon_two)) ptrzerop_epsilon_two => null()
-    if (associated(ptrzerop_epsilon_three)) ptrzerop_epsilon_two => null()
+    if (associated(ptrzerop_epsilon_three)) ptrzerop_epsilon_three => null()
     if (associated(ptrzerop_x_endinf)) ptrzerop_x_endinf => null()
 
     if (associated(ptronep_norm_potential)) ptronep_norm_potential => null()
     if (associated(ptronep_epsilon_one)) ptronep_epsilon_one => null()
     if (associated(ptronep_epsilon_two)) ptronep_epsilon_two => null()
-    if (associated(ptronep_epsilon_three)) ptronep_epsilon_two => null()
+    if (associated(ptronep_epsilon_three)) ptronep_epsilon_three => null()
     if (associated(ptronep_x_endinf)) ptronep_x_endinf => null()
 
     if (associated(ptrtwop_norm_potential)) ptrtwop_norm_potential => null()
