@@ -399,7 +399,9 @@ contains
 !update AspicModel shared variables
     AspicModel%Pstar = Pstar
     AspicModel%lnRrad = lnRrad
-    AspicModel%params(1:nasp) = mnParams(nextra+1:ntot)
+!better displaying the aspic params rather than the mnparams
+!    AspicModel%params(1:nasp) = mnParams(nextra+1:ntot)
+    AspicModel%params(1:nasp) = asparams(1:nasp)
     AspicModel%lnM = lnM
     AspicModel%lnRreh = lnRreh
     AspicModel%logeps = log10(epsStar(1))
