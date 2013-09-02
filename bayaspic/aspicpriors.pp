@@ -50,7 +50,8 @@ ONEPRIOR(li,-0.3_kp,0.3_kp,flat)
 ONEPRIOR(lip,log10(0.003_kp),log10(0.3_kp),log)
 ONEPRIOR(lin,-0.4_kp,-0.1_kp,flat)
 
-ONEPRIOR(rpi1,1._kp,1.5_kp,flat)
+ONEPRIOR(rpi1,1._kp+epsilon(1._kp),1.5_kp,flat)
+ONEPRIOR(rpi3,0.8_kp,1._kp-epsilon(1._kp),flat)
 
 ONEPRIOR(dwi,log(2._kp*sqrt(2._kp)),5._kp,log)
 
@@ -87,7 +88,7 @@ ONEPRIOR(wrio,1._kp,1._kp,flat)
 
 !with xend
 
-TWOPRIORS(rpi2,1.,1.5,flat,0.5,2,log)
+TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.5_kp,flat,0.5_kp,2_kp,log)
 
 TWOPRIORS(ii,0._kp,10._kp,flat,-1._kp,4._kp,log)
 TWOPRIORS(iif,0.1_kp,1._kp,inv,-1._kp,4._kp,log)
