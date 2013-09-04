@@ -208,7 +208,7 @@ TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
-THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
+THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,0.01_kp,10._kp,flat,0._kp,2._kp,log)
 
 !rmi1* requires quadruple precision for aspic for some of these
 !two (four). Inflation can occur at the top of the potential with hyper-fine

@@ -1,8 +1,8 @@
 use iisr, only : ii_xendmin
 use rpicommon, only : rpi_x_potmax
 use sbisr, only : sbi_alphamin
-use lmicommon, only : lmi_epstwo_potmax
-use lmi2sr, only : lmi2_xendmin
+use lmicommon, only : lmi_epstwo_potmax, lmi_big
+use lmi2sr, only : lmi2_xendmin, lmi2_epsilon_one
 use bsusybisr, only : bsusybi_xendmax
 use csisr, only : csi_xendmax
 use cncisr, only : cnci_xendmin

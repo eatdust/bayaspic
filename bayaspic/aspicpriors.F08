@@ -17,7 +17,7 @@ module aspicpriors
   real(kp), parameter :: efoldMini = 60._kp
 
 !hard prior: all models inflating in a region with eps2>eps2minMax are not counted
-  real(kp), parameter :: eps2MinMax = 0.2_kp
+  real(kp), parameter :: epsilonMax = 0.2_kp
 
 !dsi correction power
   real(kp), parameter :: qDSI = 8._kp
@@ -123,32 +123,35 @@ contains
        reject = params(2).lt.ii_xendmin(efoldNum,params(1))
 
     case ('lmi1o', 'lmi1p')
-       reject = lmi_epstwo_potmax(params(1),params(2)).gt.eps2MinMax      
+       reject = lmi_epstwo_potmax(params(1),params(2)).gt.epsilonMax      
 
     case ('lmi2o','lmi2p')
-!Such that exp(-beta xend^gamma)>10^(-100) to make it numerically
-!tractable
-       reject = params(3).gt.(100._kp/params(2))**(1._kp/params(1))
+!Such that exp(-beta xend^gamma) is computable; and epsilon1>numacc;
+!and epsilon1< 0.2 during inflation
+       reject = (params(3).gt.lmi_big(params(1),params(2))) &
+            .or. (params(2).lt.lmi2_numacc_betamin(params(1))) &
+            .or. (lmi2_epsilon_one(params(3),params(1),params(2)) &
+            .gt.epsilonMax)
        
     case ('bsusybif', 'bsusybil')
        reject = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
 
     case ('gmssmi')
-       reject = (gmssmi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
+       reject = (gmssmi_epstwomin(params(1),params(2)).gt.epsilonMax) &
             .or. (params(1).lt.gmssmi_alphamin(efoldNum,params(2)) &
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
 
     case ('gmssmiopA','gmssmiopB','gmssmiomA','gmssmiomB')
-       reject = (abs(gmssmi_epstwomin(params(1),params(2))).gt.eps2MinMax) &
+       reject = (abs(gmssmi_epstwomin(params(1),params(2))).gt.epsilonMax) &
             .or. (params(1).lt.gmssmi_alphamin(efoldMini,params(2)))
 
     case ('gripi')
-       reject = (gripi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
+       reject = (gripi_epstwomin(params(1),params(2)).gt.epsilonMax) &
             .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)) &
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
 
     case ('gripiopA','gripiopB','gripiomA','gripiomB','gripiomC')
-       reject = (gripi_epstwomin(params(1),params(2)).gt.eps2MinMax) &
+       reject = (gripi_epstwomin(params(1),params(2)).gt.epsilonMax) &
             .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)))
 
     case ('lin')
@@ -190,10 +193,10 @@ contains
     case ('ssbi3', 'ssbi3f')
       reject = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), & 
                params(1),params(2)).lt.1._kp) .or. &
-               (ssbi3_epstwo_potmax(params(1),params(2)) .gt. eps2MinMax)
+               (ssbi3_epstwo_potmax(params(1),params(2)) .gt. epsilonMax)
 
     case ('ssbi4', 'ssbi4f')
-      reject = ssbi4_epstwo_potmax(params(1),params(2)) .gt. eps2MinMax
+      reject = ssbi4_epstwo_potmax(params(1),params(2)) .gt. epsilonMax
 
     case ('ssbi5','ssbi5f')
        reject = params(1).gt.ssbi5_alphamax(params(2))
