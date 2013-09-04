@@ -34,8 +34,8 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('rpi3')
-  call initialize_manymodels()
+  call initialize_onemodel('lmi1 p')
+!  call initialize_manymodels()
 
 !  call initialize_filemodels('list_dpmodels.dat')
 
@@ -119,20 +119,14 @@ contains
   subroutine initialize_manymodels()
     implicit none
     
-    nmodels = 3
+    nmodels = 4
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'rpi1'
-    Modelnames(1) = 'rpi2'
-    Modelnames(2) = 'rpi3'
-
-!    Modelnames(2) = 'rchi'
-!    Modelnames(3) = 'lfi'
-!    Modelnames(4) = 'lfi 23'
-!    Modelnames(5) = 'lfi 1'
-!    Modelnames(6) = 'lfi 2'
-!    Modelnames(7) = 'lfi 3'
+    Modelnames(0) = 'lmi2 o'
+    Modelnames(1) = 'lmi2 p'
+    Modelnames(2) = 'lmi1 o'
+    Modelnames(3) = 'lmi1 p'
     
         
   end subroutine initialize_manymodels

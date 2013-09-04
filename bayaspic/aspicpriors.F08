@@ -128,7 +128,7 @@ contains
     case ('lmi2o','lmi2p')
 !Such that exp(-beta xend^gamma) is computable; and epsilon1>numacc;
 !and epsilon1< 0.2 during inflation
-       reject = (params(3).gt.lmi_big(params(1),params(2))) &
+       reject = (params(3).gt.lmi_numacc_x_big(params(1),params(2))) &
             .or. (params(2).lt.lmi2_numacc_betamin(params(1))) &
             .or. (lmi2_epsilon_one(params(3),params(1),params(2)) &
             .gt.epsilonMax)

@@ -138,7 +138,7 @@ TWOPRIORS(sfi4l,4._kp,4._kp,flat,0._kp,2._kp,log)
 !first param is alpha/(beta V) and 2nd is V
 TWOPRIORS(kmiii,0.2_kp,5._kp,flat,5._kp,7._kp,log)
 
-TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,-2._kp,2._kp,log)
+TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,0.01_kp,10._kp,flat)
 TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 
 !gmssmi requires aspic quad-precision
