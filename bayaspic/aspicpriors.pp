@@ -169,7 +169,7 @@ TWOPRIORS(tiD3,0.5_kp-10._kp**(-5._kp),0.5_kp,flat,-5._kp,-3._kp,log)
 !TWOPRIORS(tiE,0.4_kp,0.6_kp,flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiF1,0.5_kp-10._kp**(-7._kp),0.5_kp+10._kp**(-7._kp),flat,-5._kp,-3._kp,log)
 TWOPRIORS(tiF2,0.5_kp-10._kp**(-6._kp),0.5_kp+10._kp**(-6._kp),flat,-5._kp,-3._kp,log)
-TWOPRIORS(tiF3,0.5_kp-10._kp**(-5._kp),0.5_kp+5.*10._kp**(-5._kp),flat,-5._kp,-3._kp,log)
+TWOPRIORS(tiF3,0.5_kp-10._kp**(-5._kp),0.5_kp+10._kp**(-5._kp),flat,-5._kp,-3._kp,log)
 TWOPRIORS(ti12,0.5_kp,0.5_kp,flat,-5._kp,-3._kp,log)
 
 TWOPRIORS(bei,-3._kp,3._kp,log,-1.5_kp,3._kp,log)
