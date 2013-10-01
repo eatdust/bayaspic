@@ -182,9 +182,6 @@ contains
     case ('sbi')
        reject = params(1).lt.(sbi_alphamin(params(2)) +epsilon(1._kp))
 
-    case ('imi', 'imi1', 'imi2', 'imi3', 'imi4', 'imi5', 'imi6')
-       reject = params(2).lt.imi_xendmin(efoldNum,params(1))
-
     case ('ssbi1', 'ssbi1f')
 !otherwise inflation does not stop
       reject = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), & 
