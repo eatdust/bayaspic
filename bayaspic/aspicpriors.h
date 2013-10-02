@@ -5,7 +5,7 @@ use lmicommon, only : lmi_epstwo_potmax ,lmi_numacc_x_big
 use lmi2sr, only : lmi2_xendmin, lmi2_epsilon_one
 use lmi2sr, only : lmi2_numacc_betamin
 use bsusybisr, only : bsusybi_xendmax
-use csisr, only : csi_xendmax
+use csisr, only : csi_xendmax, csi_x_epsonenumacc
 use cncisr, only : cnci_xendmin
 use imisr, only : imi_xendmin
 use sbisr, only : sbi_alphamin

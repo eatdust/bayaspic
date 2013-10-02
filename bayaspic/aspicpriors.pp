@@ -102,7 +102,7 @@ TWOPRIORS(twiB,1._kp,100._kp,flat,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp)
 TWOPRIORS(bsusybif,0._kp,0.3_kp,flat,-200._kp,-0._kp,flat)
 TWOPRIORS(bsusybil,-3._kp,-1._kp,log,-200._kp,-0._kp,flat)
 
-TWOPRIORS(csi,-5,-1,log,0.,1.,flat)
+TWOPRIORS(csi,-5,-1,log,0,1,flat)
 
 TWOPRIORS(cnci,-5,-1,log,1,10,flat)
 

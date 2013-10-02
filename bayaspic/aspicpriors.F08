@@ -172,10 +172,6 @@ contains
     case ('tiD3', 'tiF3')
        reject = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
 
-    case ('csi')
-       reject = params(2).gt.csi_xendmax(efoldNum,params(1)) &
-            .or. params(2).lt.csi_xendmax(efoldNum,params(1))-1._kp/params(1)
-
     case ('sbi')
        reject = params(1).lt.(sbi_alphamin(params(2)) +epsilon(1._kp))
 
@@ -281,8 +277,10 @@ contains
  
     case ('csi')
        asparams(1) = newparams(1)
-       asparams(2) = newparams(2) * csi_xendmax(efoldNum,asparams(1))
-
+       asparams(2) = csi_x_epsonenumacc(asparams(1)) &
+            + newparams(2) * (csi_xendmax(efoldNum,asparams(1)) &
+            - csi_x_epsonenumacc(asparams(1)))
+  
     case ('cnci')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * cnci_xendmin(efoldNum,asparams(1))
