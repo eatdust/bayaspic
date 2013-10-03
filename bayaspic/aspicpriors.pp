@@ -174,8 +174,6 @@ TWOPRIORS(ti12,0.5_kp,0.5_kp,flat,-5._kp,-3._kp,log)
 
 TWOPRIORS(bei,-3._kp,3._kp,log,-1.5_kp,3._kp,log)
 
-!TWOPRIORS(psni,-5._kp,-1._kp,log,-2._kp,1._kp,log)
-
 !first param alpha/f**2
 TWOPRIORS(psnift1,-5._kp,-1._kp,log,-2._kp,1._kp,log)
 TWOPRIORS(psnift2,-3._kp,-1._kp,log,-2._kp,1._kp,log)
