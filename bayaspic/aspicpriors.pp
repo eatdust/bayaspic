@@ -182,7 +182,7 @@ TWOPRIORS(psnift2,-3._kp,-1._kp,log,-2._kp,1._kp,log)
 TWOPRIORS(psnift3,-2._kp,-1._kp,log,-2._kp,1._kp,log)
 TWOPRIORS(psnift4,-1.5_kp,-1._kp,log,-2._kp,1._kp,log)
 
-TWOPRIORS(nckip,-4._kp,-1._kp,log,0.05_kp,0.2_kp,flat)
+TWOPRIORS(nckip,-4._kp,-1._kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(nckim,-4._kp,-1._kp,log,-0.1_kp,-0.02_kp,flat)
 
 TWOPRIORS(oi,-3._kp,-1._kp,log,-3._kp,-1._kp,log)
