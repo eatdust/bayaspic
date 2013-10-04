@@ -62,8 +62,10 @@ lmi1 p
 lmi1 o
 lmi2 p
 lmi2 o
-twi A
-twi B
+twi A1
+twi A2
+twi B1
+twi B2
 bsusybi f
 bsusybi l
 ti B1

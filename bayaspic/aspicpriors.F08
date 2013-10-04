@@ -132,6 +132,9 @@ contains
             .or. (params(2).lt.lmi2_numacc_betamin(params(1))) &
             .or. (lmi2_epsilon_one(params(3),params(1),params(2)) &
             .gt.epsilonMax)
+
+    case('twiA1','twiA2','twiB1','twiB2')
+       reject = (params(2).gt.1._kp)
        
     case ('bsusybif', 'bsusybil')
        reject = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
@@ -267,11 +270,11 @@ contains
        asparams(2) = newparams(2)
        asparams(3) = newparams(3) * lmi2_xendmin(efoldNum,asparams(1),asparams(2))
 
-    case ('twiA')
+    case ('twiA1','twiA2')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)*newparams(1)
 
-    case ('twiB')
+    case ('twiB1','twiB2')
        asparams(1) = 10._kp**(-5._kp)/sqrt(newparams(1))
        asparams(2) = newparams(2)*asparams(1)
  

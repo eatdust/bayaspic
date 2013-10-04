@@ -95,9 +95,11 @@ TWOPRIORS(iif,0.1_kp,1._kp,inv,-1._kp,4._kp,log)
 TWOPRIORS(iilambda,0.1_kp,4._kp,log,-1._kp,4._kp,log)
 
 !second param phiend/phi0
-TWOPRIORS(twiA,-4._kp,-1._kp,log,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp),log)
+TWOPRIORS(twiA1,-4._kp,-1._kp,log,log10(2._kp),log10(20._kp),log)
+TWOPRIORS(twiA2,-4._kp,-1._kp,log,log10(2._kp),log10(40._kp),log)
 !first param is N=10^(-10) (phi0/Mp)^(-2)
-TWOPRIORS(twiB,1._kp,100._kp,flat,log(2._kp)/log(10._kp),log(20._kp)/log(10._kp),log)
+TWOPRIORS(twiB1,1._kp,100._kp,flat,log10(2._kp),log10(20._kp),log)
+TWOPRIORS(twiB2,1._kp,100._kp,flat,log10(2._kp),log10(40._kp),log)
 
 TWOPRIORS(bsusybif,0._kp,0.3_kp,flat,-200._kp,-0._kp,flat)
 TWOPRIORS(bsusybil,-3._kp,-1._kp,log,-200._kp,-0._kp,flat)
