@@ -175,6 +175,9 @@ contains
     case ('tiD3', 'tiF3')
        reject = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
 
+    case ('psnioA', 'psnioB', 'psnioC')
+       reject = (params(1).gt.0.5_kp*epsilonMax*params(2)**2)
+
     case ('sbi')
        reject = params(1).lt.(sbi_alphamin(params(2)) +epsilon(1._kp))
 
