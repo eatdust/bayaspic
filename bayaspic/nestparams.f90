@@ -14,7 +14,7 @@ module nestparams
   logical, parameter :: nestCteEff = .false.
 
 !evidence tolerance factor !1e-4
-  real(fmn), parameter :: nestZTol = 1e-5
+  real(fmn), parameter :: nestZTol = 1e-4
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
