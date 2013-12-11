@@ -140,22 +140,20 @@ contains
        reject = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
 
     case ('gmssmi')
-       reject = (gmssmi_epstwomin(params(1),params(2)).gt.epsilonMax) &
+       reject = (abs(gmssmi_epstwomin(params(1),params(2))).gt.epsilonMax) &
             .or. (params(1).lt.gmssmi_alphamin(efoldNum,params(2)) &
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
 
     case ('gmssmiopA','gmssmiopB','gmssmiomA','gmssmiomB')
-       reject = (abs(gmssmi_epstwomin(params(1),params(2))).gt.epsilonMax) &
-            .or. (params(1).lt.gmssmi_alphamin(efoldMini,params(2)))
+       reject = params(1).lt.gmssmi_alphamin(efoldMini,params(2))
 
     case ('gripi')
-       reject = (gripi_epstwomin(params(1),params(2)).gt.epsilonMax) &
+       reject = (abs(gripi_epstwomin(params(1),params(2))).gt.epsilonMax) &
             .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)) &
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
 
-    case ('gripiopA','gripiopB','gripiomA','gripiomB','gripiomC')
-       reject = (gripi_epstwomin(params(1),params(2)).gt.epsilonMax) &
-            .or. (params(1).lt.gripi_alphamin(efoldNum,params(2)))
+    case ('gripiopA','gripiopB','gripiomA','gripiomB')
+       reject = params(1).lt.gripi_alphamin(efoldNum,params(2))
 
     case ('lin')
        reject = params(1).lt.li_alphamin(efoldNum)
@@ -307,7 +305,7 @@ contains
        asparams(1) = 1._kp + newparams(1)
        asparams(2) = newparams(2)      
 
-    case ('gripiomA','gripiomB','gripiomC')
+    case ('gripiomA','gripiomB')
        asparams(1) = 1._kp - newparams(1)
        asparams(2) = newparams(2)
 

@@ -143,20 +143,19 @@ TWOPRIORS(kmiii,0.2_kp,5._kp,flat,5._kp,7._kp,log)
 TWOPRIORS(lmi1p,0.1_kp,1._kp,flat,0.01_kp,10._kp,flat)
 TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 
-!gmssmi requires aspic quad-precision
+!gmssmi requires aspic quad-precision, and lnR>0
 TWOPRIORS(gmssmi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
-TWOPRIORS(gmssmiopA,-28_kp,-18_kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiopB,-28_kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiomA,-28_kp,-18_kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiomB,-28_kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiopA,-28._kp,-23._kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiopB,-28._kp,-22.5_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiomA,-28._kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiomB,-28._kp,-22.5_kp,log,0.00002_kp,0.0002_kp,flat)
 
-!grippi requires aspic quad-precision
+!grippi requires aspic quad-precision lnR>0
 TWOPRIORS(gripi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
-TWOPRIORS(gripiopA,-15_kp,-5_kp,log,0.02_kp,0.2_kp,flat)
-TWOPRIORS(gripiopB,-15_kp,-10_kp,log,0.02_kp,0.2_kp,flat)
-TWOPRIORS(gripiomA,-15_kp,-5_kp,log,0.02_kp,0.2_kp,flat)
-TWOPRIORS(gripiomB,-15_kp,-8_kp,log,0.02_kp,0.2_kp,flat)
-TWOPRIORS(gripiomC,-15_kp,-10_kp,log,0.02_kp,0.2_kp,flat)
+TWOPRIORS(gripiopA,-15._kp,-10._kp,log,0.02_kp,0.2_kp,flat)
+TWOPRIORS(gripiopB,-15._kp,-8._kp,log,0.02_kp,0.2_kp,flat)
+TWOPRIORS(gripiomA,-15._kp,-10._kp,log,0.02_kp,0.2_kp,flat)
+TWOPRIORS(gripiomB,-15._kp,-8._kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiS,0.98_kp,1.02_kp,flat,10._kp,50._kp,flat)
 
 
