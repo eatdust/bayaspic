@@ -146,9 +146,9 @@ TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 !gmssmi requires aspic quad-precision, and lnR>0
 TWOPRIORS(gmssmi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
 TWOPRIORS(gmssmiopA,-28._kp,-23._kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiopB,-28._kp,-22.5_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiopB,-28._kp,-21.5_kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomA,-28._kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiomB,-28._kp,-22.5_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiomB,-28._kp,-20._kp,log,0.00002_kp,0.0002_kp,flat)
 
 !grippi requires aspic quad-precision lnR>0
 TWOPRIORS(gripi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
