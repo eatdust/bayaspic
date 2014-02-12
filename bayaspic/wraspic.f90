@@ -310,7 +310,7 @@ contains
 
 
   function get_slowroll(nstar,mnParams)
-    use srreheat, only : ln_potential_normalization
+    use srreheat, only : potential_normalization
     use srreheat, only : ln_rho_endinf
     use srreheat, only : get_lnrreh_rrad, get_lnrrad_rreh
     use srflow, only : scalar_spectral_index
@@ -386,7 +386,7 @@ contains
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vend = aspic_norm_potential(aspname,xend,asparams)
                          
-    lnM = ln_potential_normalization(Pstar,epsStar(1),Vstar)
+    lnM = log(potential_normalization(Pstar,epsStar(1),Vstar))
     lnRhoEnd = ln_rho_endinf(Pstar,epsStar(1) &
          ,epsOneEnd,Vend/Vstar)
     
