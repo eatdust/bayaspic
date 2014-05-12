@@ -33,11 +33,15 @@ implicit none
       
 
 
-! Parameters for Nested Sampler
+! Parameters for MultiNest
+	
+      	!whether to do use Nested Importance Sampling
+	logical nest_IS
+ 	parameter(nest_IS=.true.)
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
- 	parameter(nest_mmodal=.true.)
+ 	parameter(nest_mmodal=.false.)
 	
       	!sample with constant efficiency
 	logical nest_ceff
@@ -45,7 +49,7 @@ implicit none
 	
       	!max no. of live points
       	integer nest_nlive
-	parameter(nest_nlive=1000)
+	parameter(nest_nlive=300)
       
       	!tot no. of parameters, should be sdim in most cases but if you need to
       	!store some additional parameters with the actual parameters then
@@ -53,7 +57,7 @@ implicit none
 	integer nest_nPar 
 	parameter(nest_nPar=sdim)
       
-      	!seed for nested sampler, -ve means take it from sys clock
+      	!seed for MultiNest, -ve means take it from sys clock
 	integer nest_rseed 
 	parameter(nest_rseed=-1)
       
@@ -63,7 +67,7 @@ implicit none
       
       	!enlargement factor reduction parameter
       	double precision nest_efr
-      	parameter(nest_efr=0.5d0)
+      	parameter(nest_efr=0.05d0)
       
       	!root for saving posterior files
       	character*100 nest_root

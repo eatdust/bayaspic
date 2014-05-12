@@ -7,7 +7,7 @@ implicit none
 
 	!dimensionality
       	integer sdim
-      	parameter(sdim=2)
+      	parameter(sdim=10)
       
       	!priors on the parameters
       	!uniform priors (-5,5) are used for all dimensions & are set in main.f90
@@ -15,11 +15,15 @@ implicit none
       
 
 
-! Parameters for Nested Sampler
+! Parameters for MultiNest
+	
+      	!whether to do use Nested Importance Sampling
+	logical nest_IS
+ 	parameter(nest_IS=.true.)
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
- 	parameter(nest_mmodal=.true.)
+ 	parameter(nest_mmodal=.false.)
 	
       	!sample with constant efficiency
 	logical nest_ceff
@@ -27,7 +31,7 @@ implicit none
 	
       	!max no. of live points
       	integer nest_nlive
-	parameter(nest_nlive=500)
+	parameter(nest_nlive=1000)
       
       	!tot no. of parameters, should be sdim in most cases but if you need to
       	!store some additional parameters with the actual parameters then
@@ -35,17 +39,17 @@ implicit none
 	integer nest_nPar 
 	parameter(nest_nPar=sdim)
       
-      	!seed for nested sampler, -ve means take it from sys clock
+      	!seed for MultiNest, -ve means take it from sys clock
 	integer nest_rseed 
 	parameter(nest_rseed=-1)
       
       	!evidence tolerance factor
       	double precision nest_tol 
-      	parameter(nest_tol=0.01)
+      	parameter(nest_tol=0.1)
       
       	!enlargement factor reduction parameter
       	double precision nest_efr
-      	parameter(nest_efr=0.5d0)
+      	parameter(nest_efr=0.3d0)
       
       	!root for saving posterior files
       	character*100 nest_root
@@ -54,7 +58,7 @@ implicit none
 	!after how many iterations feedback is required & the output files should be updated
 	!note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	integer nest_updInt
-	parameter(nest_updInt=1000)
+	parameter(nest_updInt=5000)
 	
 	!null evidence (set it to very high negative no. if null evidence is unknown)
 	double precision nest_Ztol

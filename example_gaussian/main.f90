@@ -11,7 +11,7 @@ program main
       	nest_pWrap = 0
 	
 	do i = 1, sdim
-		sigma(i) = 0.001 * i
+		sigma(i) = 0.001
 	enddo
 
       	call nest_Sample

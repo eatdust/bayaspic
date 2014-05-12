@@ -15,7 +15,11 @@ implicit none
       
 
 
-! Parameters for Nested Sampler
+! Parameters for MultiNest
+	
+      	!whether to do use Nested Importance Sampling
+	logical nest_IS
+ 	parameter(nest_IS=.true.)
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
@@ -35,7 +39,7 @@ implicit none
 	integer nest_nPar 
 	parameter(nest_nPar=sdim)
       
-      	!seed for nested sampler, -ve means take it from sys clock
+      	!seed for MultiNest, -ve means take it from sys clock
 	integer nest_rseed 
 	parameter(nest_rseed=-1)
       
