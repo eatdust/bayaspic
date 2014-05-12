@@ -10,7 +10,7 @@ module Nested
   use priors
   implicit none
 
-#ifdef MPI
+#ifdef MPINEST
   include 'mpif.h'
   integer mpi_status(MPI_STATUS_SIZE), errcode
 #endif
@@ -76,7 +76,7 @@ contains
 		end subroutine dumper
 	end INTERFACE
 	
-#ifdef MPI
+#ifdef MPINEST
 	if( initMPI ) then
 		!MPI initializations
 		call MPI_INIT(errcode)
@@ -114,7 +114,7 @@ contains
 			write(*,*)"ERROR: nCdims can not be greater than ndims."
 			write(*,*)"Aborting"
 		endif
-#ifdef MPI
+#ifdef MPINEST
 		call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             	stop
@@ -177,7 +177,7 @@ contains
 				write(*,*)"ERROR: Can not undersample in constant efficiency mode."
 				write(*,*)"Aborting"
 			endif
-#ifdef MPI
+#ifdef MPINEST
 			call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             		stop
@@ -238,7 +238,7 @@ contains
 	call Nestsample(loglike, dumper, context)
 	deallocate(pWrap)
       	call killRandomNS()
-#ifdef MPI
+#ifdef MPINEST
 	if( initMPI ) call MPI_FINALIZE(errcode)
 #endif
 
@@ -301,7 +301,7 @@ contains
 				if( j /= nlive ) then
 				  	write(*,*)"ERROR: no. of live points in the resume file is not equal to the the no. passed to nestRun."
 					write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 					stop
@@ -327,7 +327,7 @@ contains
 				if( j + nlive /= i ) then
 					write(*,*)"ERROR: no. of points in ev.dat file is not equal to the no. specified in resume file."
 					write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 					stop
@@ -340,7 +340,7 @@ contains
 		ginfo=0.d0
 	endif
 
-#ifdef MPI
+#ifdef MPINEST
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(genLive,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -357,7 +357,7 @@ contains
 		endif
 	endif
 
-#ifdef MPI
+#ifdef MPINEST
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
 	
@@ -389,7 +389,7 @@ contains
     	double precision p(ndims,nlive+1), phyP(totPar,nlive+1), l(nlive+1)
     	integer id
     	character(len=100) fmt,fmt2
-#ifdef MPI
+#ifdef MPINEST
 	double precision, allocatable ::  tmpl(:), tmpp(:,:), tmpphyP(:,:)
 	integer q
 #endif
@@ -413,7 +413,7 @@ contains
 	
 	
 	allocate( pnewP(ndims,10), phyPnewP(totPar,10), lnewP(10) )
-#ifdef MPI
+#ifdef MPINEST
 	allocate( tmpl(10), tmpp(ndims,10), tmpphyP(totPar,10) )
 #endif
 
@@ -443,7 +443,7 @@ contains
 	                  			if(i>nlive) then
 							write(*,*)"ERROR: more than ",nlive," points in the live points file."
 							write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 							call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 	                        			stop
@@ -487,7 +487,7 @@ contains
 		nptPerProc = ceiling( dble(nGen) / dble(mpi_nthreads) )
 	endif
 	
-#ifdef MPI
+#ifdef MPINEST
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(nGen,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(nptPerProc,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -500,7 +500,7 @@ contains
 		endif
 		
 		deallocate( pnewP, phyPnewP, lnewP )
-#ifdef MPI
+#ifdef MPINEST
 		deallocate( tmpl, tmpp, tmpphyP )
 #endif
 		if( outfile ) then
@@ -515,7 +515,7 @@ contains
 			write(*,*)"ERROR: live points files have more live points than required."
 			write(*,*)"Aborting"
 		endif
-#ifdef MPI
+#ifdef MPINEST
             	call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             	stop
@@ -544,12 +544,12 @@ contains
 				j=0
 			endif
 
-#ifdef MPI
+#ifdef MPINEST
 			call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
 			
 			if(id/=0) then
-#ifdef MPI
+#ifdef MPINEST
 				!send the generated points to the root node
 				call MPI_SEND(lnewP(1:i),i,MPI_DOUBLE_PRECISION,0,id,MPI_COMM_WORLD,errcode)
 				call MPI_SEND(pnewP(1:ndims,1:i),ndims*i,MPI_DOUBLE_PRECISION,0,id,MPI_COMM_WORLD,errcode)
@@ -563,7 +563,7 @@ contains
 				l(nstart:nstart+i-1)=lnewP(1:i)
 				nend=nstart+i-1
 
-#ifdef MPI				
+#ifdef MPINEST				
 				!receive the points from other nodes
 				do m=1,mpi_nthreads-1
 					call MPI_RECV(tmpl(1:i),i,MPI_DOUBLE_PRECISION,m,m,MPI_COMM_WORLD,mpi_status,errcode)
@@ -591,7 +591,7 @@ contains
 			endif
 		endif
 
-#ifdef MPI
+#ifdef MPINEST
 		call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
 
@@ -601,7 +601,7 @@ contains
 	
 		
 	deallocate( pnewP, phyPnewP, lnewP )
-#ifdef MPI
+#ifdef MPINEST
 	deallocate( tmpl, tmpp, tmpphyP )
 #endif
 	
@@ -611,7 +611,7 @@ contains
 	endif
 	genLive=.false.
     	resumeFlag=.false.
-#ifdef MPI
+#ifdef MPINEST
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
     
@@ -910,7 +910,7 @@ contains
                   			if(i<nlive) then
                   				write(*,*)"ERROR: live points file has less than ",nlive," points."
 						write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         			stop
@@ -920,7 +920,7 @@ contains
 				if(i>nlive) then
 					write(*,*)"ERROR: live points file has greater than ",nlive," points."
 					write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
@@ -939,7 +939,7 @@ contains
                   			if(i<nlive) then
                   				write(*,*)"ERROR: phys live points file has less than ",nlive," points."
 						write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         			stop
@@ -949,7 +949,7 @@ contains
 				if(i>nlive) then
 					write(*,*)"ERROR: phys live points file has greater than ",nlive," points."
 					write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
@@ -976,7 +976,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(2)
 						write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -992,7 +992,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(1)
 						write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -1009,7 +1009,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(3)
 						write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -1056,7 +1056,7 @@ contains
 		enddo
 	endif
     	
-#ifdef MPI
+#ifdef MPINEST
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(ic_n,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(ic_npt(1:ic_n),ic_n,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -1064,7 +1064,7 @@ contains
 		
 	do ff=1,maxIter
 
-#ifdef MPI
+#ifdef MPINEST
     		call MPI_BARRIER(MPI_COMM_WORLD,errcode)
     		call MPI_BCAST(ic_done(0:ic_n),ic_n+1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif	
@@ -1571,7 +1571,7 @@ contains
 		
 		
             	if(my_rank==0 .and. eswitch .and. sc_n==0) eswitch=.false.
-#ifdef MPI
+#ifdef MPINEST
 		call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(eswitch,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(flag2,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -1764,7 +1764,7 @@ contains
 	            			acpt=.false.
 					do
 						if(my_rank==0) remFlag=remain(nd)
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(remFlag,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -1782,7 +1782,7 @@ contains
 								
 								if( lnew == HUGE(1d0) ) bogus = .true.
 							endif
-#ifdef MPI
+#ifdef MPINEST
 							call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 							!now send the points to the root node
 							if(my_rank/=0) then
@@ -1855,7 +1855,7 @@ contains
 							enddo
 						endif
 					
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(acpt,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -1908,7 +1908,7 @@ contains
 					acpt=.false.
 					do
 						if(my_rank==0) remFlag=remain(nd)
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(remFlag,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -1947,7 +1947,7 @@ contains
 								
 								if( IS ) IS_iterinfo(globff+1,4) = IS_iterinfo(globff+1,4) + n
 							endif
-#ifdef MPI
+#ifdef MPINEST
 							call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 							!now send the points to the root node
 							if(my_rank/=0) then
@@ -2067,7 +2067,7 @@ contains
 							enddo
 						endif
 					
-#ifdef MPI
+#ifdef MPINEST
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(acpt,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -2231,7 +2231,7 @@ contains
 						endif
 					endif
 				
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 					call MPI_BCAST(q,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 					call MPI_BCAST(i,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -3081,7 +3081,7 @@ contains
 					write(*,*)"ERROR: More modes found than allowed memory."
 					write(*,*)"Increase maxmodes in the call to nestrun and run MultiNest again."
 					write(*,*)"Aborting"
-#ifdef MPI
+#ifdef MPINEST
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
