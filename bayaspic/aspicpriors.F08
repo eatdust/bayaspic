@@ -281,9 +281,9 @@ contains
  
     case ('csi')
        asparams(1) = newparams(1)
-       asparams(2) = csi_x_epsonenumacc(asparams(1)) &
+       asparams(2) = csi_numacc_x_epsonenull(asparams(1)) &
             + newparams(2) * (csi_xendmax(efoldNum,asparams(1)) &
-            - csi_x_epsonenumacc(asparams(1)))
+            - csi_numacc_x_epsonenull(asparams(1)))
   
     case ('cnci')
        asparams(1) = newparams(1)
