@@ -211,6 +211,11 @@ contains
     case ('rmi4', 'rmi4l')
        reject = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
 
+!equivalent to an hard prior on mumin to get efoldnum
+    case ('vhi12')
+       reject = vhi_xendmax(efoldNum,params(1),params(2)) &
+            .eq.vhi_xendmin(params(1),params(2))
+
     case ('dsio', 'dsi2')
        reject = params(2) .gt. dsi_mumax(efoldNum,params(1),qDsi)
 
