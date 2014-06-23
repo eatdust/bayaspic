@@ -55,6 +55,7 @@ ONEPRIOR(rpi1,1._kp+epsilon(1._kp),1.5_kp,flat)
 ONEPRIOR(rpi3,0.8_kp,1._kp-epsilon(1._kp),flat)
 
 ONEPRIOR(dwi,log(2._kp*sqrt(2._kp)),5._kp,log)
+ONEPRIOR(dwi25,25._kp,25._kp,flat)
 
 ONEPRIOR(mhi,-2._kp,2._kp,log)
 ONEPRIOR(mhis,-2._kp,0._kp,log)
