@@ -76,7 +76,7 @@ ONEPRIOR(ripip,-3._kp,3._kp,log)
 ONEPRIOR(ripio,0.00002_kp,0.0002_kp,flat)
 ONEPRIOR(ripiS,10._kp,50._kp,flat)
 
-#ONEPRIOR(ai,-3._kp,log(0.512378_kp)/log(10._kp),log)
+!ONEPRIOR(ai,-3._kp,log(0.512378_kp)/log(10._kp),log)
 ONEPRIOR(ai,-3._kp,log10(0.51_kp),log)
 
 ONEPRIOR(cnai,-4._kp,-0.27_kp,log)
