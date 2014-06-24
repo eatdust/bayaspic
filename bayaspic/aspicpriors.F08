@@ -238,7 +238,10 @@ contains
     case ('nfi3n','nfi3p')
        reject = abs(params(1)).gt.0.1*nfi3_numacc_absamax(params(2))
 
-
+    case ('nfi4n', 'nfi4p')
+       reject = nfi4_xendmin(efoldNum,params(1),params(2)) &
+            .ge.nfi4_numacc_xendmax(params(1),params(2))
+       
     end select
 
   end function check_aspic_hardprior
