@@ -232,7 +232,7 @@ contains
             .or.(params(1).lt.nfi1_numacc_amin(params(2)))
                   
     case ('nfi2')
-       reject = params(1).lt.nfi2_amin(efoldNum,params(2))
+       reject = params(1).lt.0.1_kp*nfi2_numacc_amin(efoldNum,params(2))
 
     case ('nfi3n','nfi3p')
        reject = abs(params(1)).gt.nfi3_numacc_absamax(params(2))
@@ -405,7 +405,7 @@ contains
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = nfi2_numacc_xendmin(asparams(1),asparams(2)) &
-            + newparams(3)*(nfi2_xendmax(efoldNum,asparams(1),asparams(2)) &
+            + newparams(3)*(nfi2_numacc_xendmax(efoldNum,asparams(1),asparams(2)) &
             - nfi2_numacc_xendmin(asparams(1),asparams(2)))
 
     case ('nfi4p','nfi4n')
