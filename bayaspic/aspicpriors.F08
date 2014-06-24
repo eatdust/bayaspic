@@ -227,6 +227,15 @@ contains
 !enforce the hard prior bound xini<xuv (asparams(4) is xuv)
        reject = params(4).lt.kklti_x_trajectory(-efoldNum,params(3),params(1),params(2))
 
+    case ('nfi1')
+       reject = params(1).gt.nfi1_amax(efoldNum,params(2))
+
+    case ('nfi2')
+       reject = params(1).lt.nfi2_amin(efoldNum,params(2))
+
+    case ('nfi3n','nfi3p')
+       reject = abs(params(1)).gt.nfi3_numacc_absamax(params(2))
+
     end select
 
   end function check_aspic_hardprior
@@ -390,6 +399,20 @@ contains
        asparams(3) = max(kklti_x_epsoneunity(asparams(1),asparams(2)),newparams(3))
 !multinest param is phiuv, we map it to xuv = phiuv/mu
        asparams(4) = newparams(4)/newparams(2)
+
+    case ('nfi2')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = nfi2_numacc_xendmin(asparams(1),asparams(2)) &
+            + newparams(3)*(nfi2_xendmax(efoldNum,asparams(1),asparams(2)) &
+            - nfi2_numacc_xendmin(asparams(1),asparams(2)))
+
+    case ('nfi4p','nfi4n')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = nfi4_xendmin(efoldNum,asparams(1),asparams(2)) &
+            +newparams(3)*(nfi4_numacc_xendmax(asparams(1),asparams(2)) &
+            -nfi4_xendmin(efoldNum,asparams(1),asparams(2)))
 
     end select
 

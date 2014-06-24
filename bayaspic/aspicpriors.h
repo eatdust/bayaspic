@@ -28,3 +28,7 @@ use gripisr, only : gripi_epstwomin, gripi_alphamin
 use lisr, only : li_alphamin
 use bisr, only : bi_x_epsoneunity, bi_x_trajectory
 use kkltisr, only : kklti_x_epsoneunity, kklti_x_trajectory
+use nfi1sr, only : nfi1_amax
+use nfi2sr, only : nfi2_amin, nfi2_numacc_xendmin,nfi2_xendmax
+use nfi3sr, only : nfi3_numacc_absamax
+use nfi4sr, only : nfi4_xendmin, nfi4_numacc_xendmax

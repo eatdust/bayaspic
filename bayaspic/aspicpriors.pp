@@ -76,7 +76,7 @@ ONEPRIOR(ripip,-3._kp,3._kp,log)
 ONEPRIOR(ripio,0.00002_kp,0.0002_kp,flat)
 ONEPRIOR(ripiS,10._kp,50._kp,flat)
 
-!ONEPRIOR(ai,-3._kp,log(0.512378_kp)/log(10._kp),log)
+!ONEPRIOR(ai,-3._kp,log10(0.512378_kp),log)
 ONEPRIOR(ai,-3._kp,log10(0.51_kp),log)
 
 ONEPRIOR(cnai,-4._kp,-0.27_kp,log)
@@ -214,6 +214,9 @@ TWOPRIORS(ssbi4f,0.00001,10._kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
+TWOPRIORS(nfi1,0._kp,10._kp,flat,1._kp,10._kp,flat)
+TWOPRIORS(nfi3n,-10._kp,0._kp,flat,0._kp,1._kp,flat)
+TWOPRIORS(nfi3p,0._kp,10._kp,flat,-10._kp,0._kp,flat)
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
@@ -255,8 +258,14 @@ THREEPRIORS(dsio,1+epsilon(1._kp),6,flat,1d-9,1d-6,flat,-5,-0.7,log)
 THREEPRIORS(dsi2,2,2,flat,1d-9,1d-6,flat,-5,-0.7,log)
 
 !last params is xend/xendmax
-THREEPRIORS(cndi,-2,-1,log,1,6,flat,0,1,flat)
+THREEPRIORS(cndi,-2._kp,-1._kp,log,1._kp,6._kp,flat,0._kp,1._kp,flat)
 
+!last aprams is y such that xend = xendmin+y(xendmax-xendmin)
+THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp,10._kp,flat,0._kp,1._kp,flat)
+
+!last aprams is y such that xend = xendmin+y(xendmax-xendmin)
+THREEPRIORS(nfi4p,0._kp,10._kp,flat,0._kp,1._kp,flat,0._kp,1._kp,flat)
+THREEPRIORS(nfi4n,-10._kp,0._kp,flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 
 !witout xend
 
