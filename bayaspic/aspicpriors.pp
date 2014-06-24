@@ -215,8 +215,8 @@ TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
 TWOPRIORS(nfi1,0._kp,10._kp,flat,1._kp+epsilon(1._kp),10._kp,flat)
-TWOPRIORS(nfi3n,-10._kp,0._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat)
-TWOPRIORS(nfi3p,0._kp,10._kp,flat,-10._kp,0._kp,flat)
+TWOPRIORS(nfi3n,-10._kp,-epsilon(1._kp),flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat)
+TWOPRIORS(nfi3p,epsilon(1._kp),10._kp,flat,-10._kp,-epsilon(1._kp),flat)
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
@@ -264,8 +264,8 @@ THREEPRIORS(cndi,-2._kp,-1._kp,log,1._kp,6._kp,flat,0._kp,1._kp,flat)
 THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,1._kp,flat)
 
 !last aprams is y such that xend = xendmin+y(xendmax-xendmin)
-THREEPRIORS(nfi4p,0._kp,10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
-THREEPRIORS(nfi4n,-10._kp,0._kp,flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
+THREEPRIORS(nfi4p,epsilon(1._kp),10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
+THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 
 !witout xend
 

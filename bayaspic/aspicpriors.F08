@@ -232,10 +232,12 @@ contains
             .or.(params(1).lt.nfi1_numacc_amin(params(2)))
                   
     case ('nfi2')
-       reject = params(1).lt.0.1_kp*nfi2_numacc_amin(efoldNum,params(2))
+       reject = (params(1).lt.nfi2_numacc_amin(efoldNum,params(2))) &
+            .or.(nfi2_epsilon_one(params(3),params(1),params(2)).gt.epsilonMax)
 
     case ('nfi3n','nfi3p')
-       reject = abs(params(1)).gt.nfi3_numacc_absamax(params(2))
+       reject = abs(params(1)).gt.0.1*nfi3_numacc_absamax(params(2))
+
 
     end select
 
