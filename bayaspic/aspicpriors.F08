@@ -228,8 +228,9 @@ contains
        reject = params(4).lt.kklti_x_trajectory(-efoldNum,params(3),params(1),params(2))
 
     case ('nfi1')
-       reject = params(1).gt.nfi1_amax(efoldNum,params(2))
-
+       reject = (params(1).gt.nfi1_numacc_amax(efoldNum,params(2))) &
+            .or.(params(1).lt.nfi1_numacc_amin(params(2)))
+                  
     case ('nfi2')
        reject = params(1).lt.nfi2_amin(efoldNum,params(2))
 
