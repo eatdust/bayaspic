@@ -12,7 +12,7 @@ module nestwrap
   character(len=*), parameter :: filepost = 'shepdata/postcubed.dat'
   character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
-  integer(imn), parameter :: numDerivedParams = 10
+  integer(imn), parameter :: numDerivedParams = 11
 
   integer(imn), save :: fitNdim = 0
   integer(imn), parameter :: pstarpos = 1
@@ -24,11 +24,15 @@ module nestwrap
 
 !the name of the fastlike method we call
 
+!  character(len=*), parameter :: fastLikeName = 'null'
+
 ! radial basis functions
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
+
+!nothing
 
 
   public nest_free_slowroll
@@ -202,46 +206,6 @@ contains
   end subroutine nest_print
 
 
-  subroutine nest_dump_priors(extname)
-    use nestparams, only : nestNdim, nestRootname
-    implicit none
-    character(len=*), intent(in) :: extname
-    integer, parameter :: nunit = 412
-    
-    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
-       stop 'nest_dump_priors: prior not allocated!'
-    endif
-
-    open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
-    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
-    write(nunit,*)'limits[lnRreh]=',nestPmin(2),nestPmax(2)
-
-    select case (nestNdim-2)
-    case (0)
-    case (1)
-       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
-    case(2)
-       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
-       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
-    case (3)
-       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
-       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
-       write(nunit,*)'limits[c3]=',nestPmin(5),nestPmax(5)
-    case (4)
-       write(nunit,*)'limits[c1]=',nestPmin(3),nestPmax(3)
-       write(nunit,*)'limits[c2]=',nestPmin(4),nestPmax(4)
-       write(nunit,*)'limits[c3]=',nestPmin(5),nestPmax(5)
-       write(nunit,*)'limits[c4]=',nestPmin(6),nestPmax(6)
-    case default
-       stop 'nest_dump_priors: case not implemented!'
-    end select
-
-    close(nunit)
-
-
-  end subroutine nest_dump_priors
-
-
 
   subroutine nest_free_slowroll()
     use nestparams, only : nestPwrap    
@@ -265,7 +229,7 @@ contains
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
-    use nestparams, only : fitLogZero
+    use nestparams, only : fitLogZero, nestLogZero
     implicit none    
     integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
@@ -328,6 +292,12 @@ contains
        fitNdim = get_shep_ndim()
        fitLogZero = get_shep_fmin()
 
+
+    case ('null')
+
+       fitNdim = 0
+       fitLogZero = nestLogZero
+
     case default
 
        stop 'nest_init_aspic: fast like not found!'
@@ -350,6 +320,92 @@ contains
   end subroutine nest_init_aspic
 
   
+
+  subroutine nest_dump_priors(extname)
+    use nestparams, only : nestNdim, nestRootname
+    use wraspic, only : get_nextra, ReheatModel
+    implicit none
+    character(len=*), intent(in) :: extname
+    integer, parameter :: nunit = 412, nname = 413
+    integer :: nextra
+    
+    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
+       stop 'nest_dump_priors: prior not allocated!'
+    endif
+
+    nextra = get_nextra()
+
+    open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
+    open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
+
+    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
+    write(nname,*)'lnA            \ln[10^{10} P_*]'
+ 
+    if (nextra.eq.2) then
+
+       select case (ReheatModel)
+       case ('Rreh')
+          write(nunit,*)'limits[lnRreh]=',nestPmin(2),nestPmax(2)
+          write(nname,*)'lnRreh         \ln(R)'
+       case ('Rrad')
+          write(nunit,*)'limits[lnRrad]=',nestPmin(2),nestPmax(2)
+          write(nname,*)'lnRrad         \ln(R_{\rm rad})'
+       case default
+          stop 'nest_dump_priors: internal error!'
+       end select
+          
+    elseif (nextra.eq.3) then
+
+       if (Reheatmodel.ne.'Rhow') stop 'ReheatModel is not Rhow!'
+
+       write(nunit,*)'limits[lnRhoReh]=',nestPmin(2),nestPmax(2)
+       write(nunit,*)'limits[wreh]=',nestPmin(3),nestPmax(3)
+       write(nname,*)'lnRhoReh       \ln(\rho_{\rm reh})'
+       write(nname,*)'wreh           \bar{w}_{\rm reh}'
+
+    else
+       stop 'nest_dump_priors: nextra not found!'
+    endif
+
+
+    select case (nestNdim-nextra)
+    case (0)
+    case (1)
+       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nname,*)'c1             c_1'
+    case(2)
+       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nname,*)'c1             c_1'
+       write(nname,*)'c2             c_2'
+    case (3)
+       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nunit,*)'limits[c3]=',nestPmin(nextra+3),nestPmax(nextra+3)
+       write(nname,*)'c1             c_1'
+       write(nname,*)'c2             c_2'
+       write(nname,*)'c3             c_3'
+    case (4)
+       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nunit,*)'limits[c3]=',nestPmin(nextra+3),nestPmax(nextra+3)
+       write(nunit,*)'limits[c4]=',nestPmin(nextra+4),nestPmax(nextra+4)
+       write(nname,*)'c1             c_1'
+       write(nname,*)'c2             c_2'
+       write(nname,*)'c3             c_3'
+       write(nname,*)'c3             c_4'
+    case default
+       stop 'nest_dump_priors: case not implemented!'
+    end select
+
+    close(nunit)
+    close(nname)
+
+
+  end subroutine nest_dump_priors
+
+
+
   subroutine nest_free_aspic()
     use nestparams, only : nestPwrap
     use wraspic, only : free_model
@@ -389,6 +445,13 @@ contains
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,shep_multinest_aspic_loglike,nest_dumper,context)
+
+    case ('null')
+
+       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+            ,null_multinest_aspic_loglike,nest_dumper,context)
 
     case default
 
@@ -540,7 +603,57 @@ contains
   end subroutine shep_multinest_aspic_loglike
 
 
+
+  subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)    
+    use nestparams, only : nestLogZero
+    use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
+    implicit none   
+    integer(imn) :: nestdim, nestpars
+    real(fmn), dimension(nestpars) :: cube
+    real(fmn) :: lnew
+    integer(imn) :: context,i
+    real(fmn), dimension(nestdim) :: mnpars    
+
+!get the physical parameters we are sampling on
+    mnpars = uncubize_nestparams(nestdim,cube)
+
+!check for any hard prior in aspic model parameters
+    if (test_aspic_hardprior(mnpars)) then
+
+       lnew = nestLogZero
+
+    else
+       
+       if (test_reheating_hardprior(mnpars)) then
+! reheating hardprior, those points are ignored
+          lnew = nestLogZero
+       else
+          lnew = 1._fmn
+       endif
+       
+    endif
+    
+!dump the physical params into cube for file output
+    cube(1:nestdim) = mnpars(1:nestdim)
+
+!+ derived parameters we want to dump too
+    do i=1,nestpars-nestdim
+       cube(nestdim+i) = get_derived(i)
+    enddo
+
+    if (display) then
+       write(*,*)
+       write(*,*)'null_aspic_loglike: '       
+       write(*,*)'ln(like) =                   ',lnew
+       write(*,*)
+    end if
+
+  end subroutine null_multinest_aspic_loglike
+
+
 #endif
+
+
 
   function uncubize_nestparams(nestdim,nestcube)
     implicit none

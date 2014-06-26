@@ -6,18 +6,28 @@ module wraspic
   private
 
 
-  integer, parameter :: nextra = 2
-  integer, parameter :: ireh= 2
   integer, parameter :: ilnA = 1
-  logical, parameter :: useRrad = .false.
+  integer, parameter :: ireh= 2
+  integer, parameter :: iw=3
+
+  integer, save :: nextra = 0
+
+
+!  logical, parameter :: useRrad = .false.
+!  character(len=*), parameter :: ReheatModel = 'Rreh'
+  character(len=*), parameter :: ReheatModel = 'Rrad'
+!  character(len=*), parameter :: ReheatModel = 'Rhow'
+
+
 
   type(infaspic), save :: AspicModel
 
   integer, parameter :: naspmax = 4
   integer, parameter :: nepsmax = 3
 
+  public ReheatModel
   public set_model, check_model, free_model, get_allprior
-  public get_slowroll, get_ntot, get_derived
+  public get_slowroll, get_ntot, get_nextra, get_derived
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
@@ -53,6 +63,15 @@ contains
     AspicModel%params = 0._kp
     AspicModel%cmaps ='undefined'
 
+    select case (ReheatModel)
+    case ('Rreh','Rrad')
+       nextra = 2
+    case ('Rhow')
+       nextra = 3
+    case default
+       stop 'set_model: reheating modelisation not found!'
+    end select
+
   end subroutine set_model
 
 
@@ -82,15 +101,27 @@ contains
   end subroutine free_model
 
 
+
   function get_ntot()
     implicit none
     integer :: get_ntot
 
-    if (.not.check_model()) stop 'get_ntot: aspic not set!'
+    if (.not.check_model()) stop 'get_ntot: aspic not set!'    
 
     get_ntot = AspicModel%nasp + nextra
     
   end function get_ntot
+
+
+
+  function get_nextra()
+    implicit none
+    integer :: get_nextra
+    if (.not.check_model()) stop 'get_nextra: aspic not set!'    
+
+    get_nextra = nextra
+  end function get_nextra
+
 
 
 
@@ -136,6 +167,29 @@ contains
   end subroutine get_prior_lnRreh
 
 
+
+  subroutine get_prior_lnRhoReh(lnRhoRehMin,lnRhoRehMax)
+    use cosmopar, only : lnRhoNuc
+    implicit none
+    real(fmn), intent(out) :: lnRhoRehMin, lnRhoRehMax
+    
+    lnRhoRehMin = lnRhoNuc
+    lnRhoRehMax = 0._kp
+  end subroutine get_prior_lnRhoReh
+
+
+
+  subroutine get_prior_wreh(wmin,wmax)
+    use cosmopar, only : lnRhoNuc
+    implicit none
+    real(fmn), intent(out) :: wmin, wmax
+
+    wmin = -1._kp/3._kp
+    wmax = 1._kp
+
+  end subroutine get_prior_wreh
+
+
   
   function get_derived(i)
     implicit none
@@ -147,38 +201,36 @@ contains
     case (1)
        get_derived = AspicModel%lnM
    
-    case(2)
-       if (useRrad) then
-          get_derived = AspicModel%lnRreh
-       else
-          get_derived = AspicModel%lnRrad
-       endif
+    case (2)
 
-    case (3)       
+       get_derived = AspicModel%lnRreh
+       
+    case (3)
+       get_derived = AspicModel%lnRrad
+       
+    case (4)       
        get_derived = AspicModel%lnRhoEnd
 
-    case (4)
+    case (5)
        get_derived = AspicModel%bfold
 
-    case (5)
+    case (6)
        get_derived = AspicModel%logeps
 
-    case (6)
+    case (7)
        get_derived = AspicModel%eps2
 
-    case (7)
+    case (8)
        get_derived = AspicModel%eps3
 
-    case (8)
+    case (9)
        get_derived = AspicModel%ns
 
-    case (9)
+    case (10)
        get_derived = AspicModel%logr
 
-    case (10)
-       get_derived = AspicModel%alpha
-
-    
+    case (11)
+       get_derived = AspicModel%alpha   
 
     case default
        stop 'get_derived: incorrect parameters number!'
@@ -208,14 +260,24 @@ contains
     endif
 
 !ln[10^10 P*]
-    call get_prior_lnA(pmin(1),pmax(1))
+    call get_prior_lnA(pmin(ilnA),pmax(ilnA))
 
 !lnRrad or lnR
-    if (useRrad) then
-       call get_prior_lnRrad(pmin(2),pmax(2))
-    else
-       call get_prior_lnRreh(pmin(2),pmax(2))
-    endif
+    select case (ReheatModel)
+
+    case ('Rrad')
+       call get_prior_lnRrad(pmin(ireh),pmax(ireh))
+
+    case ('Rreh')
+       call get_prior_lnRreh(pmin(ireh),pmax(ireh))
+
+    case ('Rhow')
+       call get_prior_lnRhoReh(pmin(ireh),pmax(ireh))
+       call get_prior_wreh(pmin(iw),pmax(iw))
+
+    case default
+       stop 'get_allprior: not such a reheating modelisation!'
+    end select
 
 !model dependant
 
@@ -313,6 +375,7 @@ contains
     use srreheat, only : potential_normalization
     use srreheat, only : ln_rho_endinf
     use srreheat, only : get_lnrreh_rrad, get_lnrrad_rreh
+    use srreheat, only : get_lnrreh_rhow, get_lnrrad_rhow
     use srflow, only : scalar_spectral_index
     use srflow, only : tensor_to_scalar_ratio
     use srflow, only : scalar_running
@@ -330,7 +393,7 @@ contains
     character(len=lname), dimension(naspmax) :: mapnames
 
     real(kp) :: bfoldstar, lnA
-    real(kp) :: Pstar, lnRrad, lnRreh, lnM
+    real(kp) :: Pstar, lnRrad, lnRreh, lnRhoReh, w, lnM
     real(kp) :: xstar, xend
     real(kp) :: epsOneEnd
     real(kp) :: Vstar, lnRhoEnd, Vend
@@ -349,12 +412,7 @@ contains
     
     lnA = mnParams(ilnA)
     Pstar = map_power_amplitude(lnA)
-
-    if (useRrad) then
-       lnRrad = mnParams(ireh)
-    else
-       lnRreh = mnParams(ireh)
-    endif
+   
 
 !let's get everything from libaspic
     aspname = trim(AspicModel%name)
@@ -366,11 +424,28 @@ contains
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
          ,mapnames(1:nasp))
 
-    if (useRrad) then
+
+    select case (ReheatModel)
+
+    case ('Rrad')
+
+       lnRrad = mnParams(ireh)
        xstar = aspic_x_rrad(aspname,asparams,lnRrad,Pstar,bfoldstar)
-    else
+
+    case ('Rreh')
+
+       lnRreh = mnParams(ireh)
        xstar = aspic_x_rreh(aspname,asparams,lnRreh,bfoldstar)
-    endif
+
+    case ('Rhow')
+       lnRhoReh = mnParams(ireh)
+       w = mnParams(iw)
+       xstar = aspic_x_rhow(aspname,asparams,lnRhoReh,w,Pstar,bfoldstar)
+
+    case default
+       stop 'get_slowroll: not such a reheating modelisation!'
+
+    end select
 
     epsStar(1) = aspic_epsilon_one(aspname,xstar,asparams)
     epsStar(2) = aspic_epsilon_two(aspname,xstar,asparams)
@@ -389,18 +464,23 @@ contains
     lnM = log(potential_normalization(Pstar,epsStar(1),Vstar))
     lnRhoEnd = ln_rho_endinf(Pstar,epsStar(1) &
          ,epsOneEnd,Vend/Vstar)
-    
-    if (useRrad) then
+
+    select case (ReheatModel)
+    case ('Rrad')
        lnRreh = get_lnrreh_rrad(lnRrad,lnRhoEnd)
-    else
+    case ('Rreh')
        lnRrad = get_lnrrad_rreh(lnRreh,lnRhoEnd)
-    endif
+    case ('Rhow')
+       lnRreh = get_lnrreh_rhow(lnRhoReh,w,lnRhoEnd)
+       lnRrad = get_lnrrad_rhow(lnRhoReh,w,lnRhoEnd)
+    case default
+       stop 'get_slowroll: not such a reheating modelisation!'
+    end select
 
 !update AspicModel shared variables
     AspicModel%Pstar = Pstar
     AspicModel%lnRrad = lnRrad
 !better displaying the aspic params rather than the mnparams
-!    AspicModel%params(1:nasp) = mnParams(nextra+1:ntot)
     AspicModel%params(1:nasp) = asparams(1:nasp)
     AspicModel%lnM = lnM
     AspicModel%lnRreh = lnRreh
@@ -433,8 +513,8 @@ contains
     type(infaspic), intent(in) :: model
 
     write(*,*)'AspicModel Params: '
-    write(*,*)'Pstar= asparams=   ', Model%Pstar,Model%params
-    write(*,*)'lnRrad= lnRreh=    ', Model%lnRrad, Model%lnRreh
+    write(*,*)'Pstar= asparams=   ',Model%Pstar,Model%params
+    write(*,*)'lnRrad= lnRreh=    ',Model%lnRrad, Model%lnRreh
     write(*,*)'lnM= lnRhoEnd=     ',Model%lnM,Model%lnRhoEnd
     write(*,*)'N*-Nend=           ',Model%bfold
     write(*,*)'log(eps1)= eps23=  ',Model%logeps, Model%eps2, Model%eps3
@@ -483,15 +563,23 @@ contains
     implicit none    
     logical :: test_reheating_hardprior
     real(fmn), dimension(:), intent(in) :: mnParams
-    real(fmn) :: lnRrad, lnRreh
+    real(fmn) :: lnRrad, lnRreh, lnRhoReh,w
 
-    if (useRrad) then
+    select case (ReheatModel)
+    case ('Rrad')
        lnRrad = mnParams(ireh)       
        test_reheating_hardprior = check_lnrrad_hardprior(lnRrad)
-    else
+    case ('Rreh')
        lnRreh = mnParams(ireh)       
        test_reheating_hardprior = check_lnrreh_hardprior(lnRreh)
-    endif
+    case ('Rhow')
+       lnRhoReh = mnParams(ireh)
+       w = mnParams(iw)
+       test_reheating_hardprior = check_rhow_hardprior(lnRhoReh,w)
+    case default
+       stop 'test_reheating_hardprior: not such a reheating modelisation!'
+    end select
+
     
   end function test_reheating_hardprior
 
@@ -565,5 +653,30 @@ contains
 
   end function check_lnrrad_hardprior
 
+
+
+  function check_rhow_hardprior(lnRhoReh,w) result(reject)
+    use cosmopar, only : lnRhoNuc
+    implicit none
+    logical :: reject
+    real(fmn), intent(in) :: lnRhoReh,w
+    real(fmn) :: lnRhoEnd
+    
+    lnRhoEnd = AspicModel%lnRhoEnd
+    
+    reject = (lnRhoReh.lt.lnRhoNuc).or.(lnRhoReh.gt.lnRhoEnd) &
+         .or.(lnRhoEnd.lt.lnRhoNuc)
+
+    if (display) then
+       if (reject) then
+          write(*,*)
+          write(*,*)'check_rhow_hardprior:'
+          write(*,*)'lnRhoEnd= lnRhoNuc= ',lnRhoEnd,lnRhoNuc
+          write(*,*)'wreh= lnRhoReh= ',w, lnRhoReh
+          write(*,*)
+       end if
+    end if
+
+  end function check_rhow_hardprior
 
 end module wraspic

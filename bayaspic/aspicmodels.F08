@@ -19,14 +19,19 @@ module aspicmodels
 
   procedure(zerop_x_rrad), pointer :: ptrzerop_x_rrad => null()
   procedure(zerop_x_rreh), pointer :: ptrzerop_x_rreh => null()
+  procedure(zerop_x_rhow), pointer :: ptrzerop_x_rhow => null()
   procedure(onep_x_rrad), pointer :: ptronep_x_rrad => null()
   procedure(onep_x_rreh), pointer :: ptronep_x_rreh => null()
+  procedure(onep_x_rhow), pointer :: ptronep_x_rhow => null()
   procedure(twop_x_rrad), pointer :: ptrtwop_x_rrad => null()
   procedure(twop_x_rreh), pointer :: ptrtwop_x_rreh => null()
+  procedure(twop_x_rhow), pointer :: ptrtwop_x_rhow => null()
   procedure(threep_x_rrad), pointer :: ptrthreep_x_rrad => null()
   procedure(threep_x_rreh), pointer :: ptrthreep_x_rreh => null()
+  procedure(threep_x_rhow), pointer :: ptrthreep_x_rhow => null()
   procedure(fourp_x_rrad), pointer :: ptrfourp_x_rrad => null()
   procedure(fourp_x_rreh), pointer :: ptrfourp_x_rreh => null()
+  procedure(fourp_x_rhow), pointer :: ptrfourp_x_rhow => null()
 
   procedure(zerop_norm_potential), pointer :: ptrzerop_norm_potential => null()
   procedure(zerop_epsilon_one), pointer :: ptrzerop_epsilon_one => null()
@@ -50,13 +55,13 @@ module aspicmodels
   procedure(threep_epsilon_one), pointer :: ptrthreep_epsilon_one => null()
   procedure(threep_epsilon_two), pointer :: ptrthreep_epsilon_two => null()
   procedure(threep_epsilon_three), pointer :: ptrthreep_epsilon_three => null()
-  procedure(threep_x_endinf), pointer :: ptrthreep_x_endinf => null() 
+  procedure(threep_x_endinf), pointer :: ptrthreep_x_endinf => null()
 
 
   public check_aspic_ptrs, free_aspic_ptrs, get_aspic_numparams
   public check_aspic_xend, initialize_aspic_ptrs
 
-  public aspic_x_rrad, aspic_x_rreh
+  public aspic_x_rrad, aspic_x_rreh, aspic_x_rhow
   public aspic_norm_potential
   public aspic_epsilon_one, aspic_epsilon_two, aspic_epsilon_three
   public aspic_x_endinf
@@ -84,6 +89,7 @@ contains
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
+       ptrzerop_x_rhow => fooi/**/_x_star ; \
        ptrzerop_norm_potential => fooi/**/_norm_potential ; \
        ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
@@ -95,6 +101,7 @@ contains
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
+       ptronep_x_rhow => fooi/**/_x_star ; \
        ptrzerop_norm_potential => fooi/**/_norm_potential ; \
        ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
@@ -107,6 +114,7 @@ contains
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
+       ptronep_x_rhow => fooi/**/_x_star ; \
        ptronep_norm_potential => fooi/**/_norm_potential ; \
        ptronep_epsilon_one => fooi/**/_epsilon_one ; \
        ptronep_epsilon_two => fooi/**/_epsilon_two ; \
@@ -119,6 +127,7 @@ contains
     case ('fooi'); \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
+       ptrtwop_x_rhow => fooi/**/_x_star ; \
        ptronep_norm_potential => fooi/**/_norm_potential ; \
        ptronep_epsilon_one => fooi/**/_epsilon_one ; \
        ptronep_epsilon_two => fooi/**/_epsilon_two ; \
@@ -131,6 +140,7 @@ contains
     case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
+       ptrtwop_x_rhow => fooi/**/_x_star ; \
        ptrtwop_norm_potential => fooi/**/_norm_potential ; \
        ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
@@ -143,6 +153,7 @@ contains
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
+       ptrthreep_x_rhow => fooi/**/_x_star ; \
        ptrtwop_norm_potential => fooi/**/_norm_potential ; \
        ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
@@ -155,6 +166,7 @@ contains
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
+       ptrthreep_x_rhow => fooi/**/_x_star ; \
        ptrtwop_norm_potential => fooi/**/_norm_potential ; \
        ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
        ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
@@ -169,6 +181,7 @@ contains
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
+       ptrthreep_x_rhow => fooi/**/_x_star ; \
        ptrthreep_norm_potential => fooi/**/_norm_potential ; \
        ptrthreep_epsilon_one => fooi/**/_epsilon_one ; \
        ptrthreep_epsilon_two => fooi/**/_epsilon_two ; \
@@ -181,6 +194,7 @@ contains
     case ('fooi') ; \
        ptrfourp_x_rrad => fooi/**/_x_rrad ; \
        ptrfourp_x_rreh => fooi/**/_x_rreh ; \
+       ptrfourp_x_rhow => fooi/**/_x_star ; \
        ptrfourp_norm_potential => fooi/**/_norm_potential ; \
        ptrthreep_epsilon_one => fooi/**/_epsilon_one ; \
        ptrthreep_epsilon_two => fooi/**/_epsilon_two ; \
@@ -271,14 +285,19 @@ contains
 
     if (associated(ptrzerop_x_rrad)) ptrzerop_x_rrad => null()    
     if (associated(ptrzerop_x_rreh)) ptrzerop_x_rreh => null()
+    if (associated(ptrzerop_x_rhow)) ptrzerop_x_rhow => null()
     if (associated(ptronep_x_rrad)) ptronep_x_rrad => null()    
     if (associated(ptronep_x_rreh)) ptronep_x_rreh => null()
+    if (associated(ptronep_x_rhow)) ptronep_x_rhow => null()
     if (associated(ptrtwop_x_rrad)) ptrtwop_x_rrad => null()
     if (associated(ptrtwop_x_rreh)) ptrtwop_x_rreh => null()
+    if (associated(ptrtwop_x_rhow)) ptrtwop_x_rhow => null()
     if (associated(ptrthreep_x_rrad)) ptrthreep_x_rrad => null()
     if (associated(ptrthreep_x_rreh)) ptrthreep_x_rreh => null()
+    if (associated(ptrthreep_x_rhow)) ptrthreep_x_rhow => null()
     if (associated(ptrfourp_x_rrad)) ptrfourp_x_rrad => null()
     if (associated(ptrfourp_x_rreh)) ptrfourp_x_rreh => null()
+    if (associated(ptrfourp_x_rhow)) ptrfourp_x_rhow => null()
 
     CheckAspicPtrs = .false.
 
@@ -355,6 +374,42 @@ contains
     end if
 
   end function aspic_x_rreh
+
+
+
+  function aspic_x_rhow(name,params,lnRhoReh,w,Pstar,bfoldstar)
+    implicit none
+    real(kp) :: aspic_x_rhow
+    character(len=*), intent(in) :: name
+    real(kp), dimension(:), intent(in) :: params
+    real(kp), intent(in) :: lnRhoReh,w,Pstar
+    real(kp), intent(out), optional :: bfoldstar
+
+    if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
+
+    if (associated(ptrzerop_x_rhow)) then
+       aspic_x_rhow = ptrzerop_x_rhow(w,lnrhoReh,Pstar,bfoldstar)
+
+    elseif (associated(ptronep_x_rhow)) then
+       aspic_x_rhow = ptronep_x_rhow(params(1),w,lnRhoReh,Pstar,bfoldstar)
+
+    elseif (associated(ptrtwop_x_rhow)) then
+       aspic_x_rhow = ptrtwop_x_rhow(params(1),params(2) &
+            ,w,lnRhoReh,Pstar,bfoldstar)
+    
+    elseif (associated(ptrthreep_x_rhow)) then
+       aspic_x_rhow = ptrthreep_x_rhow(params(1),params(2) &
+            ,params(3),w,lnRhoReh,Pstar,bfoldstar)
+
+    elseif (associated(ptrfourp_x_rhow)) then
+       aspic_x_rhow = ptrfourp_x_rhow(params(1),params(2) &
+            ,params(3),params(4),w,lnRhoReh,Pstar,bfoldstar)
+
+    else
+       stop 'aspic_x_rhow: wrong nparams!'
+    end if
+
+  end function aspic_x_rhow
 
 
 

@@ -41,7 +41,7 @@ bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
 
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
-nestwrap.o: nestparams.o
+nestwrap.o: nestparams.o wraspic.o
 
 %.o: $(LIKEDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<

@@ -123,9 +123,9 @@ contains
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'psni oA'
-    Modelnames(1) = 'psni oB'
-    Modelnames(2) = 'psni oC'
+    Modelnames(0) = 'lfi 1'
+    Modelnames(1) = 'lfi 2'
+    Modelnames(2) = 'lfi 3'
     
         
   end subroutine initialize_manymodels
