@@ -34,8 +34,8 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('psni oA')
-  call initialize_manymodels()
+  call initialize_onemodel('hi')
+!  call initialize_manymodels()
 
 !  call initialize_filemodels('list_dpmodels.dat')
 

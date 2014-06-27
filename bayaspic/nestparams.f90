@@ -40,7 +40,7 @@ module nestparams
   real(fmn), parameter :: nestNullZ = -1d99
 
 !file output name
-  character(len=lenmn), parameter :: nestRootPrefix = 'chains/bayesinf_'
+  character(len=lenmn), parameter :: nestRootPrefix = 'chains/priorinf_'
   character(len=lenmn), save :: nestRootName = nestRootPrefix
 
 !seed for nested sampler, -ve means take it from sys clock

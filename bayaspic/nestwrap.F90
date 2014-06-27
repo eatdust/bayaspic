@@ -24,13 +24,13 @@ module nestwrap
 
 !the name of the fastlike method we call
 
-!  character(len=*), parameter :: fastLikeName = 'null'
+  character(len=*), parameter :: fastLikeName = 'null'
 
 ! radial basis functions
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-  character(len=*), parameter :: fastLikeName = 'shep'
+!  character(len=*), parameter :: fastLikeName = 'shep'
 
 !nothing
 
@@ -607,12 +607,14 @@ contains
   subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)    
     use nestparams, only : nestLogZero
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
+    use wraspic, only : get_slowroll
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
     real(fmn) :: lnew
     integer(imn) :: context,i
     real(fmn), dimension(nestdim) :: mnpars    
+    real(fmn), dimension(fitNdim) :: nullpars
 
 !get the physical parameters we are sampling on
     mnpars = uncubize_nestparams(nestdim,cube)
@@ -623,7 +625,10 @@ contains
        lnew = nestLogZero
 
     else
-       
+
+!to get derived parameters
+       nullpars = get_slowroll(fitNdim,mnpars)
+
        if (test_reheating_hardprior(mnpars)) then
 ! reheating hardprior, those points are ignored
           lnew = nestLogZero
