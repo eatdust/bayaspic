@@ -34,13 +34,19 @@ program shepmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_13.dat',fdata,xdata)
+
+  call read_binned_posterior('sr2ndlog_plc_posterior_4D_6.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
- 
-  nctrs = 30
+
+!3D 
+!  nctrs = 30
+!  nfits = 300
+
+!4D
+  nctrs = 90
   nfits = 300
 
   print *,'ndata= ',ndata
@@ -117,7 +123,7 @@ program shepmain
   enddo
 
   sr3=0
-  sr2 = 0.04
+  sr2 = 0.03
   do i=1,ndump
      sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
      
