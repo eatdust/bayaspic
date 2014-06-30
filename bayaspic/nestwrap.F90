@@ -24,13 +24,13 @@ module nestwrap
 
 !the name of the fastlike method we call
 
-  character(len=*), parameter :: fastLikeName = 'null'
+!  character(len=*), parameter :: fastLikeName = 'null'
 
 ! radial basis functions
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-!  character(len=*), parameter :: fastLikeName = 'shep'
+  character(len=*), parameter :: fastLikeName = 'shep'
 
 !nothing
 
