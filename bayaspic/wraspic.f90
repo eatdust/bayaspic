@@ -14,9 +14,9 @@ module wraspic
 
 
 !  logical, parameter :: useRrad = .false.
-!  character(len=*), parameter :: ReheatModel = 'Rreh'
+  character(len=*), parameter :: ReheatModel = 'Rreh'
 !  character(len=*), parameter :: ReheatModel = 'Rrad'
-  character(len=*), parameter :: ReheatModel = 'Rhow'
+!  character(len=*), parameter :: ReheatModel = 'Rhow'
 
 
 
