@@ -339,7 +339,7 @@ contains
     open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
 
     write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
-    write(nname,*)'lnA            \ln[10^{10} P_*]'
+    write(nname,*)'lnA            \ln(10^{10} P_*)'
  
     if (nextra.eq.2) then
 
