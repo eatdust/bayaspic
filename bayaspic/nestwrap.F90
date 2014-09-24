@@ -393,7 +393,7 @@ contains
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
        write(nname,*)'c3             c_3'
-       write(nname,*)'c3             c_4'
+       write(nname,*)'c4             c_4'
     case default
        stop 'nest_dump_priors: case not implemented!'
     end select
