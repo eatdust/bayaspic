@@ -494,22 +494,31 @@ contains
 !use aspic to get the slowroll parameters
        rbfpars = get_slowroll(fitNdim,mnpars)
 
+! reheating hardprior, ignoring those points
+       if (test_reheating_hardprior(mnpars)) then
+          
+          lnew = nestLogZero
+
+       else
+
 !if eps1<eps1min, the likelihood is flat
-       rbfcuts = cutmin_rbfparams(fitNdim,eps1pos,rbfpars)
+          rbfcuts = cutmin_rbfparams(fitNdim,eps1pos,rbfpars)
 
 !go into cubic space for the rbf likelihood
-       rbfcube = cubize_rbfparams(fitNdim,rbfcuts)
+          rbfcube = cubize_rbfparams(fitNdim,rbfcuts)
        
-       if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
+          if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
 !if outside rbffits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
-          lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
-       elseif (test_reheating_hardprior(mnpars)) then
-! reheating hardprior, ignoring those points
-          lnew = nestLogZero
-       else
-          lnew = rbflike_eval(rbfcube)
+             lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
+
+          else
+
+             lnew = rbflike_eval(rbfcube)
+
+          endif
+
        endif
 
     endif
@@ -564,22 +573,31 @@ contains
 !use aspic to get the slowroll parameters
        sheppars = get_slowroll(fitNdim,mnpars)
 
+! reheating hardprior, those points are ignored
+       if (test_reheating_hardprior(mnpars)) then
+
+          lnew = nestLogZero
+
+       else
+
 !if eps1<eps1min, the likelihood is flat
-       shepcuts = cutmin_shepparams(fitNdim,eps1pos,sheppars)
+          shepcuts = cutmin_shepparams(fitNdim,eps1pos,sheppars)
 
 !go into cubic space for the shep likelihood
-       shepcube = cubize_shepparams(fitNdim,shepcuts)
+          shepcube = cubize_shepparams(fitNdim,shepcuts)
        
-       if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
+          if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
 !if outside shepfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
-          lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
-       elseif (test_reheating_hardprior(mnpars)) then
-! reheating hardprior, those points are ignored
-          lnew = nestLogZero
-       else
-          lnew = sheplike_eval(shepcube)
+             lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
+       
+          else
+
+             lnew = sheplike_eval(shepcube)
+
+          endif
+
        endif
 
     endif
