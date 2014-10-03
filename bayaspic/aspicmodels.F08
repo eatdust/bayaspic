@@ -72,10 +72,10 @@ contains
   
   subroutine initialize_aspic_ptrs(name)
 #ifdef ASPIC
-#include <aspic.h>
+    include 'aspic.h'
 #endif
 #ifdef ASPICQ
-#include <aspicq.h>
+    include 'aspicq.h'
 #endif
     implicit none
     character(len=*), intent(in) :: name

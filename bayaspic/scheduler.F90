@@ -771,6 +771,7 @@ contains
 
 
     longrank = 0
+    longqsize = 0
 
 #ifdef MPISCHED
 

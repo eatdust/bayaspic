@@ -5,10 +5,20 @@ ext=$(shell uname | cut -c1-3)
 ifeq ($(ext),Lin)
 FC=gfortran
 FCFLAGS= -O2 -fopenmp -DASPIC
-#-DMPISCHED
+#-DMPISCHED -DASPICQ
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
+#-I/usr/local/include/aspicq
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
+#-laspicq
+
+##ifort specific
+#FC=ifort
+#FCFLAGS= -O -DASPIC
+#F08FLAGS="-DNOF08"
+#INCLUDE=-I/opt/intel/aspic/include/aspic
+#LFLAGS= -mkl -L/opt/intel/aspic/lib -laspic
+#CPP=cpp -P -traditional-cpp $(FCFLAGS)
 endif 
 
 
@@ -61,8 +71,15 @@ nestwrap.o: nestparams.o wraspic.o
 %.o: %.F90
 	$(FC) $(FCFLAGS) -c $<
 
+ifeq ($(FC),ifort)
+%.ifort: %.F08
+	$(CPP) $< -o $@
+%.o: %.ifort
+	$(FC) $(FCFLAGS) -c -free -Tf$< 
+else
 %.o: %.F08
 	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+endif
 
 clean:
-	rm -f *.o *.mod ../bayaspic.$(ext) ../bayslowroll.$(ext)
+	rm -f *.ifort *.o *.mod ../bayaspic.$(ext) ../bayslowroll.$(ext)
