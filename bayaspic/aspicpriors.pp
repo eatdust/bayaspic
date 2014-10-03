@@ -92,7 +92,7 @@ ONEPRIOR(wrio,1._kp,1._kp,flat)
 
 !with xend
 
-TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.5_kp,flat,0.5_kp,2_kp,log)
+TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.5_kp,flat,0.5_kp,2._kp,log)
 
 TWOPRIORS(ii,0._kp,10._kp,flat,-1._kp,4._kp,log)
 TWOPRIORS(iif,0.1_kp,1._kp,inv,-1._kp,4._kp,log)
@@ -151,7 +151,7 @@ TWOPRIORS(lmi1o,1._kp,6._kp,flat,-2._kp,2._kp,log)
 TWOPRIORS(gmssmi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
 TWOPRIORS(gmssmiopA,-28._kp,-23._kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiopB,-28._kp,-21.5_kp,log,0.00002_kp,0.0002_kp,flat)
-TWOPRIORS(gmssmiomA,-28._kp,-23_kp,log,0.00002_kp,0.0002_kp,flat)
+TWOPRIORS(gmssmiomA,-28._kp,-23._kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomB,-28._kp,-20._kp,log,0.00002_kp,0.0002_kp,flat)
 
 !grippi requires aspic quad-precision lnR>0
