@@ -47,13 +47,20 @@ contains
    subroutine nest_init_slowroll()
     use rbflike, only : initialize_rbf_like
     use rbflike, only : get_rbf_ndim, get_rbf_fmin
+    use rbflike, only : get_rbf_xpmin, get_rbf_xpmax
     use sheplike, only : initialize_shep_like
     use sheplike, only : get_shep_ndim, get_shep_fmin
+    use sheplike, only : get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     use nestparams, only : fitLogZero
     implicit none
-    
+
+    integer, parameter :: srlen = 3
+    character(len=srlen) :: name
+
+    integer :: i
+
     select case(fastLikeName)
     
     case ('rbf')
@@ -61,12 +68,30 @@ contains
        call initialize_rbf_like(fileweights, filecentres, filerbfbounds)
        fitNdim = get_rbf_ndim()
        fitLogZero = get_rbf_fmin()
+       nestNdim = fitNdim
+       
+       allocate(nestPmin(nestNdim))
+       allocate(nestPmax(nestNdim))
+       
+       do i=1,fitNdim
+          nestPmin(i) = get_rbf_xpmin(i)
+          nestPmax(i) = get_rbf_xpmax(i)
+       enddo
 
     case ('shep')
 
        call initialize_shep_like(fileshep, filepost, fileshepbounds)
        fitNdim = get_shep_ndim()
        fitLogZero = get_shep_fmin()
+       nestNdim = fitNdim
+
+       allocate(nestPmin(nestNdim))
+       allocate(nestPmax(nestNdim))
+
+       do i=1,fitNdim
+          nestPmin(i) = get_shep_xpmin(i)
+          nestPmax(i) = get_shep_xpmax(i)
+       enddo
 
     case default
 
@@ -74,22 +99,74 @@ contains
 
     end select
        
-    nestNdim = fitNdim
     nestNpars = nestNdim
     nestCdim = nestNdim
-    if (fitNdim.eq.3) then
-       nestRootName = trim(nestRootPrefix)//'sr2'
-    elseif (fitNdim.eq.4) then
-       nestRootName = trim(nestRootPrefix)//'sr3'
-    endif
+
+    select case (fitNdim)
+    case (3)
+       name = 'sr2'
+    case (4)
+       name = 'sr3'
+    case default
+       stop 'nest_init_slowroll: sr model not known'
+    end select
+
+    
 
     allocate(nestPwrap(nestNdim))
     nestPwrap = 0
+
+    nestRootName = trim(nestRootPrefix)//name
+    call nest_dump_slowroll_priors(name)
 
     call nest_print()
 
   end subroutine nest_init_slowroll
 
+
+  subroutine nest_dump_slowroll_priors(extname)
+    use nestparams, only : nestNdim, nestRootname
+    implicit none
+    character(len=*), intent(in) :: extname
+    integer, parameter :: nunit = 414, nname = 415
+    
+    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
+       stop 'nest_dump_slowroll_priors: prior not allocated!'
+    endif
+
+    open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
+    open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
+
+    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
+    write(nname,*)'lnA         \ln(10^{10} P_*)'
+ 
+    select case (extname)
+
+    case ('sr2')
+
+       write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
+       write(nname,*)'sr1         \log(\epsilon_1)'
+       write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
+       write(nname,*)'sr2         \epsilon_2'
+
+    case ('sr3')
+       write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
+       write(nname,*)'sr1         \log(\epsilon_1)'
+       write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
+       write(nname,*)'sr2         \epsilon_2'
+       write(nunit,*)'limits[sr3]=',nestPmin(4),nestPmax(4)
+       write(nname,*)'sr3         \epsilon_3'
+
+    case default
+
+       stop 'nest_dump_slowrollpriors: internal error!'
+
+    end select
+
+    close(nunit)
+    close(nname)
+
+  end subroutine nest_dump_slowroll_priors
 
 
   subroutine nest_sample_slowroll()
@@ -313,7 +390,7 @@ contains
     allocate(nestPwrap(nestNdim))
     nestPwrap = 0
 
-    call nest_dump_priors(trim(name)//subname)
+    call nest_dump_aspic_priors(trim(name)//subname)
 
     call nest_print()
     
@@ -321,7 +398,7 @@ contains
 
   
 
-  subroutine nest_dump_priors(extname)
+  subroutine nest_dump_aspic_priors(extname)
     use nestparams, only : nestNdim, nestRootname
     use wraspic, only : get_nextra, ReheatModel
     implicit none
@@ -330,7 +407,7 @@ contains
     integer :: nextra
     
     if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
-       stop 'nest_dump_priors: prior not allocated!'
+       stop 'nest_dump_aspic_priors: prior not allocated!'
     endif
 
     nextra = get_nextra()
@@ -351,7 +428,7 @@ contains
           write(nunit,*)'limits[lnRrad]=',nestPmin(2),nestPmax(2)
           write(nname,*)'lnRrad         \ln(R_{\rm rad})'
        case default
-          stop 'nest_dump_priors: internal error!'
+          stop 'nest_dump_aspic_priors: internal error!'
        end select
           
     elseif (nextra.eq.3) then
@@ -364,7 +441,7 @@ contains
        write(nname,*)'wreh           \bar{w}_{\rm reh}'
 
     else
-       stop 'nest_dump_priors: nextra not found!'
+       stop 'nest_dump_aspic_priors: nextra not found!'
     endif
 
 
@@ -395,14 +472,14 @@ contains
        write(nname,*)'c3             c_3'
        write(nname,*)'c4             c_4'
     case default
-       stop 'nest_dump_priors: case not implemented!'
+       stop 'nest_dump_aspic_priors: case not implemented!'
     end select
 
     close(nunit)
     close(nname)
 
 
-  end subroutine nest_dump_priors
+  end subroutine nest_dump_aspic_priors
 
 
 
