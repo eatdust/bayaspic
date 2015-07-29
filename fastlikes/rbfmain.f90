@@ -35,7 +35,7 @@ program rbfmain
   logical, parameter :: training = .true.
 
 
-  call read_binned_posterior('sr2ndlog_posterior_3D_25.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_posterior_3D_13.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
