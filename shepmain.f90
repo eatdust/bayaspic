@@ -35,19 +35,19 @@ program shepmain
 
 
 
-  call read_binned_posterior('sr2ndlog_plc_posterior_4D_6.dat',fdata,xdata)
+  call read_binned_posterior('sr2ndlog_fidhi_corext_posterior_4D_8.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
 
 !3D 
-!  nctrs = 30
-!  nfits = 300
-
-!4D
   nctrs = 90
   nfits = 300
+
+!4D
+!  nctrs = 90
+!  nfits = 300
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -101,8 +101,8 @@ program shepmain
   call delete_file('output.dat')
   call delete_file('output2.dat')
   call delete_file('output3.dat')
-  lnA = 3.1
-  sr3 = 0
+  lnA = 3.09
+  sr3 = 0.0
 
 
   do i=1,ndump
@@ -123,7 +123,7 @@ program shepmain
   enddo
 
   sr3=0
-  sr2 = 0.03
+  sr2 = 0.04
   do i=1,ndump
      sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
      
@@ -143,7 +143,7 @@ program shepmain
 
   if (ndim.lt.4) stop
 
-  lnA = 3.1
+  lnA = 3.09
   sr2 = 0.04
   do i=1,ndump
      sr1 = sr1min + (sr1max-sr1min)*real(i-1,fp)/real(ndump-1,fp)
