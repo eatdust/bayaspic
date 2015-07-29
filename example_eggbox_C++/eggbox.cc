@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
 	// set the MultiNest sampling parameters
 	
 	
-	int IS = 1;					// do Nested Importance Sampling?
+	int IS = 0;					// do Nested Importance Sampling?
 	
-	int mmodal = 0;					// do mode separation?
+	int mmodal = 1;					// do mode separation?
 	
 	int ceff = 0;					// run in constant efficiency mode?
 	
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 	
 	int resume = 1;					// resume from a previous job?
 	
-	int outfile = 0;				// write output files?
+	int outfile = 1;				// write output files?
 	
 	int initMPI = 1;				// initialize MPI routines?, relevant only if compiling with MPI
 							// set it to F if you want your main program to handle MPI initialization

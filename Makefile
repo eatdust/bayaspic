@@ -1,8 +1,14 @@
-FC = ifort -lmpi
-CC = icc -lmpi
-CXX = icpc -lmpi
-FFLAGS += -O3 -DMPI
-CFLAGS += -O3 -DMPI
+#FC = ifort -lmpi
+#CC = icc -lmpi
+#CXX = icpc -lmpi
+#FFLAGS += -O3 -DMPI
+#CFLAGS += -O3 -DMPI
+
+FC = gfortran
+CC = gcc
+CXX = g++
+FFLAGS += -ffree-line-length-none -O3 #-DMPI
+CFLAGS += -O3 #-DMPI
 
 LAPACKLIB = -llapack
 

@@ -1,5 +1,5 @@
 ! Do nested sampling algorithm to calculate Bayesian evidence
-! Mar 2014
+! Oct 2014
 ! Farhan Feroz
 
 module Nested
@@ -215,9 +215,9 @@ contains
 		endif
       
 		write(*,*)"*****************************************************"
-		write(*,*)"MultiNest v3.6"
+		write(*,*)"MultiNest v3.9"
       		write(*,*)"Copyright Farhan Feroz & Mike Hobson"
-      		write(*,*)"Release Mar 2014"
+      		write(*,*)"Release Oct 2014"
 		write(*,*)
       		write(*,'(a,i4)')" no. of live points = ",nest_nlive
       		write(*,'(a,i4)')" dimensionality = ",nest_ndims
@@ -724,7 +724,7 @@ contains
 	integer IS_counter(7)
 	integer :: IS_nstore = 10000, IS_nMC = 1000
 	double precision :: IS_Z(2)
-	logical :: IS_CheckAll = .false., IS_betterMC = .true.
+	logical :: IS_CheckAll = .false., IS_betterMC = .true., IS_GetVolInsidePrior = .true.
 	      
 	INTERFACE
     		!the likelihood function
@@ -762,8 +762,18 @@ contains
 	ic_volFac(:)=1d0
 	
 	if(my_rank==0) then
-		!memory allocation
 		if( IS ) then
+			if( IS_GetVolInsidePrior ) then
+				IS_GetVolInsidePrior = .false.
+				do i = 1, ndims
+					if( .not.pWrap(i) ) then
+						IS_GetVolInsidePrior = .true.
+						exit
+					endif
+				enddo
+			endif
+			
+			!memory allocation
 			allocate(IS_allpts(nlive+IS_nstore,ndims+6), IS_iterinfo(nlive+IS_nstore/10,5), IS_V(maxeCls))
 			IS_allpts = 0d0
 			IS_iterinfo = 0d0
@@ -1576,6 +1586,7 @@ contains
 		call MPI_BCAST(eswitch,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(flag2,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(modeFound,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
+		call MPI_BCAST(lowlike,1,MPI_DOUBLE_PRECISION,0,MPI_COMM_WORLD,errcode)
 		
 		if(modeFound) then
 			call MPI_BCAST(ic_n,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -1596,12 +1607,35 @@ contains
 		endif
 #endif
 
-		if( IS .and. flag2 .and. eswitch .and. my_rank == 0 ) then
+		if( IS .and. (flag2 .or. mod(ff,100)==0) .and. eswitch .and. my_rank == 0 ) then
 			!estimate the total ellipsoidal volume taking the overlap into account
 			
 			nd_i = 0 !no. of ellipsoids traversed
 			nd_j = 0 !no. of points traversed
+			flag = .false.
 			do i = 1, ic_n
+				IS_V(i) = 0d0
+				if( IS_GetVolInsidePrior ) then
+					do k = nd_i, nd_i+ic_sc(i)
+						j1 = max(5, int( ( dble(IS_nMC) * dble(ic_npt(i)) / dble(nlive) ) * ( dble(sc_vol(k)) / dble(totVol(i)) ) ))
+						m = 0
+						do i3 = 1, j1
+							d1=sc_kfac(k)*sc_eff(k)
+							call genPtInEll(ndims, sc_mean(k,:), d1, sc_tMat(k,:,:), my_rank, pnew(1:ndims))
+							do i2 = 1, ndims
+								if( .not.pWrap(i2) .and. ( pnew(i2) < 0d0 .or. pnew(i2) > 1d0 ) ) then
+									m = m+1
+									flag = .true.
+									exit
+								endif
+							enddo
+						enddo
+						IS_V(i) = IS_V(i) + sc_vol(k)*(1d0 - dble(m)/dble(j1))
+					enddo
+				else
+					IS_V(i) = totVol(i)
+				endif
+				
 				if( ic_sc(i) <= 1 .or. ic_done(i) ) then
 					j1 = 1
 					m = 1
@@ -1644,56 +1678,60 @@ contains
 					enddo
 				endif
 				
-				IS_V(i) = ( totVol(i) / ic_volFac(i) ) * dble(j1) / dble(m)
+				IS_V(i) = ( IS_V(i) / ic_volFac(i) ) * dble(j1) / dble(m)
 				
 				nd_j = nd_j+ic_npt(i)
 				nd_i = nd_i+ic_sc(i)
 			enddo
 			
+			if( IS_GetVolInsidePrior .and. .not.flag ) IS_GetVolInsidePrior = .false.
 			
-			lowlike = minval(l(1:nlive))
-			flag = .false.	!found the very first point which is inside the ellipsoidal bound?
-			j1 = IS_counter(2)
-			if( IS_CheckAll ) j1 = 1
-			do j = j1, IS_counter(1)
-				d1 = huge(1d0)
-				if( IS_CheckAll .or. IS_allpts(j,ndims+3) == 1d0 ) then
-					IS_allpts(j,ndims+3) = 0d0
-					
-					nd_i = 0 !no. of ellipsoids traversed
-					do i = 1, ic_n
-						if( ic_done(i) .or. totvol(i) == 0d0 .or. ic_npt(i) == 0 .or. ( multimodal .and. .not.isAncestor(int(IS_allpts(j,ndims+6)), i, ic_fnode(1:i)) ) ) then
-							nd_i = nd_i+ic_sc(i)
-							cycle
-						endif
+			
+			if( flag2 ) then
+				lowlike = minval(l(1:nlive))
+				flag = .false.	!found the very first point which is inside the ellipsoidal bound?
+				j1 = IS_counter(2)
+				if( IS_CheckAll ) j1 = 1
+				do j = j1, IS_counter(1)
+					d1 = huge(1d0)
+					if( IS_CheckAll .or. IS_allpts(j,ndims+3) == 1d0 ) then
+						IS_allpts(j,ndims+3) = 0d0
 						
-						!apply current limits to this point
-						call ApplyLimits(0, ic_climits(i,:,:), IS_allpts(j,1:ndims), pt(1,1:ndims))
-						
-						do k = nd_i+1, nd_i+ic_sc(i)
-							!check if this point is inside the ellipsoid
-							call ScaleFactor(1, ndims , pt(1,1:ndims), sc_mean(k,:), sc_invcov(k,:,:), d2)
-							if( d2  < sc_kfac(k)*sc_eff(k) .and. d2/(sc_kfac(k)*sc_eff(k)) < d1 ) then
-								d1 = d2/(sc_kfac(k)*sc_eff(k))
-									
-								IS_allpts(j,ndims+3) = 1d0
-								IS_allpts(j,ndims+4) = dble(k)	!ellipsoid ID
-								IS_allpts(j,ndims+5) = d2	!Mahalanobis distance of this point
-									
-								if( .not.flag ) then
-									flag = .true.
-									IS_counter(2) = j
-								endif
+						nd_i = 0 !no. of ellipsoids traversed
+						do i = 1, ic_n
+							if( ic_done(i) .or. totvol(i) == 0d0 .or. ic_npt(i) == 0 .or. ( multimodal .and. .not.isAncestor(int(IS_allpts(j,ndims+6)), i, ic_fnode(1:i)) ) ) then
+								nd_i = nd_i+ic_sc(i)
+								cycle
 							endif
+							
+							!apply current limits to this point
+							call ApplyLimits(0, ic_climits(i,:,:), IS_allpts(j,1:ndims), pt(1,1:ndims))
+							
+							do k = nd_i+1, nd_i+ic_sc(i)
+								!check if this point is inside the ellipsoid
+								call ScaleFactor(1, ndims , pt(1,1:ndims), sc_mean(k,:), sc_invcov(k,:,:), d2)
+								if( d2  < sc_kfac(k)*sc_eff(k) .and. d2/(sc_kfac(k)*sc_eff(k)) < d1 ) then
+									d1 = d2/(sc_kfac(k)*sc_eff(k))
+										
+									IS_allpts(j,ndims+3) = 1d0
+									IS_allpts(j,ndims+4) = dble(k)	!ellipsoid ID
+									IS_allpts(j,ndims+5) = d2	!Mahalanobis distance of this point
+										
+									if( .not.flag ) then
+										flag = .true.
+										IS_counter(2) = j
+									endif
+								endif
+							enddo
+							
+							nd_i = nd_i+ic_sc(i)
 						enddo
-						
-						nd_i = nd_i+ic_sc(i)
-					enddo
-				endif
-			enddo
-			
-			!not a single point inside the current ellipsoidal decomposition
-			if( .not.flag ) IS_counter(2) = IS_counter(1)+1
+					endif
+				enddo
+				
+				!not a single point inside the current ellipsoidal decomposition
+				if( .not.flag ) IS_counter(2) = IS_counter(1)+1
+			endif
 		endif
 
 		nd_i=0 !no. of ellipsoids traversed
