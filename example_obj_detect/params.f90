@@ -1,4 +1,4 @@
-! Include file for example nested sampler program obj_detect (see arXiv:0704.3704)
+! Include file for example MultiNest program obj_detect (see arXiv:0704.3704)
 
 module params
 implicit none
@@ -32,7 +32,11 @@ implicit none
       	!uniform prior on sigma
 	data spriorran(4,1),spriorran(4,2) / 3. , 12. /
 
-! Parameters for Nested Sampler
+! Parameters for MultiNest
+	
+      	!whether to do use Nested Importance Sampling
+	logical nest_IS
+ 	parameter(nest_IS=.true.)
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
@@ -51,7 +55,7 @@ implicit none
       	!you need to pass them through the likelihood routine
 	integer nest_nPar 
       
-      	!seed for nested sampler, -ve means take it from sys clock
+      	!seed for MultiNest, -ve means take it from sys clock
 	integer nest_rseed 
 	parameter(nest_rseed=-1)
       
@@ -70,7 +74,7 @@ implicit none
 	!after how many iterations feedback is required & the output files should be updated
 	!note: posterior files are updated & dumper routine is called after every updInt*10 iterations
 	integer nest_updInt
-	parameter(nest_updInt=100)
+	parameter(nest_updInt=1000)
 	
 	!null evidence (set it to very high negative no. if null evidence is unknown)
 	double precision nest_Ztol

@@ -10,16 +10,16 @@ implicit none
       	parameter(sdim=2)
       
       	!priors on the parameters
-      	!uniform priors (-6,6) are used for all dimensions & are set in main.f90
+      	!uniform priors (0, 10\pi) are used for all dimensions & are set in main.f90
       	double precision spriorran(sdim,2)
       
 
 
-! Parameters for MultiNest
+! Parameters for Nested Sampler
 	
       	!whether to do use Nested Importance Sampling
 	logical nest_IS
- 	parameter(nest_IS=.true.)
+ 	parameter(nest_IS=.false.)
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
@@ -31,7 +31,7 @@ implicit none
 	
       	!max no. of live points
       	integer nest_nlive
-	parameter(nest_nlive=500)
+	parameter(nest_nlive=2000)
       
       	!tot no. of parameters, should be sdim in most cases but if you need to
       	!store some additional parameters with the actual parameters then
@@ -45,7 +45,7 @@ implicit none
       
       	!evidence tolerance factor
       	double precision nest_tol 
-      	parameter(nest_tol=0.01)
+      	parameter(nest_tol=0.5)
       
       	!enlargement factor reduction parameter
       	double precision nest_efr
@@ -53,7 +53,7 @@ implicit none
       
       	!root for saving posterior files
       	character*100 nest_root
-	parameter(nest_root='chains/himmelblau-')
+	parameter(nest_root='chains/eggbox2D')
 	
 	!after how many iterations feedback is required & the output files should be updated
 	!note: posterior files are updated & dumper routine is called after every updInt*10 iterations
@@ -74,7 +74,7 @@ implicit none
       
       	!whether to resume from a previous run
       	logical nest_resume
-      	parameter(nest_resume=.false.)
+      	parameter(nest_resume=.true.)
       
       	!whether to write output files
       	logical nest_outfile
