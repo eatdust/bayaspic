@@ -45,7 +45,7 @@ program shepmain
   nctrs = 90
   nfits = 300
 
-!4D
+!!4D
 !  nctrs = 90
 !  nfits = 300
 
