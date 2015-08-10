@@ -63,7 +63,7 @@ nestwrap.o: nestparams.o wraspic.o
 	$(FC) $(FCFLAGS) -c $<
 
 %.o: $(NESTDIR)/%.F90
-	$(FC) $(FCFLAGS)  -c $<
+	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
 
 %.o: %.f90
 	$(FC) $(FCFLAGS) -c $<

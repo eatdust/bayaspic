@@ -182,14 +182,14 @@ contains
 
     case ('rbf')
 
-       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,rbf_multinest_slowroll_loglike,nest_dumper,context)
 
     case ('shep')
 
-       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,shep_multinest_slowroll_loglike,nest_dumper,context)
@@ -257,6 +257,7 @@ contains
     write(*,*)'Initializing multinest with:'
     write(*,*)'nestNdim     =         ',nestNdim
     write(*,*)'nestNpars    =         ',nestNpars
+    write(*,*)'nestINS      =         ',nestINS
     write(*,*)'nestMmodal   =         ',nestMmodal
     write(*,*)'nestNlive    =         ',nestNlive
     write(*,*)'nestCteEff   =         ',nestCteEff
@@ -511,21 +512,21 @@ contains
 
     case ('rbf')
 
-       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,rbf_multinest_aspic_loglike,nest_dumper,context)
 
     case ('shep')
 
-       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,shep_multinest_aspic_loglike,nest_dumper,context)
 
     case ('null')
 
-       call nestRun(nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
             nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
             nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
             ,null_multinest_aspic_loglike,nest_dumper,context)
@@ -773,8 +774,8 @@ contains
  
 
   subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
-       , maxLogLike, logZ, logZerr, context)
-    use nestparams, only : nestRootName
+       , maxLogLike, logZ, INSlogZ, logZerr, context)
+    use nestparams, only : nestRootName, nestINS
     implicit none
 ! number of samples in posterior array
     integer :: nSamples				
@@ -791,18 +792,24 @@ contains
 ! max loglikelihood value
     real(fmn) :: maxLogLike			
 ! log evidence
-    real(fmn) :: logZ				
+    real(fmn) :: logZ, INSlogZ, logE				
 ! error on log evidence
     real(fmn) :: logZerr			
 ! not required by MultiNest, any additional information user wants to pass
     integer(imn) :: context
+    print *,'INS',nestINS,logZ,INSlogZ
 
-    
+    if (nestINS) then
+       logE = INSlogZ
+    else
+       logE = logZ
+    endif
+
     write(*,*)
     write(*,*)'*****************************************************'
     write(*,*)'nest_dumper: '
     write(*,*)'nestRoot: ',trim(nestRootName)
-    write(*,*)'nSamples= logZ= logZerr= ',nSamples, logZ, logZerr
+    write(*,*)'nSamples= logZ= logZerr= ',nSamples, logE, logZerr
     write(*,*)'maxLogLike= ',maxLogLike
     write(*,*)'*****************************************************'
     write(*,*)
