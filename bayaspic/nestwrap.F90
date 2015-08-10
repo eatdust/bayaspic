@@ -792,25 +792,19 @@ contains
 ! max loglikelihood value
     real(fmn) :: maxLogLike			
 ! log evidence
-    real(fmn) :: logZ, INSlogZ, logE				
+    real(fmn) :: logZ, INSlogZ			
 ! error on log evidence
     real(fmn) :: logZerr			
 ! not required by MultiNest, any additional information user wants to pass
     integer(imn) :: context
-    print *,'INS',nestINS,logZ,INSlogZ
-
-    if (nestINS) then
-       logE = INSlogZ
-    else
-       logE = logZ
-    endif
 
     write(*,*)
     write(*,*)'*****************************************************'
     write(*,*)'nest_dumper: '
     write(*,*)'nestRoot: ',trim(nestRootName)
-    write(*,*)'nSamples= logZ= logZerr= ',nSamples, logE, logZerr
-    write(*,*)'maxLogLike= ',maxLogLike
+    write(*,*)'nSamples= ',nSamples
+    write(*,*)'logZ= logZerr=        ',logZ, logZerr
+    write(*,*)'maxLogLike= INSlogZ = ',maxLogLike, INSlogZ
     write(*,*)'*****************************************************'
     write(*,*)
    
