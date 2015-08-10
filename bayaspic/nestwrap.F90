@@ -128,7 +128,7 @@ contains
     use nestparams, only : nestNdim, nestRootname
     implicit none
     character(len=*), intent(in) :: extname
-    integer, parameter :: nunit = 414, nname = 415
+    integer, parameter :: nunit = 414, nname = 415, nrange=416
     
     if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
        stop 'nest_dump_slowroll_priors: prior not allocated!'
@@ -136,18 +136,22 @@ contains
 
     open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
     open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
+    open(unit=nrange,file=trim(nestRootName)//'.ranges', status='unknown')
 
-    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
+    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)    
     write(nname,*)'lnA         \ln(10^{10} P_*)'
- 
+    write(nrange,*)'lnA                    ',nestPmin(1),nestPmax(1)
+
     select case (extname)
 
     case ('sr2')
 
        write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
        write(nname,*)'sr1         \log(\epsilon_1)'
+       write(nunit,*)'sr1                    ',nestPmin(2),nestPmax(2)
        write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
        write(nname,*)'sr2         \epsilon_2'
+       write(nunit,*)'sr2                    ',nestPmin(3),nestPmax(3)
 
     case ('sr3')
        write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
@@ -156,6 +160,7 @@ contains
        write(nname,*)'sr2         \epsilon_2'
        write(nunit,*)'limits[sr3]=',nestPmin(4),nestPmax(4)
        write(nname,*)'sr3         \epsilon_3'
+       write(nunit,*)'sr3                    ',nestPmin(4),nestPmax(4)
 
     case default
 
@@ -165,6 +170,7 @@ contains
 
     close(nunit)
     close(nname)
+    close(nrange)
 
   end subroutine nest_dump_slowroll_priors
 
@@ -404,7 +410,7 @@ contains
     use wraspic, only : get_nextra, ReheatModel
     implicit none
     character(len=*), intent(in) :: extname
-    integer, parameter :: nunit = 412, nname = 413
+    integer, parameter :: nunit = 412, nname = 413, nrange = 414
     integer :: nextra
     
     if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
@@ -415,19 +421,23 @@ contains
 
     open(unit=nunit,file=trim(nestRootName)//'.ini', status='unknown')
     open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
+    open(unit=nrange,file=trim(nestRootName)//'.ranges', status='unknown')
 
     write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
     write(nname,*)'lnA            \ln(10^{10} P_*)'
- 
+    write(nrange,*)'lnA                    ',nestPmin(1),nestPmax(1)
+
     if (nextra.eq.2) then
 
        select case (ReheatModel)
        case ('Rreh')
           write(nunit,*)'limits[lnRreh]=',nestPmin(2),nestPmax(2)
           write(nname,*)'lnRreh         \ln(R)'
+          write(nrange,*)'lnRreh                 ',nestPmin(2),nestPmax(2)
        case ('Rrad')
           write(nunit,*)'limits[lnRrad]=',nestPmin(2),nestPmax(2)
           write(nname,*)'lnRrad         \ln(R_{\rm rad})'
+          write(nrange,*)'lnRrad                 ',nestPmin(2),nestPmax(2)
        case default
           stop 'nest_dump_aspic_priors: internal error!'
        end select
@@ -440,6 +450,8 @@ contains
        write(nunit,*)'limits[wreh]=',nestPmin(3),nestPmax(3)
        write(nname,*)'lnRhoReh       \ln(\rho_{\rm reh})'
        write(nname,*)'wreh           \bar{w}_{\rm reh}'
+       write(nrange,*)'lnRhoReh               ',nestPmin(2),nestPmax(2)
+       write(nrange,*)'wreh                   ',nestPmin(3),nestPmax(3)
 
     else
        stop 'nest_dump_aspic_priors: nextra not found!'
@@ -451,11 +463,14 @@ contains
     case (1)
        write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
        write(nname,*)'c1             c_1'
+       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
     case(2)
        write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
        write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
+       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
     case (3)
        write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
        write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
@@ -463,6 +478,9 @@ contains
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
        write(nname,*)'c3             c_3'
+       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nrange,*)'c3                     ',nestPmin(nextra+3),nestPmax(nextra+3)
     case (4)
        write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
        write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
@@ -472,13 +490,17 @@ contains
        write(nname,*)'c2             c_2'
        write(nname,*)'c3             c_3'
        write(nname,*)'c4             c_4'
+       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nrange,*)'c3                     ',nestPmin(nextra+3),nestPmax(nextra+3)
+       write(nrange,*)'c4                     ',nestPmin(nextra+4),nestPmax(nextra+4)
     case default
        stop 'nest_dump_aspic_priors: case not implemented!'
     end select
 
     close(nunit)
     close(nname)
-
+    close(nrange)
 
   end subroutine nest_dump_aspic_priors
 
