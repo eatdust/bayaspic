@@ -148,19 +148,21 @@ contains
 
        write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
        write(nname,*)'sr1         \log(\epsilon_1)'
-       write(nunit,*)'sr1                    ',nestPmin(2),nestPmax(2)
+       write(nrange,*)'sr1                    ',nestPmin(2),nestPmax(2)
        write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
        write(nname,*)'sr2         \epsilon_2'
-       write(nunit,*)'sr2                    ',nestPmin(3),nestPmax(3)
+       write(nrange,*)'sr2                    ',nestPmin(3),nestPmax(3)
 
     case ('sr3')
        write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
        write(nname,*)'sr1         \log(\epsilon_1)'
+       write(nrange,*)'sr1                    ',nestPmin(2),nestPmax(2)
        write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
        write(nname,*)'sr2         \epsilon_2'
+       write(nrange,*)'sr2                    ',nestPmin(3),nestPmax(3)
        write(nunit,*)'limits[sr3]=',nestPmin(4),nestPmax(4)
        write(nname,*)'sr3         \epsilon_3'
-       write(nunit,*)'sr3                    ',nestPmin(4),nestPmax(4)
+       write(nrange,*)'sr3                     ',nestPmin(4),nestPmax(4)
 
     case default
 
