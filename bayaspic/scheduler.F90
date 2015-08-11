@@ -1,18 +1,15 @@
 module scheduler
+#ifdef MPISCHED
+  use mpi
+#endif
   use fifo, only : ends,qval
   use fifo, only : nullify_queue_ends, free_queue
   use fifo, only : push_in_back, pop_out_back
   use fifo, only : push_in_front, pop_out_front
   use fifo, only : is_queue_empty, queue_size
   
-
-
   implicit none
 
-
-#ifdef MPISCHED
-  include "mpif.h"
-#endif
 
   private
 
@@ -24,15 +21,15 @@ module scheduler
   integer, parameter :: QLockFlag = -1
   integer, parameter :: QStarvFlag = 0
 
-!IMPORTANT: local access may return non-sync values due to register
-!buffering. If volatile does not exist, use common block
-  integer, volatile :: QrdmaAddress
- 
+
 #ifdef MPISCHED
-  integer, save :: WinOnQ
-  integer, save :: IntSize,DispUnit
-  integer(MPI_ADDRESS_KIND), save :: WinSize
+  integer :: WinOnQ
+  integer :: IntSize, DispSize
+  integer(MPI_ADDRESS_KIND) :: QrdmaAddress
+  integer(MPI_ADDRESS_KIND) :: WinSize
   integer(MPI_ADDRESS_KIND), parameter :: ZeroDisplace = 0
+#else
+  integer :: QrdmaAddress
 #endif
  
   integer, parameter :: MinDebug = 1
@@ -48,12 +45,19 @@ module scheduler
     
   public initialize_scheduler, free_scheduler, scheduler_save_queue
   public start_scheduling, irq_scheduler, stop_scheduling
-  public restore_scheduler
+  public restore_scheduler, scheduled_size
       
 contains
 
 
-  
+  function scheduled_size()
+    implicit none
+    integer :: scheduled_size
+
+    scheduled_size = qbounds%size
+
+  end function scheduled_size
+
 
   subroutine initialize_scheduler(ntodo)    
     implicit none
@@ -92,23 +96,21 @@ contains
     logical :: flag
     integer :: rank, code
 #ifdef MPISCHED
-    integer(MPI_ADDRESS_KIND) :: taille, base,dispunit
+    integer(MPI_ADDRESS_KIND) :: taille, base, dispunit
 #endif
 
     rank = get_mpi_rank()
-
-    QrdmaAddress = qbounds%size
 
 #ifdef MPISCHED
 
     call MPI_TYPE_SIZE(MPI_INTEGER,IntSize,code)
          
     WinSize = IntSize !one element
-    DispUnit = IntSize
+    DispSize = IntSize
 
-   
-    call MPI_WIN_CREATE(QrdmaAddress,WinSize,DispUnit,MPI_INFO_NULL &
-         ,MPI_COMM_WORLD,WinOnQ,code)
+
+    call MPI_WIN_ALLOCATE(WinSize,DispSize,MPI_INFO_NULL &
+         ,MPI_COMM_WORLD,QrdmaAddress,WinOnQ,code)
 
     if (debugLevel.ge.3) then
        write(*,*)
@@ -127,7 +129,7 @@ contains
   end subroutine initialize_rdma
 
 
-
+ 
 
 
   subroutine create_new_queue(ntodo)
@@ -142,25 +144,22 @@ contains
     
     if (mod(ntodo,nwork).ne.0) then
        write(*,*)'ntodo= nwork= ',ntodo,nwork,mod(ntodo,nwork)
-       write(*,*) 'create_new_queues: queue will be of unequal sizes!'
+       write(*,*)'create_new_queue: non-equal queue sizes!'
     endif
 
+    
+!!!create a qsize queue in each of the mpi processeses
+!!!clear the boundaries
+!!    qsize = ntodo/nwork
+!!    call nullify_queue_ends(qbounds)
 
-!old interleaving of equal sizes    
-!    qsize = ntodo/nwork
-!!create a qsize queue in each of the mpi processeses
-!!clear the boundaries
-!    call nullify_queue_ends(qbounds)
+!interleaves 0,1,2..nqsize-1 into the queue
+!!    do i = 0,qsize-1
+!!       qbuffer%id = rank + i*nwork
+!!       call push_in_back(qbounds, qbuffer)
+!!    end do
 
-!!interleaves 0,1,2..nqsize-1 into the queue
-!    do i = 0,qsize-1
-!       qbuffer%id = rank + i*nwork
-!       call push_in_back(qbounds, qbuffer)
-!    end do
-
-
-!new allows for queues of unequal sizes
-       
+!allow for non-equals queue size
     call nullify_queue_ends(qbounds)
     
     j=rank
@@ -171,8 +170,6 @@ contains
        qsize = qsize + 1
        j = j + nwork
     enddo
-
-
 
 !for debugging only
 !    qbuffer%id=125
@@ -352,9 +349,6 @@ contains
     rank = get_mpi_rank()
 
 
-    QrdmaAddress = qbounds%size
-
-
     if (get_mpi_size().eq.1) return
 
     if (debugLevel.ge.MaxDebug) then
@@ -504,11 +498,13 @@ contains
        call MPI_WIN_LOCK(MPI_LOCK_EXCLUSIVE,targrank,NullAssert,WinOnQ,code)
 
        
-       call MPI_GET(GetQrdma,CountOne,MPI_INTEGER,targrank,ZeroDisplace &
-            ,CountOne,MPI_INTEGER,WinOnQ,code)
+!       call MPI_GET(GetQrdma,CountOne,MPI_INTEGER,targrank,ZeroDisplace &
+!            ,CountOne,MPI_INTEGER,WinOnQ,code)
+!       call MPI_PUT(QLockFlag,CountOne,MPI_INTEGER,targrank,ZeroDisplace &
+!            ,CountOne,MPI_INTEGER,WinOnQ,code)
 
-       call MPI_PUT(QLockFlag,CountOne,MPI_INTEGER,targrank,ZeroDisplace &
-            ,CountOne,MPI_INTEGER,WinOnQ,code)
+       call MPI_FETCH_AND_OP(QLockFlag,GetQrdma,MPI_INTEGER,targrank,ZeroDisplace &
+          ,MPI_REPLACE,WinOnQ,code)
 
 
        call MPI_WIN_UNLOCK(targrank,WinOnQ,code)
@@ -715,7 +711,8 @@ contains
 !otherwise they could still being accessing my RDMA while I am checking
 !their
 
-    GetMyFlag = QrdmaAddress
+    call MPI_GET(GetQFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
+         ,CountOne,MPI_INTEGER,WinOnQ,code)
 
     if (flag) then
        if (nstarv.ne.nsize-1) stop 'check_all_starving: bug!!'
@@ -771,7 +768,6 @@ contains
 
 
     longrank = 0
-    longqsize = 0
 
 #ifdef MPISCHED
 
