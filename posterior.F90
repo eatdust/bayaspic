@@ -209,8 +209,8 @@ contains
 	if(outfile) then
       		open(55,file=postfile,form='formatted',status='replace')
       		open(56,file=postfile4,form='formatted',status='replace')
-      		write(fmt,'(a,i4,a)')  '(',nPar+2,'E28.18)'
-      		write(fmt2,'(a,i4,a)')  '(',nPar+1,'E28.18)'
+      		write(fmt,'(a,i4,a)')  '(',nPar+2,'E28.18E3)'
+      		write(fmt2,'(a,i4,a)')  '(',nPar+1,'E28.18E3)'
 	endif
       	do i=1,ic_n
       		do j=1,nPtPerNode(i)
