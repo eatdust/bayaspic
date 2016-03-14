@@ -4,8 +4,8 @@ module nestparams
 
 ! Parameters for Nested Sampler
 
-!wheter to do Importance Nested Sampling
-  logical, parameter :: nestINS = .true.
+!whether to do Importance Nested Sampling
+  logical, parameter :: nestINS = .false.
 
 !whether to do multimodal sampling
   logical, parameter :: nestMmodal = .false.
