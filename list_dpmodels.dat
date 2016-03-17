@@ -15,6 +15,7 @@ esi o
 esi l
 esi sqrt2
 esi sqrt23
+esi 8
 pli p
 pli
 kmii
@@ -26,9 +27,11 @@ li n
 rpi1
 rpi3
 dwi
+dwi 25
 mhi
 mhi s
 mhi l
+mhi xs
 rgi
 rgi 116
 rgi s
