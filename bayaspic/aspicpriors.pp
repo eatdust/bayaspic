@@ -88,8 +88,6 @@ ONEPRIOR(osti,1._kp,4._kp,log)
 ONEPRIOR(wrig,-3._kp,3._kp,log)
 ONEPRIOR(wrio,1._kp,1._kp,flat)
 
-
-
 !with xend
 
 TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.5_kp,flat,0.5_kp,2._kp,log)
@@ -217,6 +215,14 @@ TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 TWOPRIORS(nfi1,0._kp,10._kp,flat,1._kp+epsilon(1._kp),10._kp,flat)
 TWOPRIORS(nfi3n,-10._kp,-epsilon(1._kp),flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat)
 TWOPRIORS(nfi3p,epsilon(1._kp),10._kp,flat,-10._kp,-epsilon(1._kp),flat)
+
+TWOPRIORS(saai,-3._kp,3._kp,log,1._kp/3._kp,2._kp,flat)
+TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
+TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
+TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
+TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
