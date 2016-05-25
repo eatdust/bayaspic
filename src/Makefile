@@ -22,8 +22,8 @@ LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
 endif 
 
 
-LIKEDIR = ../fastlikes.rs
-NESTDIR = ../multinest.rs
+LIKEDIR = ../fastlike
+NESTDIR = ../multinest
 
 OBJSLIKE =  rbfprec.o shepprec.o qshepmdata.o iond.o rbfnd.o rbflike.o \
 	qshepmd.o shepnd.o sheplike.o
