@@ -1,4 +1,4 @@
-module samprec
+module samplprec
   implicit none
 
   public
@@ -9,4 +9,4 @@ module samprec
   integer, parameter :: lenmn = 100
 
 
-end module samprec
+end module samplprec

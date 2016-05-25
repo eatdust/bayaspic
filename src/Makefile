@@ -22,7 +22,7 @@ LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
 endif 
 
 
-LIKEDIR = ../fastlike
+LIKEDIR = ../fastlikes
 NESTDIR = ../multinest
 
 OBJSLIKE =  rbfprec.o shepprec.o qshepmdata.o iond.o rbfnd.o rbflike.o \
@@ -37,7 +37,7 @@ OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
 
-OBJFILES = samprec.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
+OBJFILES = samplprec.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
 	nestparams.o nestwrap.o
 
 FCFLAGS+=$(INCLUDE)

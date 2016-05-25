@@ -1,5 +1,5 @@
 module nestparams
-  use samprec
+  use samplprec
   implicit none
 
 ! Parameters for Nested Sampler
@@ -66,10 +66,6 @@ module nestparams
 
 !initialize MPI routines?, relevant only for -DMPINEST
   logical, parameter :: nestInitMPI = .true.
-
-!should match the zero cut in rbffit, or shepfit, that the minimal
-!like achievable numerically
-  real(fmn), save :: fitLogZero = 0._fmn
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)
   real(fmn), parameter :: nestLogZero = -1d99

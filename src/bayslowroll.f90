@@ -1,5 +1,5 @@
 program bayslowroll
-  use samprec
+  use samplprec
   use nestwrap, only : nest_init_slowroll, nest_sample_slowroll
   
   call nest_init_slowroll()

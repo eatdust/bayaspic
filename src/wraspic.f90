@@ -1,5 +1,5 @@
 module wraspic
-  use samprec, only : fmn, imn
+  use samplprec, only : fmn, imn
   use aspicvars, only : kp, infaspic, lname
   implicit none
 

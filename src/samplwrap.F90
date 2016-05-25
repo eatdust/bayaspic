@@ -1,4 +1,4 @@
-module nestwrap
+module samplwrap
   use samplprec
   implicit none
 
@@ -12,14 +12,16 @@ module nestwrap
   character(len=*), parameter :: filepost = 'shepdata/postcubed.dat'
   character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
+  integer(imn), save :: numNdim, numParams
   integer(imn), parameter :: numDerivedParams = 11
 
   integer(imn), save :: fitNdim = 0
   integer(imn), parameter :: pstarpos = 1
   integer(imn), parameter :: eps1pos = 2
 
-  real(fmn), save, dimension(:), allocatable :: nestPmin, nestPmax
+  real(fmn), save, dimension(:), allocatable :: samplPmin, samplPmax
   real(fmn), save :: fitLogZero = 0._fmn
+
   logical, parameter :: display = .false.
 
 !the name of the fastlike method we call
@@ -53,6 +55,7 @@ contains
     use sheplike, only : get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
+!    use nestparams, only : fitLogZero
     implicit none
 
     integer, parameter :: srlen = 3
@@ -69,12 +72,12 @@ contains
        fitLogZero = get_rbf_fmin()
        nestNdim = fitNdim
        
-       allocate(nestPmin(nestNdim))
-       allocate(nestPmax(nestNdim))
+       allocate(samplPmin(nestNdim))
+       allocate(samplPmax(nestNdim))
        
        do i=1,fitNdim
-          nestPmin(i) = get_rbf_xpmin(i)
-          nestPmax(i) = get_rbf_xpmax(i)
+          samplPmin(i) = get_rbf_xpmin(i)
+          samplPmax(i) = get_rbf_xpmax(i)
        enddo
 
     case ('shep')
@@ -84,12 +87,12 @@ contains
        fitLogZero = get_shep_fmin()
        nestNdim = fitNdim
 
-       allocate(nestPmin(nestNdim))
-       allocate(nestPmax(nestNdim))
+       allocate(samplPmin(nestNdim))
+       allocate(samplPmax(nestNdim))
 
        do i=1,fitNdim
-          nestPmin(i) = get_shep_xpmin(i)
-          nestPmax(i) = get_shep_xpmax(i)
+          samplPmin(i) = get_shep_xpmin(i)
+          samplPmax(i) = get_shep_xpmax(i)
        enddo
 
     case default
@@ -129,7 +132,7 @@ contains
     character(len=*), intent(in) :: extname
     integer, parameter :: nunit = 414, nname = 415, nrange=416
     
-    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
+    if ((.not.allocated(samplPmin)).or.(.not.allocated(samplPmax))) then
        stop 'nest_dump_slowroll_priors: prior not allocated!'
     endif
 
@@ -137,31 +140,31 @@ contains
     open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
     open(unit=nrange,file=trim(nestRootName)//'.ranges', status='unknown')
 
-    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)    
+    write(nunit,*)'limits[lnA]=',samplPmin(1),samplPmax(1)    
     write(nname,*)'lnA         \ln(10^{10} P_*)'
-    write(nrange,*)'lnA                    ',nestPmin(1),nestPmax(1)
+    write(nrange,*)'lnA                    ',samplPmin(1),samplPmax(1)
 
     select case (extname)
 
     case ('sr2')
 
-       write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
+       write(nunit,*)'limits[sr1]=',samplPmin(2),samplPmax(2)
        write(nname,*)'sr1         \log(\epsilon_1)'
-       write(nrange,*)'sr1                    ',nestPmin(2),nestPmax(2)
-       write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
+       write(nrange,*)'sr1                    ',samplPmin(2),samplPmax(2)
+       write(nunit,*)'limits[sr2]=',samplPmin(3),samplPmax(3)
        write(nname,*)'sr2         \epsilon_2'
-       write(nrange,*)'sr2                    ',nestPmin(3),nestPmax(3)
+       write(nrange,*)'sr2                    ',samplPmin(3),samplPmax(3)
 
     case ('sr3')
-       write(nunit,*)'limits[sr1]=',nestPmin(2),nestPmax(2)
+       write(nunit,*)'limits[sr1]=',samplPmin(2),samplPmax(2)
        write(nname,*)'sr1         \log(\epsilon_1)'
-       write(nrange,*)'sr1                    ',nestPmin(2),nestPmax(2)
-       write(nunit,*)'limits[sr2]=',nestPmin(3),nestPmax(3)
+       write(nrange,*)'sr1                    ',samplPmin(2),samplPmax(2)
+       write(nunit,*)'limits[sr2]=',samplPmin(3),samplPmax(3)
        write(nname,*)'sr2         \epsilon_2'
-       write(nrange,*)'sr2                    ',nestPmin(3),nestPmax(3)
-       write(nunit,*)'limits[sr3]=',nestPmin(4),nestPmax(4)
+       write(nrange,*)'sr2                    ',samplPmin(3),samplPmax(3)
+       write(nunit,*)'limits[sr3]=',samplPmin(4),samplPmax(4)
        write(nname,*)'sr3         \epsilon_3'
-       write(nrange,*)'sr3                     ',nestPmin(4),nestPmax(4)
+       write(nrange,*)'sr3                     ',samplPmin(4),samplPmax(4)
 
     case default
 
@@ -278,12 +281,12 @@ contains
     write(*,*)'fitNdim      =         ',fitNdim
     write(*,*)'-----------------------------------------------------'
 
-    if (allocated(nestPmin).and.allocated(nestPmax)) then
+    if (allocated(samplPmin).and.allocated(samplPmax)) then
 
        write(*,*)
        write(*,*)'--------------PIORS ON SAMPLED PARAMS----------------'
-       write(*,*)'MIN = ',nestPmin
-       write(*,*)'MAX = ',nestPmax
+       write(*,*)'MIN = ',samplPmin
+       write(*,*)'MAX = ',samplPmax
        write(*,*)'-----------------------------------------------------'
 
     endif
@@ -297,8 +300,8 @@ contains
     implicit none
    
     if (allocated(nestPwrap)) deallocate(nestPwrap)
-    if (allocated(nestpmin)) deallocate(nestpmin)
-    if (allocated(nestpmax)) deallocate(nestpmax)
+    if (allocated(samplPmin)) deallocate(samplPmin)
+    if (allocated(samplPmax)) deallocate(samplPmax)
 
   end subroutine nest_free_slowroll
 
@@ -314,7 +317,7 @@ contains
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
-    use nestparams, only : nestLogZero
+    use nestparams, only : fitLogZero, nestLogZero
     implicit none    
     integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
@@ -344,10 +347,10 @@ contains
     nestNpars = nestNdim + numDerivedParams
     nestCdim = nestNdim
 
-    allocate(nestPmin(nestNdim))
-    allocate(nestPmax(nestNdim))
+    allocate(samplPmin(nestNdim))
+    allocate(samplPmax(nestNdim))
 
-    call get_allprior(nestPmin, nestPmax)
+    call get_allprior(samplPmin, samplPmax)
 
     select case (fastLikeName)
 
@@ -358,8 +361,8 @@ contains
        endif
 
 !cut prior of P* by the one encoded in the likelihood
-       nestPmin(pstarpos) = max(get_rbf_xpmin(pstarpos),nestPmin(pstarpos))
-       nestPmax(pstarpos) = min(get_rbf_xpmax(pstarpos),nestPmax(pstarpos))
+       samplPmin(pstarpos) = max(get_rbf_xpmin(pstarpos),samplPmin(pstarpos))
+       samplPmax(pstarpos) = min(get_rbf_xpmax(pstarpos),samplPmax(pstarpos))
     
        fitNdim = get_rbf_ndim()
        fitLogZero = get_rbf_fmin()
@@ -371,8 +374,8 @@ contains
        endif
 
 !cut prior of P* by the one encoded in the likelihood
-       nestPmin(pstarpos) = max(get_shep_xpmin(pstarpos),nestPmin(pstarpos))
-       nestPmax(pstarpos) = min(get_shep_xpmax(pstarpos),nestPmax(pstarpos))
+       samplPmin(pstarpos) = max(get_shep_xpmin(pstarpos),samplPmin(pstarpos))
+       samplPmax(pstarpos) = min(get_shep_xpmax(pstarpos),samplPmax(pstarpos))
     
        fitNdim = get_shep_ndim()
        fitLogZero = get_shep_fmin()
@@ -414,7 +417,7 @@ contains
     integer, parameter :: nunit = 412, nname = 413, nrange = 414
     integer :: nextra
     
-    if ((.not.allocated(nestPmin)).or.(.not.allocated(nestPmax))) then
+    if ((.not.allocated(samplPmin)).or.(.not.allocated(samplPmax))) then
        stop 'nest_dump_aspic_priors: prior not allocated!'
     endif
 
@@ -424,21 +427,21 @@ contains
     open(unit=nname,file=trim(nestRootName)//'.paramnames', status='unknown')
     open(unit=nrange,file=trim(nestRootName)//'.ranges', status='unknown')
 
-    write(nunit,*)'limits[lnA]=',nestPmin(1),nestPmax(1)
+    write(nunit,*)'limits[lnA]=',samplPmin(1),samplPmax(1)
     write(nname,*)'lnA            \ln(10^{10} P_*)'
-    write(nrange,*)'lnA                    ',nestPmin(1),nestPmax(1)
+    write(nrange,*)'lnA                    ',samplPmin(1),samplPmax(1)
 
     if (nextra.eq.2) then
 
        select case (ReheatModel)
        case ('Rreh')
-          write(nunit,*)'limits[lnRreh]=',nestPmin(2),nestPmax(2)
+          write(nunit,*)'limits[lnRreh]=',samplPmin(2),samplPmax(2)
           write(nname,*)'lnRreh         \ln(R)'
-          write(nrange,*)'lnRreh                 ',nestPmin(2),nestPmax(2)
+          write(nrange,*)'lnRreh                 ',samplPmin(2),samplPmax(2)
        case ('Rrad')
-          write(nunit,*)'limits[lnRrad]=',nestPmin(2),nestPmax(2)
+          write(nunit,*)'limits[lnRrad]=',samplPmin(2),samplPmax(2)
           write(nname,*)'lnRrad         \ln(R_{\rm rad})'
-          write(nrange,*)'lnRrad                 ',nestPmin(2),nestPmax(2)
+          write(nrange,*)'lnRrad                 ',samplPmin(2),samplPmax(2)
        case default
           stop 'nest_dump_aspic_priors: internal error!'
        end select
@@ -447,12 +450,12 @@ contains
 
        if (Reheatmodel.ne.'Rhow') stop 'ReheatModel is not Rhow!'
 
-       write(nunit,*)'limits[lnRhoReh]=',nestPmin(2),nestPmax(2)
-       write(nunit,*)'limits[wreh]=',nestPmin(3),nestPmax(3)
+       write(nunit,*)'limits[lnRhoReh]=',samplPmin(2),samplPmax(2)
+       write(nunit,*)'limits[wreh]=',samplPmin(3),samplPmax(3)
        write(nname,*)'lnRhoReh       \ln(\rho_{\rm reh})'
        write(nname,*)'wreh           \bar{w}_{\rm reh}'
-       write(nrange,*)'lnRhoReh               ',nestPmin(2),nestPmax(2)
-       write(nrange,*)'wreh                   ',nestPmin(3),nestPmax(3)
+       write(nrange,*)'lnRhoReh               ',samplPmin(2),samplPmax(2)
+       write(nrange,*)'wreh                   ',samplPmin(3),samplPmax(3)
 
     else
        stop 'nest_dump_aspic_priors: nextra not found!'
@@ -462,39 +465,39 @@ contains
     select case (nestNdim-nextra)
     case (0)
     case (1)
-       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nunit,*)'limits[c1]=',samplPmin(nextra+1),samplPmax(nextra+1)
        write(nname,*)'c1             c_1'
-       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
+       write(nrange,*)'c1                     ',samplPmin(nextra+1),samplPmax(nextra+1)
     case(2)
-       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nunit,*)'limits[c1]=',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',samplPmin(nextra+2),samplPmax(nextra+2)
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
-       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
+       write(nrange,*)'c1                     ',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nrange,*)'c2                     ',samplPmin(nextra+2),samplPmax(nextra+2)
     case (3)
-       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
-       write(nunit,*)'limits[c3]=',nestPmin(nextra+3),nestPmax(nextra+3)
+       write(nunit,*)'limits[c1]=',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',samplPmin(nextra+2),samplPmax(nextra+2)
+       write(nunit,*)'limits[c3]=',samplPmin(nextra+3),samplPmax(nextra+3)
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
        write(nname,*)'c3             c_3'
-       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
-       write(nrange,*)'c3                     ',nestPmin(nextra+3),nestPmax(nextra+3)
+       write(nrange,*)'c1                     ',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nrange,*)'c2                     ',samplPmin(nextra+2),samplPmax(nextra+2)
+       write(nrange,*)'c3                     ',samplPmin(nextra+3),samplPmax(nextra+3)
     case (4)
-       write(nunit,*)'limits[c1]=',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nunit,*)'limits[c2]=',nestPmin(nextra+2),nestPmax(nextra+2)
-       write(nunit,*)'limits[c3]=',nestPmin(nextra+3),nestPmax(nextra+3)
-       write(nunit,*)'limits[c4]=',nestPmin(nextra+4),nestPmax(nextra+4)
+       write(nunit,*)'limits[c1]=',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nunit,*)'limits[c2]=',samplPmin(nextra+2),samplPmax(nextra+2)
+       write(nunit,*)'limits[c3]=',samplPmin(nextra+3),samplPmax(nextra+3)
+       write(nunit,*)'limits[c4]=',samplPmin(nextra+4),samplPmax(nextra+4)
        write(nname,*)'c1             c_1'
        write(nname,*)'c2             c_2'
        write(nname,*)'c3             c_3'
        write(nname,*)'c4             c_4'
-       write(nrange,*)'c1                     ',nestPmin(nextra+1),nestPmax(nextra+1)
-       write(nrange,*)'c2                     ',nestPmin(nextra+2),nestPmax(nextra+2)
-       write(nrange,*)'c3                     ',nestPmin(nextra+3),nestPmax(nextra+3)
-       write(nrange,*)'c4                     ',nestPmin(nextra+4),nestPmax(nextra+4)
+       write(nrange,*)'c1                     ',samplPmin(nextra+1),samplPmax(nextra+1)
+       write(nrange,*)'c2                     ',samplPmin(nextra+2),samplPmax(nextra+2)
+       write(nrange,*)'c3                     ',samplPmin(nextra+3),samplPmax(nextra+3)
+       write(nrange,*)'c4                     ',samplPmin(nextra+4),samplPmax(nextra+4)
     case default
        stop 'nest_dump_aspic_priors: case not implemented!'
     end select
@@ -570,7 +573,7 @@ contains
     use rbflike, only : rbflike_eval, cutmin_rbfparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : nestLogZero
+    use nestparams, only : fitLogZero, nestLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -649,7 +652,7 @@ contains
     use sheplike, only : sheplike_eval, cutmin_shepparams
     use wraspic, only : get_slowroll, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
-    use nestparams, only : nestLogZero
+    use nestparams, only : nestLogZero,fitLogZero
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -786,11 +789,11 @@ contains
     real(fmn), dimension(nestdim) :: uncubize_nestparams
     integer :: i
 
-    if (.not.allocated(nestPmin).or..not.allocated(nestPmax)) then
+    if (.not.allocated(samplPmin).or..not.allocated(samplPmax)) then
        stop 'uncubize_nestparams: prior not allocated!'
     endif
 
-    uncubize_nestparams = nestPmin + (nestPmax-nestPmin)*nestcube
+    uncubize_nestparams = samplPmin + (samplPmax-samplPmin)*nestcube
     
   end function uncubize_nestparams
 
@@ -835,4 +838,4 @@ contains
   end subroutine nest_dumper
 
 
-end module nestwrap
+end module samplwrap
