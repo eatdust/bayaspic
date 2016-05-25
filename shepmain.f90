@@ -35,19 +35,19 @@ program shepmain
 
 
 
-  call read_binned_posterior('sr2ndlog_fidhi_corext_posterior_4D_8.dat',fdata,xdata)
+  call read_binned_posterior('mp_sr2ndlog_litecore120mhi_D_posterior_4D_10.dat',fdata,xdata)
 
   ndata = size(fdata)
   ndim = size(xdata,1)
   if (size(xdata,2).ne.ndata) stop 'internal error'
 
 !3D 
-  nctrs = 90
-  nfits = 300
-
-!!4D
 !  nctrs = 90
 !  nfits = 300
+
+!!4D
+  nctrs = 90 
+  nfits = 300
 
   print *,'ndata= ',ndata
   print *,'ndim= ',ndim
@@ -157,7 +157,6 @@ program shepmain
 
         f = shepard_eval(ndim,ndata,xcubes,fdata,rmax,x)
 
-!        call livewrite('output3.dat',sr2,sr3,f)
         call livewrite('output3.dat',sr1,sr3,f)
 !        call livewrite('test.dat',sr1,sr2,rbflike_eval(x))
      enddo

@@ -2,12 +2,11 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=gfortran
-#FCFLAGS= -O3 -fopenmp -ffast-math -march=amdfam10  -fprefetch-loop-arrays -funroll-loops
-FCFLAGS = -O
+FCFLAGS= -O3 -fopenmp -ffast-math -march=haswell  -fprefetch-loop-arrays -funroll-loops
 LFLAGS= -lblas -llapack
-FC=ifort
-FCFLAGS = -O3 -xHost -openmp -mkl
-LFLAGS =
+#FC=ifort
+#FCFLAGS = -O -openmp -mkl -assume byterecl
+#LFLAGS =
 endif 
 
 OBJ= rbfprec.o shepprec.o qshepmdata.o qshepmd.o \
