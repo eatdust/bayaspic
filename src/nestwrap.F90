@@ -1,5 +1,5 @@
 module nestwrap
-  use samplprec
+  use sampl
   implicit none
 
   private
@@ -51,7 +51,7 @@ contains
     use sheplike, only : initialize_shep_like
     use sheplike, only : get_shep_ndim, get_shep_fmin
     use sheplike, only : get_shep_xpmin, get_shep_xpmax
-    use nestparams, only : nestNdim, nestNpars, nestCdim
+    use nestparams, only : nestNdim, nestNpars, nestCdim, nest_print
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
     implicit none
 
@@ -255,42 +255,7 @@ contains
     
   end subroutine shep_multinest_slowroll_loglike
 
-
-  subroutine nest_print()
-    use nestparams
-    implicit none
-
-    write(*,*)'-----------------------------------------------------'
-    write(*,*)'Initializing multinest with:'
-    write(*,*)'nestNdim     =         ',nestNdim
-    write(*,*)'nestNpars    =         ',nestNpars
-    write(*,*)'nestINS      =         ',nestINS
-    write(*,*)'nestMmodal   =         ',nestMmodal
-    write(*,*)'nestNlive    =         ',nestNlive
-    write(*,*)'nestCteEff   =         ',nestCteEff
-    write(*,*)'nestZtol     =         ',nestZtol
-    write(*,*)'nestFeedBack =         ',nestFeedBack
-    write(*,*)'nestResume   =         ',nestResume
-    write(*,*)'nestRootName =         ',trim(nestRootName)
-    write(*,*)
-    write(*,*)'fast like is :         ',fastLikeName
-    write(*,*)'lnZeroMin    =         ',fitLogZero
-    write(*,*)'fitNdim      =         ',fitNdim
-    write(*,*)'-----------------------------------------------------'
-
-    if (allocated(nestPmin).and.allocated(nestPmax)) then
-
-       write(*,*)
-       write(*,*)'--------------PIORS ON SAMPLED PARAMS----------------'
-       write(*,*)'MIN = ',nestPmin
-       write(*,*)'MAX = ',nestPmax
-       write(*,*)'-----------------------------------------------------'
-
-    endif
-
-  end subroutine nest_print
-
-
+  
 
   subroutine nest_free_slowroll()
     use nestparams, only : nestPwrap    
@@ -314,7 +279,7 @@ contains
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
     use nestparams, only : nestNdim, nestNpars, nestCdim
     use nestparams, only : nestPWrap, nestRootName, nestRootPrefix
-    use nestparams, only : nestLogZero
+    use nestparams, only : nestLogZero, nest_print
     implicit none    
     integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
@@ -778,7 +743,6 @@ contains
 #endif
 
 
-
   function uncubize_nestparams(nestdim,nestcube)
     implicit none
     integer(imn), intent(in) :: nestdim
@@ -795,44 +759,4 @@ contains
   end function uncubize_nestparams
 
  
-
-  subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
-       , maxLogLike, logZ, INSlogZ, logZerr, context)
-    use nestparams, only : nestRootName, nestINS
-    implicit none
-! number of samples in posterior array
-    integer :: nSamples				
-! number of live points
-    integer :: nlive					
-! number of parameters saved (physical plus derived)
-    integer :: nPar					
-! array containing the last set of live points
-    real(fmn), pointer :: physLive(:,:)	
-! array with the posterior distribution
-    real(fmn), pointer :: posterior(:,:)	
-! array with mean, sigmas, maxlike & MAP parameters
-    real(fmn), pointer :: paramConstr(:)	
-! max loglikelihood value
-    real(fmn) :: maxLogLike			
-! log evidence
-    real(fmn) :: logZ, INSlogZ			
-! error on log evidence
-    real(fmn) :: logZerr			
-! not required by MultiNest, any additional information user wants to pass
-    integer(imn) :: context
-
-    write(*,*)
-    write(*,*)'*****************************************************'
-    write(*,*)'nest_dumper: '
-    write(*,*)'nestRoot: ',trim(nestRootName)
-    write(*,*)'nSamples= ',nSamples
-    write(*,*)'logZ= logZerr=        ',logZ, logZerr
-    write(*,*)'maxLogLike= INSlogZ = ',maxLogLike, INSlogZ
-    write(*,*)'*****************************************************'
-    write(*,*)
-   
-
-  end subroutine nest_dumper
-
-
 end module nestwrap

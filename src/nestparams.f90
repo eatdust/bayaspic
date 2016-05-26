@@ -1,6 +1,8 @@
 module nestparams
-  use samplprec
+  use sampl
   implicit none
+
+  public
 
 ! Parameters for Nested Sampler
 
@@ -76,5 +78,71 @@ module nestparams
  !iterations or convergence criterion (defined through nest_tol) has
  !been satisfied
   integer(imn), parameter :: nestMaxIter = 0
+
+
+contains
+
+
+  subroutine nest_print()
+    implicit none
+
+    write(*,*)
+    write(*,*)'-----------------------------------------------------'
+    write(*,*)'Initializing multinest with:'
+    write(*,*)'nestNdim     =         ',nestNdim
+    write(*,*)'nestNpars    =         ',nestNpars
+    write(*,*)'nestINS      =         ',nestINS
+    write(*,*)'nestMmodal   =         ',nestMmodal
+    write(*,*)'nestNlive    =         ',nestNlive
+    write(*,*)'nestCteEff   =         ',nestCteEff
+    write(*,*)'nestZtol     =         ',nestZtol
+    write(*,*)'nestFeedBack =         ',nestFeedBack
+    write(*,*)'nestResume   =         ',nestResume
+    write(*,*)'nestRootName =         ',trim(nestRootName)
+    write(*,*)'-----------------------------------------------------'
+    write(*,*)
+
+  end subroutine nest_print
+
+
+
+  subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
+       , maxLogLike, logZ, INSlogZ, logZerr, context)
+
+    implicit none
+    ! number of samples in posterior array
+    integer :: nSamples				
+    ! number of live points
+    integer :: nlive					
+    ! number of parameters saved (physical plus derived)
+    integer :: nPar					
+    ! array containing the last set of live points
+    real(fmn), pointer :: physLive(:,:)	
+    ! array with the posterior distribution
+    real(fmn), pointer :: posterior(:,:)	
+    ! array with mean, sigmas, maxlike & MAP parameters
+    real(fmn), pointer :: paramConstr(:)	
+    ! max loglikelihood value
+    real(fmn) :: maxLogLike			
+    ! log evidence
+    real(fmn) :: logZ, INSlogZ			
+    ! error on log evidence
+    real(fmn) :: logZerr			
+    ! not required by MultiNest, any additional information user wants to pass
+    integer(imn) :: context
+
+    write(*,*)
+    write(*,*)'*****************************************************'
+    write(*,*)'nest_dumper: '
+    write(*,*)'nestRoot: ',trim(nestRootName)
+    write(*,*)'nSamples= ',nSamples
+    write(*,*)'logZ= logZerr=        ',logZ, logZerr
+    write(*,*)'maxLogLike= INSlogZ = ',maxLogLike, INSlogZ
+    write(*,*)'*****************************************************'
+    write(*,*)
+
+
+  end subroutine nest_dumper
+
 
 end module nestparams

@@ -37,8 +37,10 @@ OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
 
-OBJFILES = samplprec.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
+OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
 	nestparams.o nestwrap.o
+
+OBJSMIN = sampl.o $(OBJSLIKE) $(OBJSNEST) nestparams.o samplsr.o
 
 FCFLAGS+=$(INCLUDE)
 
@@ -46,8 +48,8 @@ FCFLAGS+=$(INCLUDE)
 bayaspic.$(ext): $(OBJFILES) $(OBJSMPI) bayaspic.o
 	$(FC) $(FCFLAGS) $(OBJFILES) $(OBJSMPI) bayaspic.o -o ../$@ $(LFLAGS) 
 
-bayslowroll.$(ext): $(OBJFILES) bayslowroll.o
-	$(FC) $(FCFLAGS) $(OBJFILES) bayslowroll.o -o ../$@ $(LFLAGS) 
+bayslowroll.$(ext): $(OBJSMIN) bayslowroll.o
+	$(FC) $(FCFLAGS) $(OBJSMIN) bayslowroll.o -o ../$@ $(LFLAGS) 
 
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp

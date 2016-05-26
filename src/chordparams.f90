@@ -1,5 +1,5 @@
 module polyparams
-  use samplprec
+  use sampl
   implicit none
 
 

@@ -1,5 +1,5 @@
 program bayaspic
-  use samplprec
+  use sampl
   use nestwrap, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use scheduler, only : initialize_scheduler, free_scheduler
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
