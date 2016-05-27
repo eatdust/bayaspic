@@ -9,7 +9,7 @@ module chordparams
   integer(imn), parameter :: chordNlive = 30000
 
 !evidence tolerance factor !1e-4
-  real(fmn), parameter :: chordZTol = 1e-2
+  real(fmn), parameter :: chordZTol = 1e-4
 
 !dimension
   integer(imn), save :: chordNdim = 0
@@ -55,7 +55,7 @@ module chordparams
   logical, parameter :: chordOutLive = .true.
   logical, parameter :: chordOutDead = .false.
   logical, parameter :: chordOutStats = .true.
-  logical, parameter :: chordOutParamNames = .true. 
+  logical, parameter :: chordOutParamNames = .false. 
 
 
 contains

@@ -4,7 +4,7 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DMPI
+FCFLAGS= -O2 -fopenmp -DASPIC -DMPISCHED
 #-DMPISCHED -DASPICQ
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
