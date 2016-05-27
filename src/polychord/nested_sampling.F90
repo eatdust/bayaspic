@@ -1,7 +1,7 @@
 module nested_sampling_module
     use utils_module, only: dp
 
-#ifdef MPI
+#ifdef MPICHORD
     use mpi_module, only: get_mpi_information,mpi_bundle,is_root,linear_mode,catch_babies,throw_babies,throw_seed,catch_seed,broadcast_integers,mpi_synchronise
 #else
     use mpi_module, only: get_mpi_information,mpi_bundle,is_root,linear_mode
@@ -23,7 +23,7 @@ module nested_sampling_module
         use random_module,     only: random_integer,random_direction
         use cluster_module,    only: do_clustering
         use generate_module,   only: GenerateSeed,GenerateLivePoints
-#ifdef MPI
+#ifdef MPICHORD
         use utils_module, only: logzero,normal_fb,stdout_unit
 #endif
 
@@ -104,7 +104,7 @@ module nested_sampling_module
 
 
 
-#ifdef MPI
+#ifdef MPICHORD
         ! MPI specific variables
         ! ----------------------
         integer                            :: i_slave       ! Slave iterator
@@ -126,7 +126,7 @@ module nested_sampling_module
         ! MPI initialisation
         mpi_information = get_mpi_information(mpi_communicator)
 
-#ifdef MPI
+#ifdef MPICHORD
         allocate(slave_cluster(mpi_information%nprocs-1)) ! Allocate the slave arrays
         slave_cluster = 1                          ! initialise with 1
 
@@ -174,7 +174,7 @@ module nested_sampling_module
             num_repeats = RTI%num_repeats
             call write_num_repeats(num_repeats,settings%feedback)
         end if
-#ifdef MPI
+#ifdef MPICHORD
         call broadcast_integers(num_repeats,mpi_information)
 #endif
         allocate(baby_points(settings%nTotal,sum(num_repeats)))
@@ -214,7 +214,7 @@ module nested_sampling_module
 
                     ! Generate a new set of points within the likelihood bound of the late point
                     baby_points = SliceSampling(loglikelihood,prior,settings,logL,seed_point,cholesky,nlike,num_repeats)
-#ifdef MPI
+#ifdef MPICHORD
                 else
                     ! Parallel mode
                     ! -------------
@@ -239,7 +239,7 @@ module nested_sampling_module
 
 
                 ! See if this point is suitable to be added to the arrays
-#ifdef MPI
+#ifdef MPICHORD
                 if( linear_mode(mpi_information) .or. master_epoch==slave_epoch ) then
 #endif
                     if(replace_point(settings,RTI,baby_points,cluster_id) ) then
@@ -263,7 +263,7 @@ module nested_sampling_module
 
 
                         if(delete_cluster(settings,RTI)) then
-#ifdef MPI
+#ifdef MPICHORD
                             master_epoch = master_epoch+1
 #endif
                         end if! Delete any clusters as necessary
@@ -279,14 +279,14 @@ module nested_sampling_module
                                 ! If we want to cluster on sub dimensions, then do this first
                                 if(allocated(settings%sub_clustering_dimensions)) then
                                     if( do_clustering(settings,RTI,settings%sub_clustering_dimensions) )  then
-#ifdef MPI
+#ifdef MPICHORD
                                         master_epoch = master_epoch+1
 #endif
                                     end if
                                 end if
 
                                 if( do_clustering(settings,RTI) )  then
-#ifdef MPI
+#ifdef MPICHORD
                                     master_epoch = master_epoch+1
 #endif
                                 end if
@@ -294,7 +294,7 @@ module nested_sampling_module
                             call calculate_covmats(settings,RTI)
                         end if
                     end if
-#ifdef MPI
+#ifdef MPICHORD
                 end if
 #endif
 
@@ -338,7 +338,7 @@ module nested_sampling_module
             ! C) Clean up
             !    ========
 
-#ifdef MPI
+#ifdef MPICHORD
             ! MPI cleanup
             ! -----------
             ! Kill off the final slaves.
@@ -412,7 +412,7 @@ module nested_sampling_module
 #endif
         end if !(myrank==root / myrank/=root) 
 
-#ifdef MPI
+#ifdef MPICHORD
         call mpi_synchronise(mpi_information)
 #endif
 

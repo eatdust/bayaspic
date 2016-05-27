@@ -1021,13 +1021,13 @@ module utils_module
 
     !> This gets the wallclock timer from the mpi library
     function time() 
-#ifdef MPI
+#ifdef MPICHORD
         use mpi,only: MPI_Wtime
 #endif
         implicit none
         real(dp) :: time
 
-#ifdef MPI
+#ifdef MPICHORD
         time = MPI_Wtime()
 #else 
         call cpu_time(time)

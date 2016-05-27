@@ -16,7 +16,7 @@ contains
         use settings_module,          only: program_settings,initialise_settings
         use random_module,            only: initialise_random
         use nested_sampling_module,   only: NestedSampling
-#ifdef MPI
+#ifdef MPICHORD
         use mpi_module,               only: initialise_mpi, finalise_mpi
         use mpi,                      only: MPI_COMM_WORLD
 #endif
@@ -43,13 +43,13 @@ contains
 
         real(dp), dimension(4) :: output_info
 
-#ifdef MPI
+#ifdef MPICHORD
         call initialise_mpi
 #endif
         call initialise_random()
         settings = settings_in
         call initialise_settings(settings)   
-#ifdef MPI
+#ifdef MPICHORD
         output_info = NestedSampling(loglikelihood,prior,settings,MPI_COMM_WORLD) 
         call finalise_mpi
 #else

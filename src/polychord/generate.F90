@@ -68,7 +68,7 @@ module generate_module
         use run_time_module,   only: run_time_info,initialise_run_time_info
         use array_module,     only: add_point
         use abort_module
-#ifdef MPI
+#ifdef MPICHORD
         use mpi_module, only: mpi_bundle,is_root,linear_mode,throw_point,catch_point,more_points_needed,sum_integers,sum_doubles,request_point,no_more_points
 #else
         use mpi_module, only: mpi_bundle,is_root,linear_mode
@@ -100,7 +100,7 @@ module generate_module
         type(run_time_info) :: RTI
 
         type(mpi_bundle),intent(in) :: mpi_information
-#ifdef MPI
+#ifdef MPICHORD
         integer             :: active_slaves    !  Number of currently working slaves
         integer             :: slave_id         !  Slave identifier to signal who to throw back to
 #endif
@@ -172,7 +172,7 @@ module generate_module
             end do
 
 
-#ifdef MPI
+#ifdef MPICHORD
         else 
             !===================== PARALLEL MODE =======================
 
@@ -235,7 +235,7 @@ module generate_module
 #endif
         end if !(nprocs case)
 
-#ifdef MPI
+#ifdef MPICHORD
         nlike = sum_integers(nlike,mpi_information) ! Gather the likelihood calls onto one node
         total_time = sum_doubles(total_time,mpi_information) ! Sum up the total time taken
 #endif
@@ -290,7 +290,7 @@ module generate_module
         use utils_module,    only: logzero,normal_fb,stdout_unit,fancy_fb,time
         use calculate_module, only: calculate_point
         use abort_module
-#ifdef MPI
+#ifdef MPICHORD
         use mpi_module, only: mpi_bundle,is_root,sum_doubles,sum_integers
 #else
         use mpi_module, only: mpi_bundle,is_root
@@ -370,7 +370,7 @@ module generate_module
                 end if
 
             end do
-#ifdef MPI
+#ifdef MPICHORD
             total_time=sum_doubles(total_time,mpi_information)
             i_live = sum_integers(i_live,mpi_information)
             nlike = sum_integers(nlike,mpi_information)

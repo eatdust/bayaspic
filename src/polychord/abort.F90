@@ -1,6 +1,6 @@
 module abort_module
     use utils_module, only: dp
-#ifdef MPI
+#ifdef MPICHORD
     use mpi
 #endif
     contains
@@ -11,7 +11,7 @@ module abort_module
 
         character(LEN=*), intent(in), optional :: message
 
-#ifdef MPI
+#ifdef MPICHORD
         integer :: errorcode=1
         integer :: mpierror
 #endif
@@ -22,7 +22,7 @@ module abort_module
             write(stderr_unit,'( 20("=") )')
         end if 
 
-#ifdef MPI
+#ifdef MPICHORD
         call MPI_ABORT(MPI_COMM_WORLD,errorcode,mpierror)
 #else
         stop 1
