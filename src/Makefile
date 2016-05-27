@@ -3,8 +3,8 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=gfortran
-FCFLAGS= -O2 -fopenmp -DASPIC
+FC=mpif90
+FCFLAGS= -O2 -fopenmp -DASPIC -DMPI
 #-DMPISCHED -DASPICQ
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
@@ -24,6 +24,7 @@ endif
 
 LIKEDIR = ../fastlikes
 NESTDIR = ../multinest
+CHORDDIR = ../polychord/src/polychord
 
 OBJSLIKE =  rbfprec.o shepprec.o qshepmdata.o iond.o rbfnd.o rbflike.o \
 	qshepmd.o shepnd.o sheplike.o
@@ -33,14 +34,20 @@ OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o
 
 OBJSMPI = fifo.o iofifo.o scheduler.o
 
-OBJSNEST = utils.o utils1.o priors.o kmeans_clstr.o \
+OBJSNEST = utilsMN.o utils1.o priorsMN.o kmeans_clstr.o \
 	xmeans_clstr.o posterior.o nested.o
 
+OBJSCHORD = utilsPC.o abort.o settings.o mpi_utils.o random_utils.o  \
+	array_utils.o calculate.o run_time_info.o params.o priorsPC.o \
+	read_write.o feedback.o chordal_sampling.o clustering.o \
+	generate.o nested_sampling.o ini.o interfaces.o 
 
-OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) \
-	nestparams.o nestwrap.o
+#nestwrap.o
+OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
+	nestparams.o chordparams.o samplaspic.o
 
-OBJSMIN = sampl.o $(OBJSLIKE) $(OBJSNEST) nestparams.o samplsr.o
+OBJSMIN = sampl.o $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
+	nestparams.o chordparams.o samplsr.o
 
 FCFLAGS+=$(INCLUDE)
 
@@ -54,6 +61,8 @@ bayslowroll.$(ext): $(OBJSMIN) bayslowroll.o
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
 nestwrap.o: nestparams.o wraspic.o
+chordparams.o: settings.o
+samplsr.o: settings.o interfaces.o
 
 %.o: $(LIKEDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<
@@ -65,6 +74,12 @@ nestwrap.o: nestparams.o wraspic.o
 	$(FC) $(FCFLAGS) -c $<
 
 %.o: $(NESTDIR)/%.F90
+	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+
+%.o: $(CHORDDIR)/%.f90
+	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+
+%.o: $(CHORDDIR)/%.F90
 	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
 
 %.o: %.f90

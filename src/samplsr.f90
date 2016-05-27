@@ -1,7 +1,7 @@
 !sampling the slow-roll parameter space only
 module samplsr
-  use sampl, only : imn, fmn
-  use sampl, only : samplNdim, rootName, rootPrefix
+  use sampl, only : imn, fmn, lenmn
+  use sampl, only : samplNdim, rootName, rootPrefix, rootDir
   use sampl, only : init_samplparams, free_samplparams
   use sampl, only : samplPmin, samplPmax
   implicit none
@@ -41,7 +41,8 @@ module samplsr
   public nest_init_slowroll,  nest_free_slowroll
   public nest_sample_slowroll
 
-  
+  public chord_init_slowroll, chord_free_slowroll
+  public chord_sample_slowroll
 
 contains
 
@@ -107,9 +108,11 @@ contains
 
     if (display) then
        write(*,*)
+       write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
        write(*,*)'fast like is :         ',fastLikeName
        write(*,*)'lnZeroMin    =         ',fitLogZero
        write(*,*)'fitNdim      =         ',fitNdim
+       write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
        write(*,*)
     end if
 
@@ -121,16 +124,18 @@ contains
   subroutine dump_slowroll_priors(extname)
     implicit none
     character(len=*), intent(in) :: extname
+    character(len=lenmn) :: fileName
     integer, parameter :: nunit = 414, nname = 415, nrange=416
     
     if ((.not.allocated(samplPmin)).or.(.not.allocated(samplPmax))) then
        stop 'dump_slowroll_priors: prior not allocated!'
     endif
    
+    fileName=trim(rootDir)//trim(rootPrefix)//extname
 
-    open(unit=nunit,file=trim(rootName)//'.ini', status='unknown')
-    open(unit=nname,file=trim(rootName)//'.paramnames', status='unknown')
-    open(unit=nrange,file=trim(rootName)//'.ranges', status='unknown')
+    open(unit=nunit,file=trim(fileName)//'.ini', status='unknown')
+    open(unit=nname,file=trim(fileName)//'.paramnames', status='unknown')
+    open(unit=nrange,file=trim(fileName)//'.ranges', status='unknown')
 
     write(nunit,*)'limits[lnA]=',samplPmin(1),samplPmax(1)    
     write(nname,*)'lnA         \ln(10^{10} P_*)'
@@ -172,50 +177,7 @@ contains
 
 
 
-  function rbf_slowroll_loglike(cube)
-    use rbfprec, only : fp
-    use rbflike, only : check_rbf
-    use rbflike, only : rbflike_eval
-    implicit none   
-    real(fmn) :: rbf_slowroll_loglike
-    real(fmn), dimension(:) :: cube
-    real(fp), dimension(size(cube,1)) :: rbfcube
-
-    integer :: ndim
-    ndim = size(cube,1)
-
-    if (.not.check_rbf()) stop 'rbf_loglike: not initialized!'
-    
-    rbfcube(1:ndim) = cube(1:ndim)
-
-    rbf_slowroll_loglike = rbflike_eval(rbfcube)
-
-  end function rbf_slowroll_loglike
-
-
-
-  function shep_slowroll_loglike(cube)
-    use shepprec, only : fp
-    use sheplike, only : check_shep
-    use sheplike, only : sheplike_eval
-    implicit none   
-    real(fmn) :: shep_slowroll_loglike
-    real(fmn), dimension(:) :: cube
-    real(fp), dimension(size(cube,1)) :: shepcube
-    integer :: ndim
-
-    if (.not.check_shep()) stop 'shep_loglike: not initialized!'
-
-    ndim = size(cube,1)
-
-    shepcube(1:ndim) = cube(1:ndim)
-
-    shep_slowroll_loglike = sheplike_eval(shepcube)
-
-  end function shep_slowroll_loglike
-
   
-
 
   subroutine nest_init_slowroll()    
     use nestparams, only : nestNdim, nestNpars, nestCdim
@@ -229,7 +191,7 @@ contains
     nestNpars = samplNdim
     nestCdim = samplNdim
 
-    nestRootName = rootName
+    nestRootName = trim(rootDir)//trim(rootName)
 
     allocate(nestPwrap(nestNdim))
     nestPwrap = 0
@@ -276,19 +238,24 @@ contains
   end subroutine nest_sample_slowroll
 
   
-
   subroutine rbf_multinest_slowroll_loglike(cube,nestdim,nestpars,lnew,context)
     use rbfprec, only : fp
-    use rbflike, only : uncubize_rbfparams
+    use rbflike, only : uncubize_rbfparams, check_rbf
+    use rbflike, only : rbflike_eval
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
     real(fmn) :: lnew
     integer(imn) :: context
+    real(fp), dimension(nestdim) :: rbfcube
+
+    if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
     
-    lnew = rbf_slowroll_loglike(cube(1:nestdim))
+    rbfcube(1:nestdim) = cube(1:nestdim)
+
+    lnew = rbflike_eval(rbfcube)
     
-    cube(1:nestdim) = real(uncubize_rbfparams(nestdim,real(cube(1:nestdim),fp)),fmn)
+    cube(1:nestdim) = real(uncubize_rbfparams(nestdim,rbfcube),fmn)
     
   end subroutine rbf_multinest_slowroll_loglike
 
@@ -296,18 +263,26 @@ contains
 
   subroutine shep_multinest_slowroll_loglike(cube,nestdim,nestpars,lnew,context)
     use shepprec, only : fp
-    use sheplike, only : uncubize_shepparams
+    use sheplike, only : uncubize_shepparams, check_shep
+    use sheplike, only : sheplike_eval
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
     real(fmn) :: lnew
     integer(imn) :: context
+    real(fp), dimension(nestdim) :: shepcube
+
+    if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'
     
-    lnew = shep_slowroll_loglike(cube(1:nestdim))
+    shepcube(1:nestdim) = cube(1:nestdim)
+
+    lnew = sheplike_eval(shepcube)
     
-    cube(1:nestdim) = real(uncubize_shepparams(nestdim,real(cube(1:nestdim),fp)),fmn)
+    cube(1:nestdim) = real(uncubize_shepparams(nestdim,shepcube),fmn)
     
   end subroutine shep_multinest_slowroll_loglike
+
+
 
   
 
@@ -325,22 +300,20 @@ contains
 
   
   subroutine chord_init_slowroll()    
-    use chordparams, only : chordNdim, chordNpars, chordCdim
-    use chordparams, only : chordPWrap, chordRootName, chord_print
+    use chordparams, only : chordNdim, chordNpars, chordNderived
+    use chordparams, only : chordName, chordDir, chord_print
     use sampl, only : sampl_print
     implicit none
 
     call init_slowroll()
 
     chordNdim = samplNdim
+    chordNderived = 0
     chordNpars = samplNdim
-    chordCdim = samplNdim
 
-    chordRootName = rootName
-
-    allocate(chordPwrap(chordNdim))
-    chordPwrap = 0
-
+    chordDir=rootDir
+    chordName = trim(rootName)
+   
     call chord_print()
 
     call sampl_print()
@@ -348,30 +321,25 @@ contains
   end subroutine chord_init_slowroll
 
 
+
   subroutine chord_sample_slowroll()
-    use chorded, only : chordRun
+    use interfaces_module, only : run_polychord
+    use settings_module, only : program_settings
     use chordparams
     implicit none
+    type(program_settings) :: runset
 
-    integer(imn) :: nclusters			
-    integer(imn) :: context
-    integer(imn) :: maxNode 			
+    call chord_settings(runset)
 
     select case (fastLikeName)
 
     case ('rbf')
 
-       call chordRun(chordINS,chordMmodal,chordCteEff,chordNlive,chordZtol,chordSampEff,chordNdim,chordNpars, &
-            chordCdim,chordMaxModes,chordUpdInt,chordNullZ,chordRootName,chordSeed,chordPwrap, &
-            chordFeedBack,chordResume,chordOutfile,chordInitMPI,chordLogZero,chordMaxIter &
-            ,rbf_multichord_slowroll_loglike,chord_dumper,context)
+       call run_polychord(rbf_polychord_slowroll_loglike,rbf_polychord_prior,runset)
 
     case ('shep')
 
-       call chordRun(chordINS,chordMmodal,chordCteEff,chordNlive,chordZtol,chordSampEff,chordNdim,chordNpars, &
-            chordCdim,chordMaxModes,chordUpdInt,chordNullZ,chordRootName,chordSeed,chordPwrap, &
-            chordFeedBack,chordResume,chordOutfile,chordInitMPI,chordLogZero,chordMaxIter &
-            ,shep_multichord_slowroll_loglike,chord_dumper,context)
+       call run_polychord(shep_polychord_slowroll_loglike,shep_polychord_prior,runset)
 
     case default
 
@@ -382,48 +350,91 @@ contains
 
   end subroutine chord_sample_slowroll
 
-  
 
-  subroutine rbf_multichord_slowroll_loglike(cube,chorddim,chordpars,lnew,context)
+  function rbf_polychord_prior(cube)
     use rbfprec, only : fp
-    use rbflike, only : uncubize_rbfparams
+    use rbflike, only :  uncubize_rbfparams
+    implicit none
+    real(fmn), dimension(:), intent(in) :: cube
+    real(fmn), dimension(size(cube,1)) :: rbf_polychord_prior
+    integer(imn) :: ndim
+    ndim = size(cube,1)
+
+    rbf_polychord_prior = real(uncubize_rbfparams(ndim,real(cube(1:ndim),fp)),fmn)
+
+  end function rbf_polychord_prior
+
+
+
+  function rbf_polychord_slowroll_loglike(theta,phi)
+    use rbfprec, only : fp
+    use rbflike, only : cubize_rbfparams, check_rbf
+    use rbflike, only : rbflike_eval
     implicit none   
-    integer(imn) :: chorddim, chordpars
-    real(fmn), dimension(chordpars) :: cube
-    real(fmn) :: lnew
-    integer(imn) :: context
+    real(fmn) :: rbf_polychord_slowroll_loglike
+    real(fmn), dimension(:), intent(in) :: theta
+    real(fmn), dimension(:), intent(out) :: phi
+
+    integer(imn) :: ndim
+    real(fp), dimension(size(theta,1)) :: rbfcube
+
+    ndim = size(theta,1)
+
+    if (.not.check_rbf()) stop 'rbf_polychord_slowroll_loglike: not initialized!'
     
-    lnew = rbf_slowroll_loglike(cube(1:chorddim))
-    
-    cube(1:chorddim) = real(uncubize_rbfparams(chorddim,real(cube(1:chorddim),fp)),fmn)
-    
-  end subroutine rbf_multichord_slowroll_loglike
+    rbfcube(1:ndim) = cubize_rbfparams(ndim,real(theta(1:ndim),fp))
+
+    rbf_polychord_slowroll_loglike = rbflike_eval(rbfcube)
+        
+  end function rbf_polychord_slowroll_loglike
 
 
 
-  subroutine shep_multichord_slowroll_loglike(cube,chorddim,chordpars,lnew,context)
+
+  function shep_polychord_prior(cube)
     use shepprec, only : fp
-    use sheplike, only : uncubize_shepparams
-    implicit none   
-    integer(imn) :: chorddim, chordpars
-    real(fmn), dimension(chordpars) :: cube
-    real(fmn) :: lnew
-    integer(imn) :: context
-    
-    lnew = shep_slowroll_loglike(cube(1:chorddim))
-    
-    cube(1:chorddim) = real(uncubize_shepparams(chorddim,real(cube(1:chorddim),fp)),fmn)
-    
-  end subroutine shep_multichord_slowroll_loglike
+    use sheplike, only :  uncubize_shepparams
+    implicit none
+    real(fmn), dimension(:), intent(in) :: cube
+    real(fmn), dimension(size(cube,1)) :: shep_polychord_prior
+    integer(imn) :: ndim
+    ndim = size(cube,1)
 
-  
+    shep_polychord_prior = real(uncubize_shepparams(ndim,real(cube(1:ndim),fp)),fmn)
+
+  end function shep_polychord_prior
+
+
+
+
+  function shep_polychord_slowroll_loglike(theta,phi)
+    use shepprec, only : fp
+    use sheplike, only : cubize_shepparams, check_shep
+    use sheplike, only : sheplike_eval
+    implicit none   
+    real(fmn) :: shep_polychord_slowroll_loglike
+    real(fmn), dimension(:), intent(in) :: theta
+    real(fmn), dimension(:), intent(out) :: phi
+
+    integer(imn) :: ndim
+    real(fp), dimension(size(theta,1)) :: shepcube
+
+    ndim = size(theta,1)
+
+    if (.not.check_shep()) stop 'shep_polychord_slowroll_loglike: not initialized!'
+    
+    shepcube(1:ndim) = cubize_shepparams(ndim,real(theta(1:ndim),fp))
+
+    shep_polychord_slowroll_loglike = sheplike_eval(shepcube)
+
+  end function shep_polychord_slowroll_loglike
+
+
+
 
   subroutine chord_free_slowroll()
-    use chordparams, only : chordPwrap    
     implicit none
    
-    if (allocated(chordPwrap)) deallocate(chordPwrap)
-
     call free_samplparams()
 
   end subroutine chord_free_slowroll

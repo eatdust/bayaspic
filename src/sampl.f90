@@ -8,10 +8,11 @@ module sampl
 
   integer, parameter :: lenmn = 100
 
-  integer(imn), save :: samplNdim
+  integer(imn), save :: samplNdim, samplNpars
   real(fmn), save, dimension(:), allocatable :: samplPmin, samplPmax
 
-  character(len=lenmn), parameter :: rootPrefix = 'chains/bayesinf_'
+  character(len=lenmn), parameter :: rootDir = 'chains/'
+  character(len=lenmn), parameter :: rootPrefix = 'bayesinf_'
   character(len=lenmn), save :: rootName = rootPrefix
 
 contains
