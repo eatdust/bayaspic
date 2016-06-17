@@ -70,6 +70,24 @@ samplsr.o: settings.o interfaces.o
 %.o: $(LIKEDIR)/%.F90
 	$(FC) $(FCFLAGS)  -c$<
 
+%.o: $(LIKEDIR)/rbf/%.f90
+	$(FC) $(FCFLAGS) -c $<
+
+%.o: $(LIKEDIR)/rbf/%.F90
+	$(FC) $(FCFLAGS)  -c$<
+
+%.o: $(LIKEDIR)/shep/%.f90
+	$(FC) $(FCFLAGS) -c $<
+
+%.o: $(LIKEDIR)/shep/%.F90
+	$(FC) $(FCFLAGS)  -c$<
+
+%.o: $(LIKEDIR)/fnn/%.f90
+	$(FC) $(FCFLAGS) -c $<
+
+%.o: $(LIKEDIR)/fnn/%.F90
+	$(FC) $(FCFLAGS)  -c$<
+
 %.o: $(NESTDIR)/%.f90
 	$(FC) $(FCFLAGS) -c $<
 
@@ -91,10 +109,18 @@ samplsr.o: settings.o interfaces.o
 ifeq ($(FC),ifort)
 %.ifort: %.F08
 	$(CPP) $< -o $@
+%.ifort: %.F03
+	$(CPP) $< -o $@
+%.ifort: %.f03
+	$(CPP) $< -o $@
 %.o: %.ifort
 	$(FC) $(FCFLAGS) -c -free -Tf$< 
 else
 %.o: %.F08
+	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+%.o: %.F03
+	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+%.o: %.f03
 	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
 endif
 

@@ -15,6 +15,37 @@ module sampl
   character(len=lenmn), parameter :: rootPrefix = 'bayesinf_'
   character(len=lenmn), save :: rootName = rootPrefix
 
+
+  abstract interface
+
+     subroutine multinest_loglike(cube,nestdim,nestpars,lnew,context)
+       import imn, fmn
+       implicit none
+       integer(imn) :: nestdim, nestpars
+       real(fmn), dimension(nestpars) :: cube
+       real(fmn) :: lnew
+       integer(imn) :: context,i
+     end subroutine multinest_loglike
+
+
+     function polychord_loglike(theta,phi)
+       import fmn
+       implicit none
+       real(fmn) :: polychord_loglike
+       real(fmn), dimension(:), intent(in) :: theta
+       real(fmn), dimension(:), intent(out) :: phi
+     end function polychord_loglike
+
+
+     function polychord_prior(cube)
+       import fmn
+       implicit none
+       real(fmn), dimension(:), intent(in) :: cube
+       real(fmn), dimension(size(cube,1)) :: polychord_prior
+     end function polychord_prior
+
+  end interface
+
 contains
 
   subroutine init_samplparams(ndim)

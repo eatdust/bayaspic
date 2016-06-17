@@ -5,6 +5,7 @@ module samplaspic
   use sampl, only : init_samplparams, free_samplparams
   use sampl, only : uncubize_samplparams
   use sampl, only : samplPmin, samplPmax
+  use sampl, only : multinest_loglike, polychord_loglike, polychord_prior
   implicit none
 
   private
@@ -21,6 +22,9 @@ module samplaspic
   character(len=*), parameter :: filepost = 'shepdata/postcubed.dat'
   character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
+
+  character(len=*), parameter :: filefnn = 'fnndata/shepdata.dat'
+  character(len=*), parameter :: filefnnbounds = 'fnndata/bounds.dat'
   
   integer(imn), parameter :: numDerivedParams = 11
 
@@ -40,7 +44,10 @@ module samplaspic
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-  character(len=*), parameter :: fastLikeName = 'shep'
+!  character(len=*), parameter :: fastLikeName = 'shep'
+
+!feedforward neural network
+  character(len=*), parameter :: fastLikeName = 'fnn'
 
   public nest_init_aspic, nest_sample_aspic, nest_free_aspic
   public chord_init_aspic, chord_sample_aspic, chord_free_aspic
@@ -56,6 +63,9 @@ contains
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
     use sheplike, only : initialize_shep_like, check_shep, get_shep_fmin
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
+    use fnnlike, only : initialize_fnn_like, check_fnn, get_fnn_fmin
+    use fnnlike, only : get_fnn_ndim, get_fnn_xpmin, get_fnn_xpmax
+
     implicit none    
     integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
@@ -116,6 +126,20 @@ contains
     
        fitNdim = get_shep_ndim()
        fitLogZero = get_shep_fmin()
+
+
+    case ('fnn')
+
+       if (.not.check_fnn()) then
+          call initialize_fnn_like(filefnn, filefnnbounds)
+       endif
+
+!cut prior of P* by the one encoded in the likelihood
+       samplPmin(pstarpos) = max(get_fnn_xpmin(pstarpos),samplPmin(pstarpos))
+       samplPmax(pstarpos) = min(get_fnn_xpmax(pstarpos),samplPmax(pstarpos))
+
+       fitNdim = get_fnn_ndim()
+       fitLogZero = get_fnn_fmin()
 
 
     case ('null')
@@ -287,6 +311,8 @@ contains
     use nested, only : nestRun
     use nestparams
     implicit none
+    
+    procedure(multinest_loglike), pointer :: ptrnest_aspic_loglike => null()
 
     integer(imn) :: nclusters			
     integer(imn) :: context
@@ -295,31 +321,30 @@ contains
     select case (fastLikeName)
 
     case ('rbf')
-
-       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
-            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
-            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
-            ,rbf_multinest_aspic_loglike,nest_dumper,context)
+       ptrnest_aspic_loglike => rbf_multinest_aspic_loglike
 
     case ('shep')
+       ptrnest_aspic_loglike => shep_multinest_aspic_loglike
 
-       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
-            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
-            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
-            ,shep_multinest_aspic_loglike,nest_dumper,context)
+    case ('fnn')
+       ptrnest_aspic_loglike => fnn_multinest_aspic_loglike
 
     case ('null')
-
-       call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
-            nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
-            nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
-            ,null_multinest_aspic_loglike,nest_dumper,context)
+       ptrnest_aspic_loglike => null_multinest_aspic_loglike
 
     case default
 
        stop 'nest_sample_aspic: fast like not found!'
 
     end select
+
+    call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+         nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
+         nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
+         ,ptrnest_aspic_loglike,nest_dumper,context)
+
+    if (associated(ptrnest_aspic_loglike)) ptrnest_aspic_loglike => null()
+
 
   end subroutine nest_sample_aspic
 
@@ -486,6 +511,87 @@ contains
 
 
 
+  subroutine fnn_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
+    use fnnprec, only : fp
+    use fnnlike, only : cubize_fnnparams, uncubize_fnnparams, check_fnn
+    use fnnlike, only : fnnlike_eval, cutmin_fnnparams
+    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
+    use nestparams, only : nestLogZero
+    implicit none   
+    integer(imn) :: nestdim, nestpars
+    real(fmn), dimension(nestpars) :: cube
+    real(fmn) :: lnew
+    integer(imn) :: context,i
+    real(fmn), dimension(nestdim) :: mnpars
+    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts
+
+
+    if (.not.check_fnn()) stop 'fnn_multinest_loglike: not initialized!'
+
+!get the physical parameters we are sampling on
+    mnpars = uncubize_samplparams(nestdim,cube)
+
+!check for any hard prior in aspic model parameters
+    if (test_aspic_hardprior(mnpars)) then
+
+       lnew = nestLogZero
+
+    else
+       
+!use aspic to get the slowroll parameters
+       fnnpars = get_slowroll(fitNdim,mnpars)
+
+! reheating hardprior, those points are ignored
+       if (test_reheating_hardprior(mnpars)) then
+
+          lnew = nestLogZero
+
+       else
+
+!if eps1<eps1min, the likelihood is flat
+          fnncuts = cutmin_fnnparams(fitNdim,eps1pos,fnnpars)
+
+!go into cubic space for the fnn likelihood
+          fnncube = cubize_fnnparams(fitNdim,fnncuts)
+       
+          if (any(fnncube.gt.1._fp).or.any(fnncube.lt.0._fp)) then
+!if outside fnnfits box, the real likelihood is so small that we
+!cannot calculate it numerically, but we can define a junk one smaller
+!than fitLogZero
+             lnew = fitLogZero * 4._fp*sum((fnncube(:)-0.5_fp)**2)
+       
+          else
+
+             lnew = fnnlike_eval(fnncube)
+
+          endif
+
+       endif
+
+    endif
+
+!dump the physical params into cube for file output
+    cube(1:nestdim) = mnpars(1:nestdim)
+
+!+ derived parameters we want to dump too
+    do i=1,nestpars-nestdim
+       cube(nestdim+i) = get_derived(i)
+    enddo
+
+    if (debug) then
+       write(*,*)
+       write(*,*)'fnn_multinest_aspic_loglike: '
+       write(*,*)'lnA= log(eps1)= eps_i=       ',fnnpars
+       write(*,*)'ln(like) =                   ',lnew
+       write(*,*)
+    end if
+
+  end subroutine fnn_multinest_aspic_loglike
+
+
+
+
   subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)    
     use nestparams, only : nestLogZero
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
@@ -580,11 +686,17 @@ contains
 
 
 
+
   subroutine chord_sample_aspic()
     use interfaces_module, only : run_polychord
     use settings_module, only : program_settings
     use chordparams
-    implicit none
+    implicit none    
+    include 'sampl.h'
+
+    procedure(polychord_loglike), pointer :: ptrchord_aspic_loglike => null()
+    
+
     type(program_settings) :: runset
 
     call chord_settings(runset)
@@ -592,17 +704,17 @@ contains
     select case (fastLikeName)
 
     case ('rbf')
-
-       call run_polychord(rbf_polychord_aspic_loglike,polychord_prior,runset)
+       ptrchord_aspic_loglike => rbf_polychord_aspic_loglike
+       ptrchord_prior => rbf_polychord_aspic_prior
 
     case ('shep')
+       ptrchord_aspic_loglike => shep_polychord_aspic_loglike
 
-       call run_polychord(shep_polychord_aspic_loglike,polychord_prior,runset)
-
+    case ('fnn')
+       ptrchord_aspic_loglike => fnn_polychord_aspic_loglike
 
     case ('null')
-       
-       call run_polychord(null_polychord_aspic_loglike,polychord_prior,runset)
+       ptrchord_aspic_loglike => null_polychord_aspic_loglike
 
     case default
 
@@ -610,7 +722,12 @@ contains
 
     end select
 
+    call run_polychord(ptrchord_aspic_loglike,polychord_prior,runset)
+
+    if (associated(ptrchord_aspic_loglike)) ptrchord_aspic_loglike => null()
+
   end subroutine chord_sample_aspic
+
 
 
   function polychord_prior(cube)
@@ -624,6 +741,7 @@ contains
     polychord_prior = uncubize_samplparams(ndim,cube)
 
   end function polychord_prior
+
 
 
 
@@ -779,6 +897,83 @@ contains
 
   end function shep_polychord_aspic_loglike
 
+
+
+
+  function fnn_polychord_aspic_loglike(theta,phi) result(lnew)
+    use chordparams, only : chordLogZero, chordNderived, chordNdim
+    use fnnprec, only : fp
+    use fnnlike, only : cubize_fnnparams, check_fnn
+    use fnnlike, only : fnnlike_eval, cutmin_fnnparams
+    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
+    implicit none   
+    real(fmn) :: lnew
+    real(fmn), dimension(:), intent(in) :: theta
+    real(fmn), dimension(:), intent(out) :: phi
+
+    integer(imn) :: ndim, i
+    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts
+
+    ndim = size(theta,1)
+    if (.not.check_fnn()) stop 'fnn_polychord_aspic_loglike: not initialized!'
+    if (ndim.ne.chordNdim) stop 'fnn_polychord_aspic_loglike: dim mismatch!'
+
+!check for any hard prior in aspic model parameters
+    if (test_aspic_hardprior(theta)) then
+
+       lnew = chordLogZero
+
+    else
+       
+!use aspic to get the slowroll parameters
+       fnnpars = get_slowroll(fitNdim,theta)
+
+! reheating hardprior, those points are ignored
+       if (test_reheating_hardprior(theta)) then
+
+          lnew = chordLogZero
+
+       else
+
+!if eps1<eps1min, the likelihood is flat
+          fnncuts = cutmin_fnnparams(fitNdim,eps1pos,fnnpars)
+
+!go into cubic space for the fnn likelihood
+          fnncube = cubize_fnnparams(fitNdim,fnncuts)
+       
+          if (any(fnncube.gt.1._fp).or.any(fnncube.lt.0._fp)) then
+!if outside fnnfits box, the real likelihood is so small that we
+!cannot calculate it numerically, but we can define a junk one smaller
+!than fitLogZero
+             lnew = fitLogZero * 4._fp*sum((fnncube(:)-0.5_fp)**2)
+       
+          else
+
+             lnew = fnnlike_eval(fnncube)
+
+          endif
+
+       endif
+
+    endif
+
+
+!+ derived parameters we want to dump too
+    do i=1,chordNderived
+       phi(i) = get_derived(i)
+    enddo
+
+
+    if (debug) then
+       write(*,*)
+       write(*,*)'fnn_polychord_aspic_loglike: '
+       write(*,*)'lnA= log(eps1)= eps_i=       ',fnnpars
+       write(*,*)'ln(like) =                   ',lnew
+       write(*,*)
+    end if
+
+  end function fnn_polychord_aspic_loglike
 
 
   
