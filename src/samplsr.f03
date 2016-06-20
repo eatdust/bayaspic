@@ -4,7 +4,7 @@ module samplsr
   use sampl, only : samplNdim, rootName, rootPrefix, rootDir
   use sampl, only : init_samplparams, free_samplparams
   use sampl, only : samplPmin, samplPmax
-  use sampl, only : multinest_loglike, polychord_loglike, polychord_prior
+  use sampl, only : mn_loglike, pc_loglike, pc_prior
   implicit none
 
   private
@@ -17,7 +17,7 @@ module samplsr
   character(len=*), parameter :: filepost = 'shepdata/postcubed.dat'
   character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
-  character(len=*), parameter :: filefnn = 'fnndata/shepdata.dat'
+  character(len=*), parameter :: filefnn = 'fnndata/fnndata.dat'
   character(len=*), parameter :: filefnnbounds = 'fnndata/bounds.dat'
 
   logical, parameter :: display = .true.
@@ -101,6 +101,8 @@ contains
        fitNdim = get_fnn_ndim()
        fitLogZero = get_fnn_fmin()
       
+       print *,'fitNdim',fitndim
+
        call init_samplparams(fitNdim)
 
        do i=1,fitNdim
@@ -230,7 +232,7 @@ contains
     use nestparams
     implicit none
 
-    procedure(multinest_loglike), pointer :: ptrnest_slowroll_loglike => null()
+    procedure(mn_loglike), pointer :: ptrnest_slowroll_loglike => null()
 
     integer(imn) :: nclusters			
     integer(imn) :: context
@@ -375,8 +377,8 @@ contains
     use chordparams
     implicit none
 
-    procedure(polychord_loglike), pointer :: ptrchord_slowroll_loglike => null()
-    procedure(polychord_prior), pointer :: ptrchord_prior => null()
+    procedure(pc_loglike), pointer :: ptrchord_slowroll_loglike => null()
+    procedure(pc_prior), pointer :: ptrchord_prior => null()
 
     type(program_settings) :: runset
 

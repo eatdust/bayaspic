@@ -5,7 +5,7 @@ module samplaspic
   use sampl, only : init_samplparams, free_samplparams
   use sampl, only : uncubize_samplparams
   use sampl, only : samplPmin, samplPmax
-  use sampl, only : multinest_loglike, polychord_loglike, polychord_prior
+  use sampl, only : mn_loglike, pc_loglike, pc_prior
   implicit none
 
   private
@@ -312,7 +312,7 @@ contains
     use nestparams
     implicit none
     
-    procedure(multinest_loglike), pointer :: ptrnest_aspic_loglike => null()
+    procedure(mn_loglike), pointer :: ptrnest_aspic_loglike => null()
 
     integer(imn) :: nclusters			
     integer(imn) :: context
@@ -692,9 +692,8 @@ contains
     use settings_module, only : program_settings
     use chordparams
     implicit none    
-    include 'sampl.h'
 
-    procedure(polychord_loglike), pointer :: ptrchord_aspic_loglike => null()
+    procedure(pc_loglike), pointer :: ptrchord_aspic_loglike => null()
     
 
     type(program_settings) :: runset
@@ -705,7 +704,6 @@ contains
 
     case ('rbf')
        ptrchord_aspic_loglike => rbf_polychord_aspic_loglike
-       ptrchord_prior => rbf_polychord_aspic_prior
 
     case ('shep')
        ptrchord_aspic_loglike => shep_polychord_aspic_loglike

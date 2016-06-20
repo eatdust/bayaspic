@@ -4,12 +4,12 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DMPISCHED
-#-DMPISCHED -DASPICQ
+FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DMPISCHED
+#-DMPISCHED -DASPICQ 
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
-LFLAGS= -lblas -llapack -L/usr/local/lib -laspic
+LFLAGS= -lblas -llapack -ldoublefann -L/usr/local/lib -laspic
 #-laspicq
 
 ##ifort specific
@@ -26,8 +26,9 @@ LIKEDIR = ../fastlikes
 NESTDIR = ../multinest
 CHORDDIR = ../polychord/src/polychord
 
-OBJSLIKE =  rbfprec.o shepprec.o qshepmdata.o iond.o rbfnd.o rbflike.o \
-	qshepmd.o shepnd.o sheplike.o
+OBJSLIKE =  prec.o ioml.o rbfprec.o iorbf.o rbfnd.o rbflike.o \
+	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o \
+	fnnprec.o fann.o fnn.o fnnlike.o
 
 #with -DASPIC
 OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
@@ -64,10 +65,10 @@ nestwrap.o: nestparams.o wraspic.o
 chordparams.o: settings.o
 samplsr.o: settings.o interfaces.o
 
-%.o: $(LIKEDIR)/%.f90
+%.o: $(LIKEDIR)/common/%.f90
 	$(FC) $(FCFLAGS) -c $<
 
-%.o: $(LIKEDIR)/%.F90
+%.o: $(LIKEDIR)/commom/%.F90
 	$(FC) $(FCFLAGS)  -c$<
 
 %.o: $(LIKEDIR)/rbf/%.f90
@@ -107,6 +108,10 @@ samplsr.o: settings.o interfaces.o
 	$(FC) $(FCFLAGS) -c $<
 
 ifeq ($(FC),ifort)
+%.ifort: $(LIKEDIR)/fnn/%.F03
+	$(CPP) $< -o $@
+%.ifort: $(LIKEDIR)/fnn/%.f03
+	$(CPP) $< -o $@
 %.ifort: %.F08
 	$(CPP) $< -o $@
 %.ifort: %.F03
@@ -116,6 +121,10 @@ ifeq ($(FC),ifort)
 %.o: %.ifort
 	$(FC) $(FCFLAGS) -c -free -Tf$< 
 else
+%.o: $(LIKEDIR)/fnn/%.F03
+	$(FC) $(FCFLAGS) -c $<
+%.o: $(LIKEDIR)/fnn/%.f03
+	$(FC) $(FCFLAGS) -c $<
 %.o: %.F08
 	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
 %.o: %.F03

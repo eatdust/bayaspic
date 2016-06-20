@@ -18,31 +18,31 @@ module sampl
 
   abstract interface
 
-     subroutine multinest_loglike(cube,nestdim,nestpars,lnew,context)
+     subroutine mn_loglike(cube,nestdim,nestpars,lnew,context)
        import imn, fmn
        implicit none
        integer(imn) :: nestdim, nestpars
        real(fmn), dimension(nestpars) :: cube
        real(fmn) :: lnew
        integer(imn) :: context,i
-     end subroutine multinest_loglike
+     end subroutine mn_loglike
 
 
-     function polychord_loglike(theta,phi)
+     function pc_loglike(theta,phi)
        import fmn
        implicit none
-       real(fmn) :: polychord_loglike
+       real(fmn) :: pc_loglike
        real(fmn), dimension(:), intent(in) :: theta
        real(fmn), dimension(:), intent(out) :: phi
-     end function polychord_loglike
+     end function pc_loglike
 
 
-     function polychord_prior(cube)
+     function pc_prior(cube)
        import fmn
        implicit none
        real(fmn), dimension(:), intent(in) :: cube
-       real(fmn), dimension(size(cube,1)) :: polychord_prior
-     end function polychord_prior
+       real(fmn), dimension(size(cube,1)) :: pc_prior
+     end function pc_prior
 
   end interface
 
