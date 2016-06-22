@@ -28,7 +28,7 @@ CHORDDIR = ../polychord/src/polychord
 
 OBJSLIKE =  prec.o ioml.o rbfprec.o iorbf.o rbfnd.o rbflike.o \
 	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o \
-	fnnprec.o fann.o fnn.o fnnlike.o
+	fnnprec.o fann.o fnnlike.o
 
 #with -DASPIC
 OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
