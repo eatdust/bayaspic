@@ -23,7 +23,7 @@ module samplaspic
   character(len=*), parameter :: fileshepbounds = 'shepdata/bounds.dat'
 
 
-  character(len=*), parameter :: filefnn = 'fnndata/shepdata.dat'
+  character(len=*), parameter :: filefnn = 'fnndata/fnndata.dat'
   character(len=*), parameter :: filefnnbounds = 'fnndata/bounds.dat'
   
   integer(imn), parameter :: numDerivedParams = 11
