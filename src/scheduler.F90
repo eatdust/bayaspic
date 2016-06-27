@@ -20,6 +20,7 @@ module scheduler
   integer, parameter :: NullAssert = 0
   integer, parameter :: QLockFlag = -1
   integer, parameter :: QStarvFlag = 0
+  integer, parameter :: QInitFlag = 10
 
 
 #ifdef MPISCHED
@@ -111,6 +112,10 @@ contains
 
     call MPI_WIN_ALLOCATE(WinSize,DispSize,MPI_INFO_NULL &
          ,MPI_COMM_WORLD,QrdmaAddress,WinOnQ,code)
+
+    call MPI_PUT(QInitFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
+         ,CountOne,MPI_INTEGER,WinOnQ,code)
+
 
     if (debugLevel.ge.3) then
        write(*,*)
@@ -366,17 +371,8 @@ contains
   subroutine irq_scheduler()
     implicit none
 
-    integer, parameter :: chunk = 1
-    integer, parameter :: minqsize = 1
-    
-
-    integer :: nstarv,nsize,rank,longrank
-    integer, save :: longqsize = huge(1_4)
-
-    logical, save :: aqstarving = .false.
-    integer :: starvrank
-
-    integer :: i
+    integer, save :: chunk = 1    
+    integer :: nsize,rank
     
 !initialization
     rank = get_mpi_rank()
@@ -592,9 +588,16 @@ contains
    
 #ifdef MPISCHED
 
-    WorkAvailable = .false.
-    RunCompleted = .false.
+    call MPI_WIN_LOCK(MPI_LOCK_EXCLUSIVE,rank,NullAssert,WinOnQ,code)
 
+    call MPI_PUT(QStarvFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
+         ,CountOne,MPI_INTEGER,WinOnQ,code)
+
+    call MPI_WIN_UNLOCK(rank,WinOnQ,code)
+
+
+    WorkAvailable = .false.
+    RunCompleted = .false.    
 
     allocate(msg(chunk))
 
