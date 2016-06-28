@@ -683,7 +683,7 @@ contains
 
        if (targrank.eq.rank) cycle
 
-       call MPI_WIN_LOCK(MPI_LOCK_SHARED,targrank,NullAssert,WinOnQ,code)
+       call MPI_WIN_LOCK(MPI_LOCK_EXCLUSIVE,targrank,NullAssert,WinOnQ,code)
        
        call MPI_GET(GetQFlag,CountOne,MPI_INTEGER,targrank,ZeroDisplace &
             ,CountOne,MPI_INTEGER,WinOnQ,code)
@@ -717,7 +717,7 @@ contains
 !otherwise they could still being accessing my RDMA while I am checking
 !their
 
-    call MPI_WIN_LOCK(MPI_LOCK_SHARED,rank,NullAssert,WinOnQ,code)
+    call MPI_WIN_LOCK(MPI_LOCK_EXCLUSIVE,rank,NullAssert,WinOnQ,code)
 
     call MPI_GET(GetQFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
          ,CountOne,MPI_INTEGER,WinOnQ,code)

@@ -1,15 +1,14 @@
 program bayaspic
   use sampl
-!  use nestwrap, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use samplaspic, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use samplaspic, only : chord_init_aspic, chord_sample_aspic, chord_free_aspic
-  use scheduler, only : initialize_scheduler, free_scheduler
+  use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
   use scheduler, only : restore_scheduler, scheduler_save_queue
   implicit none
 
 
-  character(len=*), parameter :: sampler = 'polychord'
+  character(len=*), parameter :: sampler = 'multinest'
 
 
 #ifdef MPISCHED
@@ -25,6 +24,7 @@ program bayaspic
   character(len=lmod), dimension(:), allocatable :: ModelNames
   character(len=lmod) :: name
 
+  integer :: timein, timenow
   logical, parameter :: display = .true.
 
 !restore all processes from previous run
@@ -66,15 +66,15 @@ program bayaspic
 
      call start_scheduling(imodel)
 
-!     call irq_scheduler()
+     call irq_scheduler()
  
      name = modelNames(imodel)
 
      if (display) then
         write(*,*)
-        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
-        write(*,*)'MODEL: ',name,'        RANK= ',mpiRank
-        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++'
+        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
+        write(*,*)'MODEL: ',name,'RANK= ',mpiRank,'   QSIZE= ',scheduled_size()
+        write(*,*)'+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
         write(*,*)
      end if
 
@@ -92,6 +92,14 @@ program bayaspic
         call chord_init_aspic(trim(name))
         call chord_sample_aspic()
         call chord_free_aspic()
+
+     case ('timer')
+
+        timein = time()
+        timenow = timein
+        do while ((timenow-timein).lt.(mpiRank + 1))
+           timenow = time()
+        end do
 
      case default
         stop 'bayaspic: sampler not found!'
