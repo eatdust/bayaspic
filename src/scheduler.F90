@@ -717,8 +717,12 @@ contains
 !otherwise they could still being accessing my RDMA while I am checking
 !their
 
+    call MPI_WIN_LOCK(MPI_LOCK_SHARED,rank,NullAssert,WinOnQ,code)
+
     call MPI_GET(GetQFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
          ,CountOne,MPI_INTEGER,WinOnQ,code)
+
+    call MPI_WIN_UNLOCK(rank,WinOnQ,code)
 
     if (flag) then
        if (nstarv.ne.nsize-1) stop 'check_all_starving: bug!!'
