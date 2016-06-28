@@ -113,11 +113,14 @@ contains
     call MPI_WIN_ALLOCATE(WinSize,DispSize,MPI_INFO_NULL &
          ,MPI_COMM_WORLD,QrdmaAddress,WinOnQ,code)
 
+    call MPI_WIN_LOCK(MPI_LOCK_EXCLUSIVE,rank,NullAssert,WinOnQ,code)
+
     call MPI_PUT(QInitFlag,CountOne,MPI_INTEGER,rank,ZeroDisplace &
          ,CountOne,MPI_INTEGER,WinOnQ,code)
 
+    call MPI_WIN_UNLOCK(rank,WinOnQ,code)
 
-    if (debugLevel.ge.3) then
+    if (debugLevel.ge.minDebug) then
        write(*,*)
        write(*,*)'initialize_scheduler: Opening WIN on rank:',rank
    
@@ -535,7 +538,7 @@ contains
 
           if (debugLevel.ge.MinDebug) then
              write(*,*)
-             write(*,*)'give_nodes:  SENDING INIT  || orig= targ= ',rank,targrank,msg
+             write(*,*)'give_nodes:  SENDING INIT  || orig= targ= msg= ',rank,targrank,msg
           endif
           
           call MPI_SSEND(msg,chunk,MPI_INTEGER,targrank,TagNode,MPI_COMM_WORLD,code)
@@ -633,7 +636,7 @@ contains
        enddo
 
        if (debugLevel.ge.MinDebug) then
-          write(*,*)'steal_nodes: RECEIVED DONE || rank= from= ',rank,fromrank,msg
+          write(*,*)'steal_nodes: RECEIVED DONE || rank= from= msg= ',rank,fromrank,msg
           write(*,*)
        endif
     
