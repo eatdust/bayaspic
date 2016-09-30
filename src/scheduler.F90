@@ -199,7 +199,7 @@ contains
   subroutine restore_saved_queues()
     use iofifo, only : read_queue_vals
     implicit none    
-    type(qval), dimension(:), pointer :: ptrqvals
+    type(qval), dimension(:), pointer :: ptrqvals => null()
 
     integer :: rank, nwork
     integer :: i, qsize
