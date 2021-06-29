@@ -1,17 +1,40 @@
-! Include file for example MultiNest program 'Gaussian Rings' (see arXiv:0704.3704 & arXiv:0809.3437)
+! Include file for example MultiNest program 'Gaussian' (see arXiv:1001.0719)
 
 module params
 implicit none
 
 ! Toy Model Parameters
+	!number of Gaussian components in the mixture model
+	integer num_components
+	parameter(num_components=4)
 
-	!dimensionality
-      	integer sdim
-      	parameter(sdim=2)
+
+	!dimensionality of each Gaussian components in the mixture model
+      	integer ndim_components
+      	parameter(ndim_components=16)
+	
+	!dimensionality of the problem
+	integer sdim
+	parameter(sdim=ndim_components)
       
-      	!priors on the parameters
-      	!uniform priors (-6,6) are used for all dimensions & are set in main.f90
-      	double precision spriorran(sdim,2)
+      	!variance of the Gaussians (same in each direction)
+	double precision variance
+	parameter(variance=0.003)
+	
+	!min & max values of the centers of the Gaussian components
+	double precision center_min, center_max
+	parameter(center_min = 0.5 - 2.0 * (variance**0.5))
+	parameter(center_max = 0.5 + 2.0 * (variance**0.5))
+	
+	!weights of the components in the mixture model
+	double precision alpha(num_components)
+	
+	!centers of the Gaussian components
+	double precision centers(num_components, ndim_components)
+	
+	!seed for setting parameters for Gaussian components
+	integer data_seed
+	parameter(data_seed=-1)
       
 
 
@@ -23,7 +46,7 @@ implicit none
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
- 	parameter(nest_mmodal=.true.)
+ 	parameter(nest_mmodal=.false.)
 	
       	!sample with constant efficiency
 	logical nest_ceff
@@ -31,7 +54,7 @@ implicit none
 	
       	!max no. of live points
       	integer nest_nlive
-	parameter(nest_nlive=500)
+	parameter(nest_nlive=300)
       
       	!tot no. of parameters, should be sdim in most cases but if you need to
       	!store some additional parameters with the actual parameters then
@@ -45,15 +68,15 @@ implicit none
       
       	!evidence tolerance factor
       	double precision nest_tol 
-      	parameter(nest_tol=0.01)
+      	parameter(nest_tol=0.5)
       
       	!enlargement factor reduction parameter
       	double precision nest_efr
-      	parameter(nest_efr=0.5d0)
+      	parameter(nest_efr=0.05d0)
       
       	!root for saving posterior files
       	character*1000 nest_root
-	parameter(nest_root='chains/himmelblau-')
+	parameter(nest_root='chains/gaussian_weinberg_')
 	
 	!after how many iterations feedback is required & the output files should be updated
 	!note: posterior files are updated & dumper routine is called after every updInt*10 iterations
@@ -74,7 +97,7 @@ implicit none
       
       	!whether to resume from a previous run
       	logical nest_resume
-      	parameter(nest_resume=.false.)
+      	parameter(nest_resume=.true.)
       
       	!whether to write output files
       	logical nest_outfile

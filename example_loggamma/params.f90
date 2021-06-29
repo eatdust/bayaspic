@@ -1,17 +1,17 @@
-! Include file for example MultiNest program 'Gaussian Rings' (see arXiv:0704.3704 & arXiv:0809.3437)
+! Include file for example MultiNest program 'Gaussian' (see arXiv:1001.0719)
 
 module params
 implicit none
 
-! Toy Model Parameters
-
-	!dimensionality
-      	integer sdim
-      	parameter(sdim=2)
-      
-      	!priors on the parameters
-      	!uniform priors (-6,6) are used for all dimensions & are set in main.f90
-      	double precision spriorran(sdim,2)
+! Toy Model Parameters 
+	!dimensionality of the problem
+	integer sdim
+	parameter(sdim=20)
+	
+	!min & max values of the centers of the Gaussian components
+	double precision center_min, center_max
+	parameter(center_min = -30d0)
+	parameter(center_max = 30d0)
       
 
 
@@ -23,7 +23,7 @@ implicit none
 	
       	!whether to do multimodal sampling
 	logical nest_mmodal 
- 	parameter(nest_mmodal=.true.)
+ 	parameter(nest_mmodal=.false.)
 	
       	!sample with constant efficiency
 	logical nest_ceff
@@ -31,7 +31,7 @@ implicit none
 	
       	!max no. of live points
       	integer nest_nlive
-	parameter(nest_nlive=500)
+	parameter(nest_nlive=300)
       
       	!tot no. of parameters, should be sdim in most cases but if you need to
       	!store some additional parameters with the actual parameters then
@@ -44,16 +44,16 @@ implicit none
 	parameter(nest_rseed=-1)
       
       	!evidence tolerance factor
-      	double precision nest_tol 
-      	parameter(nest_tol=0.01)
+      	double precision nest_tol
+      	parameter(nest_tol=0.1)
       
       	!enlargement factor reduction parameter
       	double precision nest_efr
-      	parameter(nest_efr=0.5d0)
+      	parameter(nest_efr=0.05d0)
       
       	!root for saving posterior files
       	character*1000 nest_root
-	parameter(nest_root='chains/himmelblau-')
+	parameter(nest_root='chains/gaussian_loggamma_')
 	
 	!after how many iterations feedback is required & the output files should be updated
 	!note: posterior files are updated & dumper routine is called after every updInt*10 iterations
@@ -74,7 +74,7 @@ implicit none
       
       	!whether to resume from a previous run
       	logical nest_resume
-      	parameter(nest_resume=.false.)
+      	parameter(nest_resume=.true.)
       
       	!whether to write output files
       	logical nest_outfile
