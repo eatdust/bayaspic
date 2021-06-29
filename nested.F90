@@ -10,7 +10,7 @@ module Nested
   use priors
   implicit none
 
-#ifdef MPINEST
+#ifdef MPI
   include 'mpif.h'
   integer mpi_status(MPI_STATUS_SIZE), errcode
 #endif
@@ -2577,36 +2577,36 @@ contains
 			!calculate the global evidence & info
 			if(mod(ff,50)==0) then
 				
-				
-				if( IS ) then
-					IS_Z = logZero
-					do j = 1, IS_counter(1)
-						d1 = IS_allpts(j,ndims+1)-log(IS_allpts(j,ndims+2))
-						IS_Z(1) = LogSumExp(IS_Z(1), d1)
-						IS_Z(2) = LogSumExp(IS_Z(2), 2d0*d1)
-					enddo
-					IS_Z(2) = sqrt(exp(IS_Z(2)-2d0*IS_Z(1)) - 1d0/IS_counter(1))
-				endif
+				if(fback) then
+					if( IS ) then
+						IS_Z = logZero
+						do j = 1, IS_counter(1)
+							d1 = IS_allpts(j,ndims+1)-log(IS_allpts(j,ndims+2))
+							IS_Z(1) = LogSumExp(IS_Z(1), d1)
+							IS_Z(2) = LogSumExp(IS_Z(2), 2d0*d1)
+						enddo
+						IS_Z(2) = sqrt(exp(IS_Z(2)-2d0*IS_Z(1)) - 1d0/IS_counter(1))
+					endif
 					
-				if (fback) call gfeedback(gZ,IS,IS_Z,numlike,globff,.false.)
+					call gfeedback(gZ,IS,IS_Z,numlike,globff,.false.)
 				
-				if(debug) then
-					d1=0.d0
-					d2=0.d0
-					j=0
-					do i=1,ic_n
-						if(ic_done(i)) then
+					if(debug) then
+						d1=0.d0
+						d2=0.d0
+						j=0
+						do i=1,ic_n
+							if(ic_done(i)) then
+								j=j+ic_sc(i)
+								cycle
+							endif
+							d1=d1+ic_vnow(i)*ic_volFac(i)
+							d2=d2+sum(sc_vol(j+1:j+ic_sc(i)))
 							j=j+ic_sc(i)
-							cycle
-						endif
-						d1=d1+ic_vnow(i)*ic_volFac(i)
-						d2=d2+sum(sc_vol(j+1:j+ic_sc(i)))
-						j=j+ic_sc(i)
-					enddo
-					write(*,*)ic_n,sc_n,d2/d1,count,scount
-					if(ceff) write(*,*)ic_eff(1:ic_n,4)
+						enddo
+						write(*,*)ic_n,sc_n,d2/d1,count,scount
+						if(ceff) write(*,*)ic_eff(1:ic_n,4)
+					endif
 				endif
-				
 			endif
 			
 			!switch ellipsoidal sampling on if the sum of the volumes of all the
