@@ -1,4 +1,4 @@
-! Do nested sampling algorithm to calculate Bayesian evidence
+!Do nested sampling algorithm to calculate Bayesian evidence
 ! Jul 2015
 ! Farhan Feroz
 
@@ -33,9 +33,9 @@ module Nested
   integer maxIter
   logical fback,resumeFlag,dlive,genLive,dino
   !output files name
-  character(LEN=100)physname,broot,rname,resumename,livename,evname,IS_Files(3)
+  character(LEN=1000)physname,broot,rname,resumename,livename,physbirthname,evname,evbirthname,IS_Files(3)
   !output file units
-  integer u_ev,u_resume,u_phys,u_live,u_IS(3)
+  integer u_ev,u_ev_birth,u_resume,u_phys,u_live,u_phys_birth,u_IS(3)
   double precision gZ,ginfo !total log(evidence) & info
   integer count,sCount
   logical, dimension(:), allocatable :: pWrap
@@ -56,7 +56,7 @@ contains
 	integer nest_ndims,nest_nlive,nest_updInt,context,seed,i
 	integer maxClst,nest_nsc,nest_totPar,nest_nCdims,nest_pWrap(*),nest_maxIter
 	logical nest_IS,nest_mmodal,nest_fb,nest_resume,nest_ceff,nest_outfile,initMPI
-	character(LEN=100) nest_root
+	character(LEN=1000) nest_root
 	double precision nest_tol,nest_ef,nest_Ztol,nest_logZero
 	
 	INTERFACE
@@ -76,7 +76,7 @@ contains
 		end subroutine dumper
 	end INTERFACE
 	
-#ifdef MPINEST
+#ifdef MPI
 	if( initMPI ) then
 		!MPI initializations
 		call MPI_INIT(errcode)
@@ -114,7 +114,7 @@ contains
 			write(*,*)"ERROR: nCdims can not be greater than ndims."
 			write(*,*)"Aborting"
 		endif
-#ifdef MPINEST
+#ifdef MPI
 		call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             	stop
@@ -133,10 +133,14 @@ contains
       		resumename = trim(rname)//'resume.dat'
       		physname = trim(rname)//'phys_live.points'
       		livename = trim(rname)//'live.points'
+      		physbirthname = trim(rname)//'phys_live-birth.txt'
       		evname = trim(rname)//'ev.dat'
+      		evbirthname = trim(rname)//'dead-birth.txt'
       		u_ev=55
+      		u_ev_birth=550
 		u_phys=57
       		u_live=59
+      		u_phys_birth=590
 		u_resume=61
 		
 		if( IS ) then
@@ -177,7 +181,7 @@ contains
 				write(*,*)"ERROR: Can not undersample in constant efficiency mode."
 				write(*,*)"Aborting"
 			endif
-#ifdef MPINEST
+#ifdef MPI
 			call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             		stop
@@ -215,9 +219,9 @@ contains
 		endif
       
 		write(*,*)"*****************************************************"
-		write(*,*)"MultiNest v3.10"
+		write(*,*)"MultiNest v3.12"
       		write(*,*)"Copyright Farhan Feroz & Mike Hobson"
-      		write(*,*)"Release Jul 2015"
+      		write(*,*)"Release Nov 2019"
 		write(*,*)
       		write(*,'(a,i4)')" no. of live points = ",nest_nlive
       		write(*,'(a,i4)')" dimensionality = ",nest_ndims
@@ -232,13 +236,15 @@ contains
 		if(.not.resumeFlag .and. outfile) then
 			open(unit=u_ev,file=evname,status='replace')
 			close(u_ev)
+			open(unit=u_ev_birth,file=evbirthname,status='replace')
+			close(u_ev_birth)
 		endif
 	endif
 	
 	call Nestsample(loglike, dumper, context)
 	deallocate(pWrap)
       	call killRandomNS()
-#ifdef MPINEST
+#ifdef MPI
 	if( initMPI ) call MPI_FINALIZE(errcode)
 #endif
 
@@ -252,10 +258,10 @@ contains
 	
 	integer context
 	double precision, allocatable :: p(:,:), phyP(:,:) !live points
-	double precision, allocatable :: l(:) !log-likelihood
+	double precision, allocatable :: l(:), l0(:) !log-likelihood
 	double precision vnow1!current vol
 	double precision ltmp(totPar+2)
-	character(len=100) fmt
+	character(len=1000) fmt
 	integer np,i,j,k,ios
 	logical flag
 
@@ -278,7 +284,7 @@ contains
 	end INTERFACE
 	
 	
-	allocate( p(ndims,nlive+1), phyP(totPar,nlive+1), l(nlive+1) )
+	allocate( p(ndims,nlive+1), phyP(totPar,nlive+1), l(nlive+1), l0(nlive+1) )
 
 	if(my_rank==0) then
 		np=ndims
@@ -286,7 +292,7 @@ contains
 		numlike=0
 		vnow1=1.d0
 
-		write(fmt,'(a,i5,a)')  '(',np+1,'E28.18)'
+		write(fmt,'(a,i5,a)')  '(',np+1,'E28.18E3)'
 	
 		genLive=.true.
 	
@@ -301,7 +307,7 @@ contains
 				if( j /= nlive ) then
 				  	write(*,*)"ERROR: no. of live points in the resume file is not equal to the the no. passed to nestRun."
 					write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 					stop
@@ -312,7 +318,7 @@ contains
 			if( .not.genLive ) then
 				j = 0
 				open(unit=u_ev,file=evname,status='old') 
-				write(fmt,'(a,i2.2,a)')  '(',totPar+2,'E28.18,i3)'
+				write(fmt,'(a,i2.2,a)')  '(',totPar+2,'E28.18E3,i3)'
 				do
 					read(55,*,IOSTAT=ios) ltmp(1:totPar+2),k
 				
@@ -327,7 +333,7 @@ contains
 				if( j + nlive /= i ) then
 					write(*,*)"ERROR: no. of points in ev.dat file is not equal to the no. specified in resume file."
 					write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 					stop
@@ -340,7 +346,7 @@ contains
 		ginfo=0.d0
 	endif
 
-#ifdef MPINEST
+#ifdef MPI
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(genLive,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -349,6 +355,7 @@ contains
 		if(my_rank==0 .and. fback) write(*,*) 'generating live points'
 		
 		call gen_initial_live(p,phyP,l,loglike,dumper,context)
+        l0=logZero
 	
 		if(my_rank==0 .and. .not.bogus) then
 			globff=nlive
@@ -357,11 +364,11 @@ contains
 		endif
 	endif
 
-#ifdef MPINEST
+#ifdef MPI
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
 	
-	if( .not.bogus ) call clusteredNest(p,phyP,l,loglike,dumper,context)
+	if( .not.bogus ) call clusteredNest(p,phyP,l,l0,loglike,dumper,context)
 	
 	if( my_rank==0 ) then
 		if( .not.bogus ) then
@@ -386,10 +393,10 @@ contains
     
     	integer i,j,iostatus,idum,k,m,nptPerProc,nGen,nstart,nend,context
     	double precision, allocatable :: pnewP(:,:), phyPnewP(:,:), lnewP(:)
-    	double precision p(ndims,nlive+1), phyP(totPar,nlive+1), l(nlive+1)
+    	double precision p(ndims,nlive+1), phyP(totPar,nlive+1), l(nlive+1), ldum
     	integer id
-    	character(len=100) fmt,fmt2
-#ifdef MPINEST
+    	character(len=1000) fmt,fmt1,fmt2
+#ifdef MPI
 	double precision, allocatable ::  tmpl(:), tmpp(:,:), tmpphyP(:,:)
 	integer q
 #endif
@@ -413,7 +420,7 @@ contains
 	
 	
 	allocate( pnewP(ndims,10), phyPnewP(totPar,10), lnewP(10) )
-#ifdef MPINEST
+#ifdef MPI
 	allocate( tmpl(10), tmpp(ndims,10), tmpphyP(totPar,10) )
 #endif
 
@@ -423,8 +430,9 @@ contains
     			open(unit=u_resume,file=resumename,form='formatted',status='replace')
     			write(u_resume,'(l2)')genLive
     			close(u_resume)
-    			write(fmt,'(a,i5,a)')  '(',ndims+1,'E28.18)'
-    			write(fmt2,'(a,i5,a)')  '(',totPar+1,'E28.18,i4)'
+    			write(fmt,'(a,i5,a)')  '(',ndims+1,'E28.18E3)'
+    			write(fmt1,'(a,i5,a)')  '(',totPar+2,'E28.18E3,i4)'
+    			write(fmt2,'(a,i5,a)')  '(',totPar+1,'E28.18E3,i4)'
 		endif
 
     		id=0
@@ -437,13 +445,13 @@ contains
 				open(unit=u_live,file=livename,status='old')
 				do
 	      				i=i+1
-					read(u_live,*,IOSTAT=iostatus) p(:,i),l(i)
+					read(u_live,*,IOSTAT=iostatus) p(:,i),l(i),ldum
 	            			if(iostatus<0) then
 	            				i=i-1
 	                  			if(i>nlive) then
 							write(*,*)"ERROR: more than ",nlive," points in the live points file."
 							write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 							call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 	                        			stop
@@ -463,9 +471,11 @@ contains
 				endif
 	    	
 	      			open(unit=u_live,file=livename,form='formatted',status='old',position='append')
+	      			open(unit=u_phys_birth,file=physbirthname,form='formatted',status='old',position='append')
 	    			open(unit=u_phys,file=physname,form='formatted',status='old',position='append')
 	    		else
 	      			open(unit=u_live,file=livename,form='formatted',status='replace')
+	      			open(unit=u_phys_birth,file=physbirthname,form='formatted',status='replace')
 	    			open(unit=u_phys,file=physname,form='formatted',status='replace')
 				
 				if( IS ) then
@@ -487,7 +497,7 @@ contains
 		nptPerProc = ceiling( dble(nGen) / dble(mpi_nthreads) )
 	endif
 	
-#ifdef MPINEST
+#ifdef MPI
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(nGen,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(nptPerProc,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -500,11 +510,12 @@ contains
 		endif
 		
 		deallocate( pnewP, phyPnewP, lnewP )
-#ifdef MPINEST
+#ifdef MPI
 		deallocate( tmpl, tmpp, tmpphyP )
 #endif
 		if( outfile ) then
 			close(u_live)
+			close(u_phys_birth)
 			close(u_phys)
 		endif
 		
@@ -515,7 +526,7 @@ contains
 			write(*,*)"ERROR: live points files have more live points than required."
 			write(*,*)"Aborting"
 		endif
-#ifdef MPINEST
+#ifdef MPI
             	call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
             	stop
@@ -544,12 +555,12 @@ contains
 				j=0
 			endif
 
-#ifdef MPINEST
+#ifdef MPI
 			call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
 			
 			if(id/=0) then
-#ifdef MPINEST
+#ifdef MPI
 				!send the generated points to the root node
 				call MPI_SEND(lnewP(1:i),i,MPI_DOUBLE_PRECISION,0,id,MPI_COMM_WORLD,errcode)
 				call MPI_SEND(pnewP(1:ndims,1:i),ndims*i,MPI_DOUBLE_PRECISION,0,id,MPI_COMM_WORLD,errcode)
@@ -563,7 +574,7 @@ contains
 				l(nstart:nstart+i-1)=lnewP(1:i)
 				nend=nstart+i-1
 
-#ifdef MPINEST				
+#ifdef MPI				
 				!receive the points from other nodes
 				do m=1,mpi_nthreads-1
 					call MPI_RECV(tmpl(1:i),i,MPI_DOUBLE_PRECISION,m,m,MPI_COMM_WORLD,mpi_status,errcode)
@@ -585,13 +596,14 @@ contains
 					!now write this batch to the files
 					do m=nstart,nend
 						write(u_live,fmt) p(1:ndims,m),l(m)
+						write(u_phys_birth,fmt1) phyP(:,m),l(m),logzero,1
             					write(u_phys,fmt2) phyP(:,m),l(m),1
 					enddo
 				endif
 			endif
 		endif
 
-#ifdef MPINEST
+#ifdef MPI
 		call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
 
@@ -601,17 +613,18 @@ contains
 	
 		
 	deallocate( pnewP, phyPnewP, lnewP )
-#ifdef MPINEST
+#ifdef MPI
 	deallocate( tmpl, tmpp, tmpphyP )
 #endif
 	
 	if( outfile ) then
     		close(u_live)
+    		close(u_phys_birth)
    		close(u_phys)
 	endif
 	genLive=.false.
     	resumeFlag=.false.
-#ifdef MPINEST
+#ifdef MPI
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 #endif
     
@@ -636,7 +649,7 @@ contains
 
 !----------------------------------------------------------------------
   
-  subroutine clusteredNest(p,phyP,l,loglike,dumper,context)
+  subroutine clusteredNest(p,phyP,l,l0,loglike,dumper,context)
   	
 	implicit none
 	
@@ -646,7 +659,7 @@ contains
 	integer context
 	double precision p(ndims,nlive+1) !live points
 	double precision phyP(totPar,nlive+1) !physical live points
-	double precision l(nlive+1) !log-likelihood
+	double precision l(nlive+1),l0(nlive+1) !log-likelihood
 	
 	
 	!work variables
@@ -661,9 +674,9 @@ contains
 	double precision gZOld !global evidence & info
 	logical eswitch,peswitch,cSwitch !whether to do ellipsoidal sampling or not
 	logical remFlag, acpt, flag, flag2
-	integer funit1, funit2 !file units
-	character(len=100) fName1, fName2 !file names
-	character(len=100) fmt,fmt1
+	integer funit1, funit2, funit3 !file units
+	character(len=1000) fName1, fName2, fName3 !file names
+	character(len=1000) fmt,fmt1,fmt2
 	
 	!diagnostics for determining when to do eigen analysis
 	integer neVol
@@ -704,6 +717,7 @@ contains
 	
 	!rejected point info
 	double precision lowlike !lowest log-like
+	double precision lowl0
 	double precision, allocatable :: lowp(:), lowphyP(:) !point with the lowlike
 	integer indx(1) !point no. of lowlike
 	
@@ -745,7 +759,7 @@ contains
 	
 	
 	allocate( eswitchff(maxCls), escount(maxCls), dmin(maxCls) )
-	allocate( evData(updInt,totPar+3) )
+	allocate( evData(updInt,totPar+4) )
 	allocate( ic_sc(maxCls), ic_npt(maxCls) )
 	allocate( ic_done(0:maxCls) )
 	allocate( ic_climits(maxCls,ndims,2), ic_volFac(maxCls) )
@@ -810,7 +824,7 @@ contains
 		sc_evec(maxeCls,ndims,ndims), eveck(maxeCls,ndims,ndims), kfack(maxeCls), &
 		effk(maxeCls), volk(maxeCls), &
  		sc_node(maxeCls),nodek(maxeCls),sck(maxCls))
-		allocate(pt(ndims,nlive), aux(ndims+totPar+4-nCdims,nlive))
+		allocate(pt(ndims,nlive), aux(ndims+totPar+5-nCdims,nlive))
 		allocate(ic_fNode(maxCls),ic_nsc(maxCls),ic_nBrnch(maxCls), &
 		ic_brnch(maxCls,maxCls,2),ic_reme(maxCls),ic_rFlag(maxCls),ic_z(maxCls),ic_zold(maxCls),ic_info(maxCls), &
 		ic_vnow(maxCls),ic_hilike(maxCls),ic_inc(maxCls),ic_chk(maxCls),ic_llimits(maxCls,ndims,2))
@@ -920,7 +934,7 @@ contains
                   			if(i<nlive) then
                   				write(*,*)"ERROR: live points file has less than ",nlive," points."
 						write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         			stop
@@ -930,7 +944,7 @@ contains
 				if(i>nlive) then
 					write(*,*)"ERROR: live points file has greater than ",nlive," points."
 					write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
@@ -940,16 +954,18 @@ contains
 			
     			!read physical-live file
 			open(unit=u_phys,file=physname,status='old')
+			open(unit=u_phys_birth,file=physbirthname,status='old')
 			i=0
 			do
       				i=i+1
+				read(u_phys_birth,*,IOSTAT=iostatus) phyP(1:totPar,i),d1,l0(i),j
 				read(u_phys,*,IOSTAT=iostatus) phyP(1:totPar,i),d1,j
             			if(iostatus<0) then
             				i=i-1
                   			if(i<nlive) then
                   				write(*,*)"ERROR: phys live points file has less than ",nlive," points."
 						write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         			stop
@@ -959,13 +975,14 @@ contains
 				if(i>nlive) then
 					write(*,*)"ERROR: phys live points file has greater than ",nlive," points."
 					write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
 				endif
 			enddo
 			close(u_phys)
+			close(u_phys_birth)
 			
 			!read the IS files
 			if( IS ) then
@@ -986,7 +1003,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(2)
 						write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -1002,7 +1019,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(1)
 						write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -1019,7 +1036,7 @@ contains
 					if(iostatus<0) then
 						write(*,*)"ERROR: Not enough points in ",IS_Files(3)
 						write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
 						stop
@@ -1066,7 +1083,7 @@ contains
 		enddo
 	endif
     	
-#ifdef MPINEST
+#ifdef MPI
 	call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(ic_n,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 	call MPI_BCAST(ic_npt(1:ic_n),ic_n,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -1074,7 +1091,7 @@ contains
 		
 	do ff=1,maxIter
 
-#ifdef MPINEST
+#ifdef MPI
     		call MPI_BARRIER(MPI_COMM_WORLD,errcode)
     		call MPI_BCAST(ic_done(0:ic_n),ic_n+1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif	
@@ -1086,25 +1103,25 @@ contains
 	                        	!write the resume file
 	                        	funit1=u_resume
 					fName1=resumename
-	                        	write(fmt,'(a,i5,a)')  '(',totPar+1,'E28.18,i4)'
+	                        	write(fmt,'(a,i5,a)')  '(',totPar+1,'E28.18E3,i4)'
 					open(unit=funit1,file=fName1,form='formatted',status='replace')
 					write(funit1,'(l2)').false.
 					write(funit1,'(4i12)')globff,numlike,ic_n,nlive
-					write(funit1,'(2E28.18)')gZ,ginfo
+					write(funit1,'(2E28.18E3)')gZ,ginfo
 					write(funit1,'(l2)')eswitch
 	            			!write branching info
 		            		do i=1,ic_n
 	            				write(funit1,'(i4)')ic_nBrnch(i)
 						if(ic_nBrnch(i)>0) then
-							write(fmt,'(a,i5,a)')  '(',2*ic_nBrnch(i),'E28.18)'
+							write(fmt,'(a,i5,a)')  '(',2*ic_nBrnch(i),'E28.18E3)'
 							write(funit1,fmt)ic_brnch(i,1:ic_nBrnch(i),1),ic_brnch(i,1:ic_nBrnch(i),2)
 						endif
 					enddo
 					!write the node info
 					do i=1,ic_n
 						write(funit1,'(2l2,i6,i12)')ic_done(i),ic_reme(i),ic_fNode(i),ic_npt(i)
-						write(funit1,'(3E28.18)')ic_vnow(i),ic_Z(i),ic_info(i)
-						if(ceff) write(funit1,'(1E28.18)')ic_eff(i,4)
+						write(funit1,'(3E28.18E3)')ic_vnow(i),ic_Z(i),ic_info(i)
+						if(ceff) write(funit1,'(1E28.18E3)')ic_eff(i,4)
 					enddo
 	                  		close(funit1)
 				endif
@@ -1185,10 +1202,11 @@ contains
 !				endif
 				
 				!aux information to be re-arranged with the live points
-				naux=ndims+totPar+1-nCdim
+				naux=ndims+totPar+2-nCdim
 				aux(1,1:nlive)=l(1:nlive)
-				aux(2:totPar+1,1:nlive)=phyP(1:totPar,1:nlive)
-				aux(totPar+2:naux,1:nlive)=p(nCdim+1:ndims,1:nlive)
+				aux(2,1:nlive)=l0(1:nlive)
+				aux(3:totPar+2,1:nlive)=phyP(1:totPar,1:nlive)
+				aux(totPar+3:naux,1:nlive)=p(nCdim+1:ndims,1:nlive)
 				
 				!save old no. of modes
 				i=ic_n
@@ -1208,8 +1226,9 @@ contains
 				if(modeFound) then			
 					!re-arrange info
 					l(1:nlive)=aux(1,1:nlive)
-					phyP(1:totPar,1:nlive)=aux(2:totPar+1,1:nlive)
-					p(nCdim+1:ndims,1:nlive)=aux(totPar+2:naux,1:nlive)
+					l0(1:nlive)=aux(2,1:nlive)
+					phyP(1:totPar,1:nlive)=aux(3:totPar+2,1:nlive)
+					p(nCdim+1:ndims,1:nlive)=aux(totPar+3:naux,1:nlive)
 					
 					if(nCdims<ndims .or. .true.) then
 						ic_sc(i+1:ic_n)=1
@@ -1409,7 +1428,7 @@ contains
 						flag=.false.
 						
 						!aux information to be re-arranged with the live points
-						naux=totPar+2
+						naux=totPar+3
 						!rescaling
 						do i3=1,ndims
 							!rescale back into unit hypercube
@@ -1427,7 +1446,8 @@ contains
 							pt(i3,1:ic_npt(i1))=(pt(i3,1:ic_npt(i1))-ic_llimits(i1,i3,1))/d4
 						enddo
 						aux(1,1:ic_npt(i1))=l(m+1:m+ic_npt(i1))
-						aux(2:totPar+1,1:ic_npt(i1))=phyP(1:totPar,m+1:m+ic_npt(i1))
+						aux(2,1:ic_npt(i1))=l0(m+1:m+ic_npt(i1))
+						aux(3:totPar+2,1:ic_npt(i1))=phyP(1:totPar,m+1:m+ic_npt(i1))
 						lowlike=minval(l(m+1:m+ic_npt(i1)))
 						aux(naux,1:ic_npt(i1))=(l(m+1:m+ic_npt(i1))-lowlike)/(ic_hilike(i1)-lowlike)
 						
@@ -1533,7 +1553,8 @@ contains
 						!aux information to be re-arranged with the live points
 						p(:,m+1:m+ic_npt(i1))=pt(:,1:ic_npt(i1))
 						l(m+1:m+ic_npt(i1))=aux(1,1:ic_npt(i1))
-						phyP(1:totPar,m+1:m+ic_npt(i1))=aux(2:totPar+1,1:ic_npt(i1))
+						l0(m+1:m+ic_npt(i1))=aux(2,1:ic_npt(i1))
+						phyP(1:totPar,m+1:m+ic_npt(i1))=aux(3:totPar+2,1:ic_npt(i1))
 					else
 						sck(i1)=ic_sc(i1)
 						meank(n+1:n+sck(i1),:)=sc_mean(q+1:q+sck(i1),:)
@@ -1581,7 +1602,7 @@ contains
 		
 		
             	if(my_rank==0 .and. eswitch .and. sc_n==0) eswitch=.false.
-#ifdef MPINEST
+#ifdef MPI
 		call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(eswitch,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 		call MPI_BCAST(flag2,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -1769,6 +1790,7 @@ contains
 		      			lowlike=l(indx(1))
 					lowp(:)=p(:,indx(1))
 					lowphyP(:)=phyP(:,indx(1))
+                    lowl0 = l0(indx(1))
 					
 					!set the limits
 					do i3=1,ndims
@@ -1802,7 +1824,7 @@ contains
 	            			acpt=.false.
 					do
 						if(my_rank==0) remFlag=remain(nd)
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(remFlag,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -1820,7 +1842,7 @@ contains
 								
 								if( lnew == HUGE(1d0) ) bogus = .true.
 							endif
-#ifdef MPINEST
+#ifdef MPI
 							call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 							!now send the points to the root node
 							if(my_rank/=0) then
@@ -1893,7 +1915,7 @@ contains
 							enddo
 						endif
 					
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(acpt,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -1906,6 +1928,7 @@ contains
 	                  			p(:,indx(1))=pnew(:)
 	                  			phyP(:,indx(1))=phyPnew(:)
 	                  			l(indx(1))=lnew
+                                l0(indx(1)) = lowlike
 						if(lnew>ic_hilike(nd)) ic_hilike(nd)=lnew
 						
 						!set the limits
@@ -1946,7 +1969,7 @@ contains
 					acpt=.false.
 					do
 						if(my_rank==0) remFlag=remain(nd)
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(remFlag,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 #endif
@@ -1985,7 +2008,7 @@ contains
 								
 								if( IS ) IS_iterinfo(globff+1,4) = IS_iterinfo(globff+1,4) + n
 							endif
-#ifdef MPINEST
+#ifdef MPI
 							call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 							!now send the points to the root node
 							if(my_rank/=0) then
@@ -2105,7 +2128,7 @@ contains
 							enddo
 						endif
 					
-#ifdef MPINEST
+#ifdef MPI
 						call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(acpt,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
 						call MPI_BCAST(bogus,1,MPI_LOGICAL,0,MPI_COMM_WORLD,errcode)
@@ -2219,6 +2242,7 @@ contains
 							p(:,indx(1):nd_j+ic_npt(nd)-1)=p(:,indx(1)+1:nd_j+ic_npt(nd))
 							phyP(:,indx(1):nd_j+ic_npt(nd)-1)=phyP(:,indx(1)+1:nd_j+ic_npt(nd))
 							l(indx(1):nd_j+ic_npt(nd)-1)=l(indx(1)+1:nd_j+ic_npt(nd))
+							l0(indx(1):nd_j+ic_npt(nd)-1)=l0(indx(1)+1:nd_j+ic_npt(nd))
 						endif
 						sc_npt(q)=sc_npt(q)-1
 						
@@ -2269,7 +2293,7 @@ contains
 						endif
 					endif
 				
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_BARRIER(MPI_COMM_WORLD,errcode)
 					call MPI_BCAST(q,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
 					call MPI_BCAST(i,1,MPI_INTEGER,0,MPI_COMM_WORLD,errcode)
@@ -2302,10 +2326,12 @@ contains
 						p(:,n1+1:nd_j+ic_npt(nd))=p(:,n1:nd_j+ic_npt(nd)-1)
 						phyP(:,n1+1:nd_j+ic_npt(nd))=phyP(:,n1:nd_j+ic_npt(nd)-1)
 						l(n1+1:nd_j+ic_npt(nd))=l(n1:nd_j+ic_npt(nd)-1)
+						l0(n1+1:nd_j+ic_npt(nd))=l0(n1:nd_j+ic_npt(nd)-1)
 						!insert the new point
 						p(:,n1)=pnew(:)
 						phyP(:,n1)=phyPnew(:)
 						l(n1)=lnew
+						l0(n1)=lowlike
 						!increment no. of points in sub-cluster i
 						sc_npt(i)=sc_npt(i)+1
 					endif
@@ -2329,8 +2355,9 @@ contains
 					j1=mod(sff-1,updInt)+1
 					evData(j1,1:totPar)=lowphyP(1:totPar)
 					evData(j1,totPar+1)=lowlike
-					evData(j1,totPar+2)=log(h)
-					evData(j1,totPar+3)=dble(nd)
+					evData(j1,totPar+2)=lowl0
+					evData(j1,totPar+3)=log(h)
+					evData(j1,totPar+4)=dble(nd)
 					
 					lowlike=minval(l(nd_j+1:nd_j+ic_npt(nd)))
 				
@@ -2360,39 +2387,49 @@ contains
 							allocate( evDataTemp(k) )
 							evDataTemp=evDataAll
 							deallocate( evDataAll )
-							allocate( evDataAll(k+j1*(totPar+3)) )
+							allocate( evDataAll(k+j1*(totPar+4)) )
 							evDataAll(1:k)=evDataTemp(1:k)
 							deallocate( evDataTemp )
 						else
 							deallocate( evDataAll )
-							allocate( evDataAll(j1*(totPar+3)) )
+							allocate( evDataAll(j1*(totPar+4)) )
 						endif
 						do i=1,j1
-    							evDataAll(k+1:k+totPar+3) = evData(i,1:totPar+3)
-							k=k+totPar+3
+    							evDataAll(k+1:k+totPar+4) = evData(i,1:totPar+4)
+							k=k+totPar+4
 						enddo
 					else
 						!write the evidence file
 						funit1=u_ev
 						fName1=evname
+						funit2=u_ev_birth
+						fName2=evbirthname
 						open(unit=funit1,file=fName1,form='formatted',status='old', position='append')
-	    					write(fmt,'(a,i5,a)')  '(',totPar+2,'E28.18,i5)'	
+						open(unit=funit2,file=fName2,form='formatted',status='old', position='append')
+	    					write(fmt,'(a,i5,a)')  '(',totPar+2,'E28.18E3,i5)'	
+	    					write(fmt1,'(a,i5,a)')  '(',totPar+3,'E28.18E3,i5)'	
 						do i=1,j1
-	    						write(funit1,fmt) evData(i,1:totPar+2),int(evData(i,totPar+3))
+	    						write(funit1,fmt) evData(i,1:totPar+1),evData(i,totPar+3),int(evData(i,totPar+4))
+	    						write(funit2,fmt1) evData(i,1:totPar+3),int(evData(i,totPar+4))
 						enddo
 						!close the files
 						close(funit1)
+                        close(funit2)
 					
 		                		!write the live file
 						funit1=u_phys
 						fName1=physname
 						funit2=u_live
 						fName2=livename
+						funit3=u_phys_birth
+						fName3=physbirthname
 						open(unit=funit1,file=fName1,form='formatted',status='replace')
 						open(unit=funit2,file=fName2,form='formatted',status='replace')
+						open(unit=funit3,file=fName3,form='formatted',status='replace')
 	                		
-						write(fmt,'(a,i5,a)')  '(',totPar+1,'E28.18,i4)'
-	                			write(fmt1,'(a,i5,a)')  '(',ndims+1,'E28.18)'
+						write(fmt,'(a,i5,a)')  '(',totPar+1,'E28.18E3,i4)'
+	                			write(fmt1,'(a,i5,a)')  '(',ndims+1,'E28.18E3)'
+                        write(fmt2,'(a,i5,a)')  '(',totPar+2,'E28.18E3,i4)'
 						k=0
 						do i=1,ic_n
 							do j=1,ic_npt(i)
@@ -2400,11 +2437,13 @@ contains
 								write(funit1,fmt) phyP(1:totPar,k),l(k),i
 								lPts(1:ndims) = ic_climits(i,1:ndims,1)+(ic_climits(i,1:ndims,2)-ic_climits(i,1:ndims,1))*p(1:ndims,k)
 								write(funit2,fmt1) lPts(1:ndims),l(k)
+								write(funit3,fmt2) phyP(1:totPar,k),l(k),l0(k),i
 							enddo
 	                			enddo
 						!close the files
 						close(funit1)
 						close(funit2)
+						close(funit3)
 						
                   	
 	                  			!write the resume file
@@ -2414,14 +2453,14 @@ contains
 	                	  	
 						write(funit1,'(l2)')genLive
 						write(funit1,'(4i12)')globff,numlike,ic_n,nlive
-						write(funit1,'(2E28.18)')gZ,ginfo
+						write(funit1,'(2E28.18E3)')gZ,ginfo
 						write(funit1,'(l2)')eswitch
 					
 	            				!write branching info
 		            			do i=1,ic_n
 	            					write(funit1,'(i4)')ic_nBrnch(i)
 							if(ic_nBrnch(i)>0) then
-								write(fmt,'(a,i5,a)')  '(',2*ic_nBrnch(i),'E28.18)'
+								write(fmt,'(a,i5,a)')  '(',2*ic_nBrnch(i),'E28.18E3)'
 								write(funit1,fmt)ic_brnch(i,1:ic_nBrnch(i),1), ic_brnch(i,1:ic_nBrnch(i),2)
 							endif
 						enddo
@@ -2429,8 +2468,8 @@ contains
 						!write the node info
 						do i=1,ic_n
 							write(funit1,'(2l2,i6,i12)')ic_done(i),ic_reme(i),ic_fNode(i),ic_npt(i)
-							write(funit1,'(3E28.18)')ic_vnow(i),ic_Z(i),ic_info(i)
-							if(ceff) write(funit1,'(1E28.18)')ic_eff(i,4)
+							write(funit1,'(3E28.18E3)')ic_vnow(i),ic_Z(i),ic_info(i)
+							if(ceff) write(funit1,'(1E28.18E3)')ic_eff(i,4)
 						enddo
 	                  			close(funit1)
 						
@@ -2805,7 +2844,7 @@ contains
 	write(*,'(a,i14)')   	     'Replacements:                     ',nacc
 	write(*,'(a,i14)')   	     'Total Samples:                    ',nlike
 	write(*,'(a,F14.6)')	     'Nested Sampling ln(Z):            ',logZ
-	if( IS ) write(*,'(a,F14.6,a,F10.6)')'Importance Nested Sampling ln(Z): ',IS_Z(1), ' +/-', IS_Z(2)
+	if( IS ) write(*,'(a,F14.6)')'Importance Nested Sampling ln(Z): ',IS_Z(1)
 	if(dswitch) write(*,'(a,i5)')'Total No. of Live Points:         ',nlive
     
   end subroutine gfeedback
@@ -3119,7 +3158,7 @@ contains
 					write(*,*)"ERROR: More modes found than allowed memory."
 					write(*,*)"Increase maxmodes in the call to nestrun and run MultiNest again."
 					write(*,*)"Aborting"
-#ifdef MPINEST
+#ifdef MPI
 					call MPI_ABORT(MPI_COMM_WORLD,errcode)
 #endif
                         		stop
