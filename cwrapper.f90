@@ -114,7 +114,7 @@ module cnested
    	type(c_funptr),  intent(in), value :: loglike, dumper
 	type(c_ptr),     intent(in) :: context
 
-	character(len=100) :: fnest_root
+	character(len=1000) :: fnest_root
 	integer :: i, context_f
 
 	fnest_root = ' '
