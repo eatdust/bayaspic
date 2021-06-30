@@ -11,10 +11,8 @@ module aspicmodels
 
 !if xend is the last model parameter
   logical, save :: xEndIsParam = .false.
-!if xini or xuv is a model parameter
-  logical, save :: xIniIsParam = .false.
 
-!number of aspic parameters + xend if required
+!number of aspic parameters including xend
   integer, save :: numAspicParams = 0
 
   procedure(zerop_x_rrad), pointer :: ptrzerop_x_rrad => null()
@@ -29,9 +27,6 @@ module aspicmodels
   procedure(threep_x_rrad), pointer :: ptrthreep_x_rrad => null()
   procedure(threep_x_rreh), pointer :: ptrthreep_x_rreh => null()
   procedure(threep_x_rhow), pointer :: ptrthreep_x_rhow => null()
-  procedure(fourp_x_rrad), pointer :: ptrfourp_x_rrad => null()
-  procedure(fourp_x_rreh), pointer :: ptrfourp_x_rreh => null()
-  procedure(fourp_x_rhow), pointer :: ptrfourp_x_rhow => null()
 
   procedure(zerop_norm_potential), pointer :: ptrzerop_norm_potential => null()
   procedure(zerop_epsilon_one), pointer :: ptrzerop_epsilon_one => null()
@@ -85,7 +80,7 @@ contains
     select case (trim(name))
 
 !reminder: cpp is only used in "traditional mode" for fortran
-#define ZEROPP_PURE(fooi) \
+#define ZERO(fooi) \
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
@@ -95,22 +90,10 @@ contains
        ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        ptrzerop_x_endinf => fooi/**/_x_endinf ; \
+       xEndIsParam = .false. ; \
        numAspicParams = 0
 
-#define ZEROPP_XEND(fooi) \
-    case ('fooi'); \
-       ptronep_x_rrad => fooi/**/_x_rrad ; \
-       ptronep_x_rreh => fooi/**/_x_rreh ; \
-       ptronep_x_rhow => fooi/**/_x_star ; \
-       ptrzerop_norm_potential => fooi/**/_norm_potential ; \
-       ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
-       ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
-       ptrzerop_x_endinf => null() ; \
-       xEndIsParam = .true. ; \
-       numAspicParams = 1
-
-#define ONEPP_PURE(fooi) \
+#define ONE(fooi) \
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
@@ -119,65 +102,55 @@ contains
        ptronep_epsilon_one => fooi/**/_epsilon_one ; \
        ptronep_epsilon_two => fooi/**/_epsilon_two ; \
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .false. ; \
        ptronep_x_endinf => fooi/**/_x_endinf ; \
        numAspicParams = 1
 
 
-#define ONEPP_XEND(fooi) \
+#define ONE_XEND(fooi) \
     case ('fooi'); \
+       ptrzerop_x_rrad => fooi/**/_x_rrad ; \
+       ptrzerop_x_rreh => fooi/**/_x_rreh ; \
+       ptrzerop_x_rhow => fooi/**/_x_star ; \
+       ptrzerop_norm_potential => fooi/**/_norm_potential ; \
+       ptrzerop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrzerop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .true. ; \
+       ptrzerop_x_endinf => null() ; \
+       numAspicParams = 1
+
+       
+
+#define TWO(fooi) \
+    case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
        ptrtwop_x_rhow => fooi/**/_x_star ; \
+       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
+       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .false. ; \
+       ptrtwop_x_endinf => fooi/**/_x_endinf ; \
+       numAspicParams = 2
+
+       
+#define TWO_XEND(fooi) \
+    case ('fooi') ; \
+       ptronep_x_rrad => fooi/**/_x_rrad ; \
+       ptronep_x_rreh => fooi/**/_x_rreh ; \
+       ptronep_x_rhow => fooi/**/_x_star ; \
        ptronep_norm_potential => fooi/**/_norm_potential ; \
        ptronep_epsilon_one => fooi/**/_epsilon_one ; \
        ptronep_epsilon_two => fooi/**/_epsilon_two ; \
-       ptronep_epsilon_three => fooi/**/_epsilon_three ;\
+       ptronep_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .true. ; \
        ptronep_x_endinf => null() ; \
-       xEndIsParam = .true. ;\
-       numAspicParams = 2
-
-#define TWOPP_PURE(fooi) \
-    case ('fooi') ; \
-       ptrtwop_x_rrad => fooi/**/_x_rrad ; \
-       ptrtwop_x_rreh => fooi/**/_x_rreh ; \
-       ptrtwop_x_rhow => fooi/**/_x_star ; \
-       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
-       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
-       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrtwop_epsilon_three => fooi/**/_epsilon_three; \
-       ptrtwop_x_endinf => fooi/**/_x_endinf; \
-       xEndIsParam = .false. ;\
-       numAspicParams = 2
-
-#define TWOPP_XEND(fooi) \
-    case ('fooi') ; \
-       ptrthreep_x_rrad => fooi/**/_x_rrad ; \
-       ptrthreep_x_rreh => fooi/**/_x_rreh ; \
-       ptrthreep_x_rhow => fooi/**/_x_star ; \
-       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
-       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
-       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrtwop_epsilon_three => fooi/**/_epsilon_three ;\
-       ptrtwop_x_endinf => null() ; \
-       xEndIsParam = .true. ;\
-       numAspicParams = 3
-
-#define TWOPP_XEND_XINI(fooi) \
-    case ('fooi') ; \
-       ptrthreep_x_rrad => fooi/**/_x_rrad ; \
-       ptrthreep_x_rreh => fooi/**/_x_rreh ; \
-       ptrthreep_x_rhow => fooi/**/_x_star ; \
-       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
-       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
-       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrtwop_epsilon_three => fooi/**/_epsilon_three ;\
-       ptrtwop_x_endinf => null() ; \
-       xEndIsParam = .true. ;\
-       xIniIsParam = .true. ;\
-       numAspicParams = 4
+       numAspicParams = 2       
 
 
-#define THREEPP_PURE(fooi) \
+#define THREE(fooi) \
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
@@ -185,35 +158,33 @@ contains
        ptrthreep_norm_potential => fooi/**/_norm_potential ; \
        ptrthreep_epsilon_one => fooi/**/_epsilon_one ; \
        ptrthreep_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrthreep_epsilon_three => fooi/**/_epsilon_three; \
-       ptrthreep_x_endinf => fooi/**/_x_endinf; \
-       xEndIsParam = .false. ;\
+       ptrthreep_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .false. ; \
+       ptrthreep_x_endinf => fooi/**/_x_endinf ; \
        numAspicParams = 3
 
-#define THREEPP_XEND(fooi) \
+       
+#define THREE_XEND(fooi) \
     case ('fooi') ; \
-       ptrfourp_x_rrad => fooi/**/_x_rrad ; \
-       ptrfourp_x_rreh => fooi/**/_x_rreh ; \
-       ptrfourp_x_rhow => fooi/**/_x_star ; \
-       ptrfourp_norm_potential => fooi/**/_norm_potential ; \
-       ptrthreep_epsilon_one => fooi/**/_epsilon_one ; \
-       ptrthreep_epsilon_two => fooi/**/_epsilon_two ; \
-       ptrthreep_epsilon_three => fooi/**/_epsilon_three ;\
-       ptrthreep_x_endinf => null() ; \
-       xEndIsParam = .true. ;\
-       numAspicParams = 4
-
+       ptrtwop_x_rrad => fooi/**/_x_rrad ; \
+       ptrtwop_x_rreh => fooi/**/_x_rreh ; \
+       ptrtwop_x_rhow => fooi/**/_x_star ; \
+       ptrtwop_norm_potential => fooi/**/_norm_potential ; \
+       ptrtwop_epsilon_one => fooi/**/_epsilon_one ; \
+       ptrtwop_epsilon_two => fooi/**/_epsilon_two ; \
+       ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
+       xEndIsParam = .true. ; \
+       ptrtwop_x_endinf => null() ; \
+       numAspicParams = 3
+       
 
 #include "aspicmodels.pp"
-#undef ZEROPP_PURE
-#undef ZEROPP_XEND
-#undef ONEPP_PURE
-#undef ONEPP_XEND
-#undef TWOPP_PURE
-#undef TWOPP_XEND
-#undef TWOPP_XEND_XINI
-#undef THREEPP_PURE
-#undef THREEPP_XEND
+#undef ONE
+#undef ONE_XEND       
+#undef TWO
+#undef TWO_XEND
+#undef THREE
+#undef THREE_XEND
 
 
     case default
@@ -295,9 +266,6 @@ contains
     if (associated(ptrthreep_x_rrad)) ptrthreep_x_rrad => null()
     if (associated(ptrthreep_x_rreh)) ptrthreep_x_rreh => null()
     if (associated(ptrthreep_x_rhow)) ptrthreep_x_rhow => null()
-    if (associated(ptrfourp_x_rrad)) ptrfourp_x_rrad => null()
-    if (associated(ptrfourp_x_rreh)) ptrfourp_x_rreh => null()
-    if (associated(ptrfourp_x_rhow)) ptrfourp_x_rhow => null()
 
     CheckAspicPtrs = .false.
 
@@ -305,34 +273,30 @@ contains
 
 
 
-  function aspic_x_rrad(name,params,lnRrad,Pstar,bfoldstar)
+  function aspic_x_rrad(name,params,xend,lnRrad,Pstar,bfoldstar)
     implicit none
     real(kp) :: aspic_x_rrad
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
-    real(kp), intent(in) :: lnRrad, Pstar
+    real(kp), intent(in) :: xend, lnRrad, Pstar
     real(kp), optional, intent(out) :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
    
     if (associated(ptrzerop_x_rrad)) then
-       aspic_x_rrad = ptrzerop_x_rrad(lnRrad,Pstar,bfoldstar)
+       aspic_x_rrad = ptrzerop_x_rrad(xend,lnRrad,Pstar,bfoldstar)
 
     elseif (associated(ptronep_x_rrad)) then
-       aspic_x_rrad = ptronep_x_rrad(params(1),lnRrad,Pstar,bfoldstar)
+       aspic_x_rrad = ptronep_x_rrad(params(1),xend,lnRrad,Pstar,bfoldstar)
 
     elseif (associated(ptrtwop_x_rrad)) then
        aspic_x_rrad = ptrtwop_x_rrad(params(1),params(2) &
-            ,lnRrad,Pstar,bfoldstar)
+            ,xend,lnRrad,Pstar,bfoldstar)
 
     elseif (associated(ptrthreep_x_rrad)) then
        aspic_x_rrad = ptrthreep_x_rrad(params(1),params(2) &
-            ,params(3),lnRrad,Pstar,bfoldstar)
+            ,params(3),xend,lnRrad,Pstar,bfoldstar)
     
-    elseif (associated(ptrfourp_x_rrad)) then
-       aspic_x_rrad = ptrfourp_x_rrad(params(1),params(2) &
-            ,params(3),params(4),lnRrad,Pstar,bfoldstar)
-
     else
        stop 'aspic_x_rrad: wrong nparams!'
     end if
@@ -341,33 +305,29 @@ contains
 
 
 
-  function aspic_x_rreh(name,params,lnRreh,bfoldstar)
+  function aspic_x_rreh(name,params,xend,lnRreh,bfoldstar)
     implicit none
     real(kp) :: aspic_x_rreh
     character(len=*), intent(in) :: name
-    real(kp), dimension(:), intent(in) :: params
-    real(kp), intent(in) :: lnRreh
+    real(kp), dimension(:), intent(in) :: params   
+    real(kp), intent(in) :: xend, lnRreh
     real(kp), intent(out), optional :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
     if (associated(ptrzerop_x_rreh)) then
-       aspic_x_rreh = ptrzerop_x_rreh(lnRreh,bfoldstar)
+       aspic_x_rreh = ptrzerop_x_rreh(xend,lnRreh,bfoldstar)
 
     elseif (associated(ptronep_x_rreh)) then
-       aspic_x_rreh = ptronep_x_rreh(params(1),lnRreh,bfoldstar)
+       aspic_x_rreh = ptronep_x_rreh(params(1),xend,lnRreh,bfoldstar)
 
     elseif (associated(ptrtwop_x_rreh)) then
        aspic_x_rreh = ptrtwop_x_rreh(params(1),params(2) &
-            ,lnRreh,bfoldstar)
+            ,xend,lnRreh,bfoldstar)
     
     elseif (associated(ptrthreep_x_rreh)) then
        aspic_x_rreh = ptrthreep_x_rreh(params(1),params(2) &
-            ,params(3),lnRreh,bfoldstar)
-
-    elseif (associated(ptrfourp_x_rreh)) then
-       aspic_x_rreh = ptrfourp_x_rreh(params(1),params(2) &
-            ,params(3),params(4),lnRreh,bfoldstar)
+            ,params(3),xend,lnRreh,bfoldstar)
 
     else
        stop 'aspic_x_rreh: wrong nparams!'
@@ -377,33 +337,29 @@ contains
 
 
 
-  function aspic_x_rhow(name,params,lnRhoReh,w,Pstar,bfoldstar)
+  function aspic_x_rhow(name,params,xend,w,lnRhoReh,Pstar,bfoldstar)
     implicit none
     real(kp) :: aspic_x_rhow
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
-    real(kp), intent(in) :: lnRhoReh,w,Pstar
+    real(kp), intent(in) :: xend,w,lnRhoReh,Pstar
     real(kp), intent(out), optional :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
     if (associated(ptrzerop_x_rhow)) then
-       aspic_x_rhow = ptrzerop_x_rhow(w,lnrhoReh,Pstar,bfoldstar)
+       aspic_x_rhow = ptrzerop_x_rhow(xend,w,lnrhoReh,Pstar,bfoldstar)
 
     elseif (associated(ptronep_x_rhow)) then
-       aspic_x_rhow = ptronep_x_rhow(params(1),w,lnRhoReh,Pstar,bfoldstar)
+       aspic_x_rhow = ptronep_x_rhow(params(1),xend,w,lnRhoReh,Pstar,bfoldstar)
 
     elseif (associated(ptrtwop_x_rhow)) then
        aspic_x_rhow = ptrtwop_x_rhow(params(1),params(2) &
-            ,w,lnRhoReh,Pstar,bfoldstar)
+            ,xend,w,lnRhoReh,Pstar,bfoldstar)
     
     elseif (associated(ptrthreep_x_rhow)) then
        aspic_x_rhow = ptrthreep_x_rhow(params(1),params(2) &
-            ,params(3),w,lnRhoReh,Pstar,bfoldstar)
-
-    elseif (associated(ptrfourp_x_rhow)) then
-       aspic_x_rhow = ptrfourp_x_rhow(params(1),params(2) &
-            ,params(3),params(4),w,lnRhoReh,Pstar,bfoldstar)
+            ,params(3),xend,w,lnRhoReh,Pstar,bfoldstar)
 
     else
        stop 'aspic_x_rhow: wrong nparams!'
@@ -560,15 +516,11 @@ contains
     
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
 
-!if xini is a parameter, it is the last one and xend the before to
-!last. Otherwise, xend is the last one.
+!when xend is present it is the the last one.
        
     if (xEndIsParam) then
-       if (xIniIsParam) then
-          aspic_x_endinf = params(size(params,1)-1)
-       else
-          aspic_x_endinf = params(size(params,1))
-       endif
+!       aspic_x_endinf = params(size(params,1))
+       aspic_x_endinf = params(numAspicParams)
        return
     endif
 

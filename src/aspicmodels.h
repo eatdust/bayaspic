@@ -147,129 +147,105 @@
 
 
 !for zero param reheat
-     function zerop_x_rrad(lnRrad,Pstar,bfoldstar)
+     function zerop_x_rrad(xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: zerop_x_rrad
-       real(kp), intent(in) :: lnRrad,Pstar
+       real(kp), intent(in) :: xend, lnRrad,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function zerop_x_rrad
 
-     function zerop_x_rreh(lnRreh,bfoldstar)
+     function zerop_x_rreh(xend,lnRreh,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: zerop_x_rreh
-       real(kp), intent(in) :: lnRreh
+       real(kp), intent(in) :: xend, lnRreh
        real(kp), intent(out), optional :: bfoldstar
      end function zerop_x_rreh
 
-     function zerop_x_rhow(w,lnRhoReh,Pstar,bfoldstar)
+     function zerop_x_rhow(xend,w,lnRhoReh,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: zerop_x_rhow
-       real(kp), intent(in) :: w,lnRhoReh,Pstar
+       real(kp), intent(in) :: xend, w,lnRhoReh,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function zerop_x_rhow
 
 
 !for one param reheat
-     function onep_x_rrad(p1,lnRrad,Pstar,bfoldstar)
+     function onep_x_rrad(p1,xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: onep_x_rrad
-       real(kp), intent(in) :: p1,lnRrad,Pstar
+       real(kp), intent(in) :: p1,xend,lnRrad,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function onep_x_rrad
 
-     function onep_x_rreh(p1,lnRreh,bfoldstar)
+     function onep_x_rreh(p1,xend,lnRreh,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: onep_x_rreh
-       real(kp), intent(in) :: p1,lnRreh
+       real(kp), intent(in) :: p1,xend,lnRreh
        real(kp), intent(out), optional :: bfoldstar
      end function onep_x_rreh
 
-     function onep_x_rhow(p1,w,lnRhoReh,Pstar,bfoldstar)
+     function onep_x_rhow(p1,xend,w,lnRhoReh,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: onep_x_rhow
-       real(kp), intent(in) :: p1,w,lnRhoReh,Pstar
+       real(kp), intent(in) :: p1,xend,w,lnRhoReh,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function onep_x_rhow
 
 !for two params reheat
-    function twop_x_rrad(p1,p2,lnRrad,Pstar,bfoldstar)
+    function twop_x_rrad(p1,p2,xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: twop_x_rrad
-       real(kp), intent(in) :: p1,p2,lnRrad,Pstar
+       real(kp), intent(in) :: p1,p2,xend,lnRrad,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function twop_x_rrad
 
-     function twop_x_rreh(p1,p2,lnRreh,bfoldstar)
+     function twop_x_rreh(p1,p2,xend,lnRreh,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: twop_x_rreh
-       real(kp), intent(in) :: p1,p2,lnRreh
+       real(kp), intent(in) :: p1,p2,xend,lnRreh
        real(kp), intent(out), optional :: bfoldstar
      end function twop_x_rreh
 
-     function twop_x_rhow(p1,p2,w,lnRhoReh,Pstar,bfoldstar)
+     function twop_x_rhow(p1,p2,xend,w,lnRhoReh,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: twop_x_rhow
-       real(kp), intent(in) :: p1,p2,w,lnRhoReh,Pstar
+       real(kp), intent(in) :: p1,p2,xend,w,lnRhoReh,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function twop_x_rhow
 
 !for three params reheat
-    function threep_x_rrad(p1,p2,p3,lnRrad,Pstar,bfoldstar)
+    function threep_x_rrad(p1,p2,p3,xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: threep_x_rrad
-       real(kp), intent(in) :: p1,p2,p3,lnRrad,Pstar
+       real(kp), intent(in) :: p1,p2,p3,xend,lnRrad,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function threep_x_rrad
 
-     function threep_x_rreh(p1,p2,p3,lnRreh,bfoldstar)
+     function threep_x_rreh(p1,p2,p3,xend,lnRreh,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: threep_x_rreh
-       real(kp), intent(in) :: p1,p2,p3,lnRreh
+       real(kp), intent(in) :: p1,p2,p3,xend,lnRreh
        real(kp), intent(out), optional :: bfoldstar
      end function threep_x_rreh
 
-     function threep_x_rhow(p1,p2,p3,w,lnRhoReh,Pstar,bfoldstar)
+     function threep_x_rhow(p1,p2,p3,xend,w,lnRhoReh,Pstar,bfoldstar)
        use infprec, only : kp
        implicit none
        real(kp) :: threep_x_rhow
-       real(kp), intent(in) :: p1,p2,p3,w,lnRhoReh,Pstar
+       real(kp), intent(in) :: p1,p2,p3,xend,w,lnRhoReh,Pstar
        real(kp), intent(out), optional :: bfoldstar
      end function threep_x_rhow
 
-!for four params reheat
-    function fourp_x_rrad(p1,p2,p3,p4,lnRrad,Pstar,bfoldstar)
-       use infprec, only : kp
-       implicit none
-       real(kp) :: fourp_x_rrad
-       real(kp), intent(in) :: p1,p2,p3,p4,lnRrad,Pstar
-       real(kp), intent(out), optional :: bfoldstar
-     end function fourp_x_rrad
-
-     function fourp_x_rreh(p1,p2,p3,p4,lnRreh,bfoldstar)
-       use infprec, only : kp
-       implicit none
-       real(kp) :: fourp_x_rreh
-       real(kp), intent(in) :: p1,p2,p3,p4,lnRreh
-       real(kp), intent(out), optional :: bfoldstar
-     end function fourp_x_rreh
-
-     function fourp_x_rhow(p1,p2,p3,p4,w,lnRhoReh,Pstar,bfoldstar)
-       use infprec, only : kp
-       implicit none
-       real(kp) :: fourp_x_rhow
-       real(kp), intent(in) :: p1,p2,p3,p4,w,lnRhoReh,Pstar
-       real(kp), intent(out), optional :: bfoldstar
-     end function fourp_x_rhow
 
   end interface

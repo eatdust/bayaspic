@@ -6,7 +6,7 @@ module sampl
   integer, parameter :: imn = kind(4)
   integer, parameter :: fmn = kind(1._8)
 
-  integer, parameter :: lenmn = 100
+  integer, parameter :: lenmn = 1000
 
   integer(imn), save :: samplNdim, samplNpars
   real(fmn), save, dimension(:), allocatable :: samplPmin, samplPmax

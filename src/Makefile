@@ -4,7 +4,7 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DMPISCHED
+FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DMPI
 #-DMPISCHED -DASPICQ 
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
@@ -26,7 +26,7 @@ LIKEDIR = ../fastlikes
 NESTDIR = ../multinest
 CHORDDIR = ../polychord/src/polychord
 
-OBJSLIKE =  prec.o ioml.o rbfprec.o iorbf.o rbfnd.o rbflike.o \
+OBJSLIKE =  mlprec.o ioml.o iocmb.o rbfprec.o iorbf.o rbfuncs.o rbfnd.o rbflike.o \
 	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o \
 	fnnprec.o fann.o fnnlike.o
 
@@ -41,7 +41,7 @@ OBJSNEST = utilsMN.o utils1.o priorsMN.o kmeans_clstr.o \
 OBJSCHORD = utilsPC.o abort.o settings.o mpi_utils.o random_utils.o  \
 	array_utils.o calculate.o run_time_info.o params.o priorsPC.o \
 	read_write.o feedback.o chordal_sampling.o clustering.o \
-	generate.o nested_sampling.o ini.o interfaces.o 
+	generate.o nelder_mead.o maximiser.o nested_sampling.o ini.o interfaces.o 
 
 #nestwrap.o
 OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \

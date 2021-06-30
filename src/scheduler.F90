@@ -287,7 +287,7 @@ contains
        ptrnode => ptrnode%next
     enddo
     ptrnode => null()
-    if (i.ne.ntodo-1) stop'redistribute_saved_queue: screwed!'
+    if (i.ne.ntodo-1) stop 'redistribute_saved_queue: screwed!'
 
     call free_queue(qtmp)
 

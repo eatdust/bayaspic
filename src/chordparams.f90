@@ -1,8 +1,7 @@
 module chordparams
   use sampl
-  use utils_module, only : logzero
   implicit none
-
+    
   public
 
 !max no. of live points !20000
@@ -23,7 +22,7 @@ module chordparams
   real(fmn), parameter :: chordBoost = 5._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: chordLogZero = logzero
+  real(fmn), parameter :: chordLogZero = 1d-30
 
 !Whether to calculate weighted posteriors
   logical, parameter :: chordWeightedPost = .true.
@@ -48,8 +47,6 @@ module chordparams
 !whether to resume/save from a previous run
   logical, parameter :: chordSave = .true.
   logical, parameter :: chordResume = .false.
-!How often to update the resume file
-  integer(imn), parameter :: chordUpdSave = -1
 
 !whether to write output files
   logical, parameter :: chordOutLive = .true.
@@ -107,6 +104,7 @@ contains
     set%num_repeats = chordNdim*5
     set%do_clustering = chordCluster
     set%precision_criterion = chordZtol
+    set%logzero = chordLogZero
     set%base_dir = trim(chordDir)
     set%file_root = trim(chordName)
     set%write_resume = chordSave
@@ -118,7 +116,6 @@ contains
     set%posteriors = chordWeightedPost
     set%cluster_posteriors = chordClusterPost
     set%feedback = chordFeedBack
-    set%update_files = chordUpdSave
     set%boost_posterior = chordBoost
     
 

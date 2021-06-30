@@ -354,7 +354,7 @@ contains
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, uncubize_rbfparams, check_rbf
     use rbflike, only : rbflike_eval, cutmin_rbfparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
     implicit none   
@@ -379,7 +379,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       rbfpars = get_slowroll(fitNdim,mnpars)
+       rbfpars = get_hubbleflow(fitNdim,mnpars)
 
 ! reheating hardprior, ignoring those points
        if (test_reheating_hardprior(mnpars)) then
@@ -435,7 +435,7 @@ contains
     use shepprec, only : fp
     use sheplike, only : cubize_shepparams, uncubize_shepparams, check_shep
     use sheplike, only : sheplike_eval, cutmin_shepparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
     implicit none   
@@ -460,7 +460,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       sheppars = get_slowroll(fitNdim,mnpars)
+       sheppars = get_hubbleflow(fitNdim,mnpars)
 
 ! reheating hardprior, those points are ignored
        if (test_reheating_hardprior(mnpars)) then
@@ -515,7 +515,7 @@ contains
     use fnnprec, only : fp
     use fnnlike, only : cubize_fnnparams, uncubize_fnnparams, check_fnn
     use fnnlike, only : fnnlike_eval, cutmin_fnnparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
     implicit none   
@@ -540,7 +540,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       fnnpars = get_slowroll(fitNdim,mnpars)
+       fnnpars = get_hubbleflow(fitNdim,mnpars)
 
 ! reheating hardprior, those points are ignored
        if (test_reheating_hardprior(mnpars)) then
@@ -595,7 +595,7 @@ contains
   subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)    
     use nestparams, only : nestLogZero
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
-    use wraspic, only : get_slowroll
+    use wraspic, only : get_hubbleflow
     implicit none   
     integer(imn) :: nestdim, nestpars
     real(fmn), dimension(nestpars) :: cube
@@ -615,7 +615,7 @@ contains
     else
 
 !to get derived parameters
-       nullpars = get_slowroll(fitNdim,mnpars)
+       nullpars = get_hubbleflow(fitNdim,mnpars)
 
        if (test_reheating_hardprior(mnpars)) then
 ! reheating hardprior, those points are ignored
@@ -748,7 +748,7 @@ contains
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, check_rbf
     use rbflike, only : rbflike_eval, cutmin_rbfparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     implicit none   
     real(fmn) :: lnew
@@ -771,7 +771,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       rbfpars = get_slowroll(fitNdim,theta)
+       rbfpars = get_hubbleflow(fitNdim,theta)
 
 ! reheating hardprior, ignoring those points
        if (test_reheating_hardprior(theta)) then
@@ -825,7 +825,7 @@ contains
     use shepprec, only : fp
     use sheplike, only : cubize_shepparams, check_shep
     use sheplike, only : sheplike_eval, cutmin_shepparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     implicit none   
     real(fmn) :: lnew
@@ -847,7 +847,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       sheppars = get_slowroll(fitNdim,theta)
+       sheppars = get_hubbleflow(fitNdim,theta)
 
 ! reheating hardprior, those points are ignored
        if (test_reheating_hardprior(theta)) then
@@ -903,7 +903,7 @@ contains
     use fnnprec, only : fp
     use fnnlike, only : cubize_fnnparams, check_fnn
     use fnnlike, only : fnnlike_eval, cutmin_fnnparams
-    use wraspic, only : get_slowroll, get_derived
+    use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     implicit none   
     real(fmn) :: lnew
@@ -925,7 +925,7 @@ contains
     else
        
 !use aspic to get the slowroll parameters
-       fnnpars = get_slowroll(fitNdim,theta)
+       fnnpars = get_hubbleflow(fitNdim,theta)
 
 ! reheating hardprior, those points are ignored
        if (test_reheating_hardprior(theta)) then
@@ -979,7 +979,7 @@ contains
   function null_polychord_aspic_loglike(theta,phi)    
     use chordparams, only : chordLogZero, chordNderived, chordNdim
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
-    use wraspic, only : get_slowroll
+    use wraspic, only : get_hubbleflow
     implicit none   
     real(fmn) :: null_polychord_aspic_loglike
     real(fmn), dimension(:), intent(in) :: theta
@@ -1000,7 +1000,7 @@ contains
     else
 
 !to get derived parameters
-       nullpars = get_slowroll(fitNdim,theta)
+       nullpars = get_hubbleflow(fitNdim,theta)
 
        if (test_reheating_hardprior(theta)) then
 ! reheating hardprior, those points are ignored

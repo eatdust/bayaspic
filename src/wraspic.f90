@@ -27,7 +27,7 @@ module wraspic
 
   public ReheatModel
   public set_model, check_model, free_model, get_allprior
-  public get_slowroll, get_ntot, get_nextra, get_derived
+  public get_hubbleflow, get_ntot, get_nextra, get_derived
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
@@ -63,6 +63,7 @@ contains
     AspicModel%params = 0._kp
     AspicModel%cmaps ='undefined'
 
+!nextra encompasses reheating parameters and CMB amplitude    
     select case (ReheatModel)
     case ('Rreh','Rrad')
        nextra = 2
@@ -349,7 +350,7 @@ contains
           scalparams(i) = 1._kp/inparams(i)
 
        case ('invsqrt')
-
+          stop 'this one is weird!'
           scalparams(i) = 1._kp/sqrt(inparams(i))
 
        
@@ -371,11 +372,12 @@ contains
 
 
 
-  function get_slowroll(nstar,mnParams)
+  function get_hubbleflow(nstar,mnParams)
     use srreheat, only : potential_normalization
     use srreheat, only : ln_rho_endinf
     use srreheat, only : get_lnrreh_rrad, get_lnrrad_rreh
     use srreheat, only : get_lnrreh_rhow, get_lnrrad_rhow
+    use srflow, only : slowroll_to_hubble
     use srflow, only : scalar_spectral_index
     use srflow, only : tensor_to_scalar_ratio
     use srflow, only : scalar_running
@@ -384,10 +386,10 @@ contains
 
     implicit none
     integer, intent(in) :: nstar
-    real(fmn), dimension(nstar) :: get_slowroll
+    real(fmn), dimension(nstar) :: get_hubbleflow
     real(fmn), dimension(:), intent(in) :: mnParams
 
-    real(kp), dimension(nepsmax) :: epsStar
+    real(kp), dimension(nepsmax) :: epsVStar, epsHStar
     real(kp), dimension(naspmax) :: asparams
     character(len=lname) :: aspname
     character(len=lname), dimension(naspmax) :: mapnames
@@ -407,7 +409,7 @@ contains
 
 
     if (size(mnParams,1).ne.ntot) then
-       stop 'get_slowroll: size mismatch!'
+       stop 'get_hubbleflow: size mismatch!'
     endif
     
     lnA = mnParams(ilnA)
@@ -416,9 +418,9 @@ contains
 
 !let's get everything from libaspic
     aspname = trim(AspicModel%name)
-    forall (i=1:nasp)
+    do i=1,nasp
        mapnames(i) = AspicModel%cmaps(i)
-    end forall
+    enddo
 !    asparams(1:nasp) = mnParams(nextra+1:ntot)
 
     asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
@@ -430,39 +432,39 @@ contains
     case ('Rrad')
 
        lnRrad = mnParams(ireh)
-       xstar = aspic_x_rrad(aspname,asparams,lnRrad,Pstar,bfoldstar)
+       xend = aspic_x_endinf(aspname,asparams)
+       xstar = aspic_x_rrad(aspname,asparams,xend,lnRrad,Pstar,bfoldstar)
 
     case ('Rreh')
 
        lnRreh = mnParams(ireh)
-       xstar = aspic_x_rreh(aspname,asparams,lnRreh,bfoldstar)
+       xend = aspic_x_endinf(aspname,asparams)
+       xstar = aspic_x_rreh(aspname,asparams,xend,lnRreh,bfoldstar)
 
     case ('Rhow')
        lnRhoReh = mnParams(ireh)
        w = mnParams(iw)
-       xstar = aspic_x_rhow(aspname,asparams,lnRhoReh,w,Pstar,bfoldstar)
+       xend = aspic_x_endinf(aspname,asparams)
+       xstar = aspic_x_rhow(aspname,asparams,xend,w,lnRhoReh,Pstar,bfoldstar)
 
     case default
-       stop 'get_slowroll: not such a reheating modelisation!'
+       stop 'get_hubbleflow: not such a reheating modelisation!'
 
     end select
 
-    epsStar(1) = aspic_epsilon_one(aspname,xstar,asparams)
-    epsStar(2) = aspic_epsilon_two(aspname,xstar,asparams)
-    epsStar(3) = aspic_epsilon_three(aspname,xstar,asparams)
+    epsVStar(1) = aspic_epsilon_one(aspname,xstar,asparams)
+    epsVStar(2) = aspic_epsilon_two(aspname,xstar,asparams)
+    epsVStar(3) = aspic_epsilon_three(aspname,xstar,asparams)
 
-
+    epsHstar = slowroll_to_hubble(epsVstar)
+    
     Vstar = aspic_norm_potential(aspname,xstar,asparams)       
-
-!aspicmodels returns the correct values of xend, even if it is a model
-!parameters
-    xend = aspic_x_endinf(aspname,asparams(1:nasp))
 
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vend = aspic_norm_potential(aspname,xend,asparams)
                          
-    lnM = log(potential_normalization(Pstar,epsStar(1),Vstar))
-    lnRhoEnd = ln_rho_endinf(Pstar,epsStar(1) &
+    lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
+    lnRhoEnd = ln_rho_endinf(Pstar,epsHStar(1) &
          ,epsOneEnd,Vend/Vstar)
 
     select case (ReheatModel)
@@ -474,7 +476,7 @@ contains
        lnRreh = get_lnrreh_rhow(lnRhoReh,w,lnRhoEnd)
        lnRrad = get_lnrrad_rhow(lnRhoReh,w,lnRhoEnd)
     case default
-       stop 'get_slowroll: not such a reheating modelisation!'
+       stop 'get_hubbleflow: not such a reheating modelisation!'
     end select
 
 !update AspicModel shared variables
@@ -484,41 +486,41 @@ contains
     AspicModel%params(1:nasp) = asparams(1:nasp)
     AspicModel%lnM = lnM
     AspicModel%lnRreh = lnRreh
-    AspicModel%logeps = log10(epsStar(1))
-    AspicModel%eps2 = epsStar(2)
-    AspicModel%eps3 = epsStar(3)
+    AspicModel%logeps = log10(epsVStar(1))
+    AspicModel%eps2 = epsVStar(2)
+    AspicModel%eps3 = epsVStar(3)
     AspicModel%lnRhoEnd = lnRhoEnd
     AspicModel%bfold = bfoldstar
-    AspicModel%ns = scalar_spectral_index(epsStar(1:3))
-    AspicModel%logr = log10(tensor_to_scalar_ratio(epsStar(1:2)))
-    AspicModel%alpha = scalar_running(epsStar(1:3))
+    AspicModel%ns = scalar_spectral_index(epsVStar(1:3))
+    AspicModel%logr = log10(tensor_to_scalar_ratio(epsVStar(1:2)))
+    AspicModel%alpha = scalar_running(epsVStar(1:3))
 
     if (display) then
        write(*,*)
-       write(*,*)'get_slowroll:',neps
+       write(*,*)'get_hubbleflow:',neps
        call print_aspicmodel(AspicModel)
     end if
       
 
 !output the slow-roll params for the likelihood
-    get_slowroll(1) = lnA
-    get_slowroll(2) = log10(epsStar(1))
-    get_slowroll(3:nstar) = epsStar(2:neps)
+    get_hubbleflow(1) = lnA
+    get_hubbleflow(2) = log10(epsHStar(1))
+    get_hubbleflow(3:nstar) = epsHStar(2:neps)
 
-  end function get_slowroll
+  end function get_hubbleflow
 
   
   subroutine print_aspicmodel(model)
     implicit none
     type(infaspic), intent(in) :: model
 
-    write(*,*)'AspicModel Params: '
-    write(*,*)'Pstar= asparams=   ',Model%Pstar,Model%params
-    write(*,*)'lnRrad= lnRreh=    ',Model%lnRrad, Model%lnRreh
-    write(*,*)'lnM= lnRhoEnd=     ',Model%lnM,Model%lnRhoEnd
-    write(*,*)'N*-Nend=           ',Model%bfold
-    write(*,*)'log(eps1)= eps23=  ',Model%logeps, Model%eps2, Model%eps3
-    write(*,*)'ns= log(r)= alpha= ',Model%ns,Model%logr,Model%alpha
+    write(*,*)'AspicModel Params:   '
+    write(*,*)'Pstar= asparams=     ',Model%Pstar,Model%params
+    write(*,*)'lnRrad= lnRreh=      ',Model%lnRrad, Model%lnRreh
+    write(*,*)'lnM= lnRhoEnd=       ',Model%lnM,Model%lnRhoEnd
+    write(*,*)'N*-Nend=             ',Model%bfold
+    write(*,*)'log(epsV1)= epsV23=  ',Model%logeps, Model%eps2, Model%eps3
+    write(*,*)'ns= log(r)= alpha=   ',Model%ns,Model%logr,Model%alpha
     write(*,*)
 
   end subroutine print_aspicmodel
@@ -594,7 +596,7 @@ contains
     real(fmn) :: lnRhoEnd
 
     if (AspicModel%lnRreh.ne.lnRreh) then
-       stop 'test_lnrreh_hardprior: must be called after get_slowroll!'
+       stop 'test_lnrreh_hardprior: must be called after get_hubbleflow!'
     endif
 
     lnRhoEnd = AspicModel%lnRhoEnd
@@ -628,7 +630,7 @@ contains
     real(fmn) :: lnRhoEnd, lnRradMax, lnRradMin
 
     if (AspicModel%lnRrad.ne.lnRrad) then
-       stop 'test_lnrrad_hardprior: must be called after get_slowroll!'
+       stop 'test_lnrrad_hardprior: must be called after get_hubbleflow!'
     endif
 
     lnRhoEnd = AspicModel%lnRhoEnd
