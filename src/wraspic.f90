@@ -130,8 +130,8 @@ contains
     implicit none
     real(fmn) , intent(out) :: lnAmin,lnAmax
 
-    lnAmin = 2.7
-    lnAmax = 4.
+    lnAmin = 2.4
+    lnAmax = 3.6
 !    lnAmin = 3.000
 !    lnAmax = 3.175
 

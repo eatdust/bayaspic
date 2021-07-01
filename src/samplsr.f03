@@ -38,10 +38,10 @@ module samplsr
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-  character(len=*), parameter :: fastLikeName = 'shep'
+!  character(len=*), parameter :: fastLikeName = 'shep'
 
 !feedforward neural network
-!  character(len=*), parameter :: fastLikeName = 'fnn'
+  character(len=*), parameter :: fastLikeName = 'fnn'
 
 
   public nest_init_slowroll,  nest_free_slowroll
@@ -99,9 +99,7 @@ contains
 
        call initialize_fnn_like(filefnn,filefnnbounds)
        fitNdim = get_fnn_ndim()
-       fitLogZero = get_fnn_fmin()
-      
-       print *,'fitNdim',fitndim
+       fitLogZero = get_fnn_fmin()      
 
        call init_samplparams(fitNdim)
 
@@ -528,6 +526,8 @@ contains
 
     fnn_polychord_slowroll_loglike = fnnlike_eval(fnncube)
 
+!    print *,'test',fnn_polychord_slowroll_loglike,phi
+    
   end function fnn_polychord_slowroll_loglike
 
 

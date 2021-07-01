@@ -22,7 +22,7 @@ module chordparams
   real(fmn), parameter :: chordBoost = 5._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: chordLogZero = 1d-30
+  real(fmn), parameter :: chordLogZero = -1d30
 
 !Whether to calculate weighted posteriors
   logical, parameter :: chordWeightedPost = .true.
@@ -30,7 +30,7 @@ module chordparams
 !Whether to calculate equally weighted posteriors
   logical, parameter :: chordEqualWeightedPost = .false.
 
-!Whether to calculate equally weighted posteriors
+!Whether to calculate equally weighted cluster posteriors
   logical, parameter :: chordClusterPost = .false.
 
 
@@ -42,7 +42,7 @@ module chordparams
   character(len=lenmn), save :: chordName = 'bayesinf_'
 
 !need update on sampling progress?
-  integer(imn), parameter :: chordFeedBack =3
+  integer(imn), parameter :: chordFeedBack = 3
 
 !whether to resume/save from a previous run
   logical, parameter :: chordSave = .true.

@@ -37,11 +37,11 @@ module sampl
      end function pc_loglike
 
 
-     function pc_prior(cube)
+     function pc_prior(cube) result(theta)
        import fmn
        implicit none
        real(fmn), dimension(:), intent(in) :: cube
-       real(fmn), dimension(size(cube,1)) :: pc_prior
+       real(fmn), dimension(size(cube,1)) :: theta
      end function pc_prior
 
   end interface
