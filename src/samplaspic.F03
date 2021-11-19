@@ -11,7 +11,7 @@ module samplaspic
   private
 
   logical, parameter :: display = .true.
-  logical, parameter :: debug = .true.
+  logical, parameter :: debug = .false.
 
 
   character(len=*), parameter :: fileweights = 'rbfdata/weights.dat'

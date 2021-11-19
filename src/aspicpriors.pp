@@ -1,18 +1,31 @@
 !write down the prior associated with the aspic models. Syntax is of
-!the form: (p1min,p1max,maptype1,p2min,p2max,maptype2...). If the end
-!of inflation is an additional parameter, it is assumed to come after
-!the potential parameters. Any other additional and non-potential
-!parameters comes next. Maptype denotes the relation between the aspic parameters
-!and the one we are sampling on, "flat" means they are identical,
-!"log" means we are sampling on the log10, "ln" means we are sampling
-!on the log Neper, "mlog" means -log() as "mln" for -ln(), "inv" means
-!inverse 1/(), "invsqrt" means the square root of the inverse 1/sqrt()
-!etc...  The prior bounds are assumed to be on the multinest sampling
-!parameters.
+!the form:
 
-!Redefinition of aspic parameters is made after any prior rescaling
-!and through the function redefine_aspic_params() in aspicpriors.F08,
-!itself called in map_aspic_params() found in wraspic.f90
+!   NPRIOR(modelname,p1min,p1max,maptype1,p2min,p2max,maptype2...)
+
+!If the end of inflation is an additional parameter, it is assumed to
+!come *just after* the potential parameters. Any other additional and
+!non-potential parameters comes next.
+
+!The "maptype" entry denotes the relation between the aspic parameters
+!and the one we are sampling on, "flat" means they are identical,
+!"log" means we are sampling on the log10(aspicparam), "ln" means we
+!are sampling on the log Neper, "mlog" means -log() as "mln" for
+!-ln(), "inv" means inverse 1/(), "invsqrt" means the square root of
+!the inverse 1/sqrt() etc...
+
+!The prior bounds are assumed to be on the actual *sampled
+!parameters*.  Therefore, if maptype is "ln", and the prior bounds are
+![0,1], it means that the aspic parameters will vary in the range
+![1,e].
+
+!Redefinition of aspic parameters can made in the function
+!redefine_aspic_params() in aspicpriors.F08. This can be used if the
+!observable parameter is a combination of the fundamental aspic
+!parameters. This function is called in map_aspic_params() (see
+!wraspic.f90) and assumes that the parameters are the aspic ones, not
+!the ones on which we sample. Therefore, it is called after the
+!sampled parameter inverse rescaling.
 
 ZEROPRIOR(si)
 

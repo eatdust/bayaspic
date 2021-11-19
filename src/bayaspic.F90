@@ -39,8 +39,8 @@ program bayaspic
 
 
 
-  call initialize_onemodel('si')
-!  call initialize_onemodel('rchi o')
+!  call initialize_onemodel('si')
+  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   
   

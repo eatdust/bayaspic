@@ -1,6 +1,6 @@
 !write down the list of aspic models sorted according to the total
 !number of ASPIC parameters, append _XEND if the field value at the end
-!of inflation is one of the aspic model parameter.
+!of inflation is one of them.
 
 ZERO(si)
 
@@ -75,3 +75,4 @@ THREE_XEND(cndi)
 THREE_XEND(nfi2)
 THREE_XEND(nfi4)
 
+THREE_XEND(kklti)

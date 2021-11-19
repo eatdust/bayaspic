@@ -61,7 +61,7 @@ bayslowroll.$(ext): $(OBJSMIN) bayslowroll.o
 
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
-nestwrap.o: nestparams.o wraspic.o
+#nestwrap.o: nestparams.o wraspic.o
 chordparams.o: settings.o
 samplsr.o: settings.o interfaces.o
 

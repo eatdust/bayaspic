@@ -445,8 +445,9 @@ contains
 
     end do
 
-!some models have redefined parameters, this is called after the prior
-!scaling
+!some models have redefined parameters, because this relationships are
+!done on the fundamental aspic parameters, this is called after the
+!sampled parameter scaling
     outparams =  redefine_aspic_params(AspicModel%extname,scalparams)
    
    
