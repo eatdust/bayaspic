@@ -75,4 +75,5 @@ THREE_XEND(cndi)
 THREE_XEND(nfi2)
 THREE_XEND(nfi4)
 
+THREE_XEND(bi)
 THREE_XEND(kklti)
