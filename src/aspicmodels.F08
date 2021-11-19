@@ -519,7 +519,9 @@ contains
 !when xend is present it is the the last one.
        
     if (xEndIsParam) then
-!       aspic_x_endinf = params(size(params,1))
+       if (size(params,1).lt.numAspicParams) then
+          stop 'aspic_x_endinf: time to debug...!'
+       endif
        aspic_x_endinf = params(numAspicParams)
        return
     endif

@@ -38,10 +38,10 @@ module samplsr
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-!  character(len=*), parameter :: fastLikeName = 'shep'
+  character(len=*), parameter :: fastLikeName = 'shep'
 
 !feedforward neural network
-  character(len=*), parameter :: fastLikeName = 'fnn'
+!  character(len=*), parameter :: fastLikeName = 'fnn'
 
 
   public nest_init_slowroll,  nest_free_slowroll

@@ -13,13 +13,13 @@ module nestparams
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000
-  integer(imn), parameter :: nestNlive = 30000
+  integer(imn), parameter :: nestNlive = 100000
 
 !sample with constant efficiency
   logical, parameter :: nestCteEff = .false.
 
 !evidence tolerance factor !1e-4
-  real(fmn), parameter :: nestZTol = 1e-4
+  real(fmn), parameter :: nestZTol = 1e-6
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
@@ -66,7 +66,7 @@ module nestparams
 !whether to write output files
   logical, parameter ::  nestOutfile = .true.
 
-!initialize MPI routines?, relevant only for -DMPINEST
+!initialize MPI routines?, relevant only for -DMPI
   logical, parameter :: nestInitMPI = .true.
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)

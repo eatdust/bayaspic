@@ -1,0 +1,7 @@
+Data are:
+TTTEEE+lowE (plikHM) + BK15 + lensing
+
+Shepard trained with 300 control points and 600 fitted points, using data from
+a marginalized posterior binned with 14x14x14x14.
+
+NB: lowl is *not used* as it induces a running (eps3) inconsistent with slow-roll, which is not seen in lowE. These data slightly prefer non-vanishing primordial GWs.

@@ -13,7 +13,6 @@ module wraspic
   integer, save :: nextra = 0
 
 
-!  logical, parameter :: useRrad = .false.
   character(len=*), parameter :: ReheatModel = 'Rreh'
 !  character(len=*), parameter :: ReheatModel = 'Rrad'
 !  character(len=*), parameter :: ReheatModel = 'Rhow'
@@ -22,12 +21,12 @@ module wraspic
 
   type(infaspic), save :: AspicModel
 
-  integer, parameter :: naspmax = 4
+  integer, parameter :: nparmax = 4
   integer, parameter :: nepsmax = 3
 
   public ReheatModel
-  public set_model, check_model, free_model, get_allprior
-  public get_hubbleflow, get_ntot, get_nextra, get_derived
+  public set_model, check_model, free_model, allocate_and_set_allprior
+  public get_hubbleflow, get_ntot, get_nextra, get_derived, get_derived_name
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
@@ -54,24 +53,9 @@ contains
     endif
 
     AspicModel%nasp = get_aspic_numparams()
-
-    if (AspicModel%nasp.gt.naspmax) stop 'set_model: naspmax too small!'
-
-    allocate(AspicModel%params(AspicModel%nasp))
-    allocate(AspicModel%cmaps(AspicModel%nasp))
-
-    AspicModel%params = 0._kp
-    AspicModel%cmaps ='undefined'
-
-!nextra encompasses reheating parameters and CMB amplitude    
-    select case (ReheatModel)
-    case ('Rreh','Rrad')
-       nextra = 2
-    case ('Rhow')
-       nextra = 3
-    case default
-       stop 'set_model: reheating modelisation not found!'
-    end select
+    AspicModel%nhid = 0
+    
+    if (AspicModel%nasp.gt.nparmax) stop 'set_model: nparmax too small!'
 
   end subroutine set_model
 
@@ -109,18 +93,30 @@ contains
 
     if (.not.check_model()) stop 'get_ntot: aspic not set!'    
 
-    get_ntot = AspicModel%nasp + nextra
+    get_ntot = AspicModel%nasp + AspicModel%nhid + nextra
     
   end function get_ntot
 
 
+  function get_nhid()
+    implicit none
+    integer :: get_nhid
+    if (.not.check_model()) stop 'get_nhid: aspic not set!'    
+
+    get_nhid = AspicModel%nhid
+
+  end function get_nhid
+
+  
 
   function get_nextra()
     implicit none
     integer :: get_nextra
+
     if (.not.check_model()) stop 'get_nextra: aspic not set!'    
 
     get_nextra = nextra
+
   end function get_nextra
 
 
@@ -201,38 +197,37 @@ contains
 
     case (1)
        get_derived = AspicModel%lnM
-   
+            
     case (2)
-
-       get_derived = AspicModel%lnRreh
-       
-    case (3)
-       get_derived = AspicModel%lnRrad
-       
-    case (4)       
-       get_derived = AspicModel%lnRhoEnd
-
-    case (5)
        get_derived = AspicModel%bfold
 
-    case (6)
+    case (3)
        get_derived = AspicModel%logeps
 
-    case (7)
+    case (4)
        get_derived = AspicModel%eps2
 
-    case (8)
+    case (5)
        get_derived = AspicModel%eps3
 
-    case (9)
+    case (6)
        get_derived = AspicModel%ns
 
-    case (10)
+    case (7)
        get_derived = AspicModel%logr
 
-    case (11)
+    case (8)
        get_derived = AspicModel%alpha   
 
+    case (9)       
+       get_derived = AspicModel%lnRhoEnd
+       
+    case (10)
+       get_derived = AspicModel%lnRreh
+       
+    case (11)
+       get_derived = AspicModel%lnRrad
+       
     case default
        stop 'get_derived: incorrect parameters number!'
 
@@ -242,59 +237,146 @@ contains
   end function get_derived
 
 
-
-  subroutine get_allprior(pmin,pmax)
-    use aspicpriors, only : get_aspic_priors
+!should be consistent with the get_derived, not check made.  
+  function get_derived_name(i)
     implicit none
-    real(fmn), dimension(:), intent(out) :: pmin, pmax
+    integer, intent(in) :: i
+    integer, parameter :: lenderived = 40
+    character(len=lenderived) :: get_derived_name
 
-    integer :: nsize, nasp, ntot
-    real(kp), dimension(naspmax) :: aspmin,aspmax
+    select case(i)
 
-    nsize = size(pmin,1)
-    nasp = AspicModel%nasp
-    ntot = get_ntot()
+    case (1)
+       get_derived_name = 'lnM*           \ln(M)                  '
+          
+    case (2)
+       get_derived_name = 'bfold*         N_{\mathrm{end}}-N_*    '
 
-    if (nsize.ne.size(pmax,1) &
-         .or.(nsize.ne.(nextra+size(AspicModel%params,1)))) then
-       stop 'get_allprior: size mismatch!'
+    case (3)
+       get_derived_name = 'logeps*        \log(\epsilon_1)        '
+
+    case (4)
+       get_derived_name = 'eps2*          \epsilon_2              '
+
+    case (5)
+       get_derived_name = 'eps3*          \epsilon_3              '
+
+    case (6)
+       get_derived_name = 'ns*            n_{\mathrm{S}}          '
+
+    case (7)
+       get_derived_name = 'logr*          \log(r_\epsilon)        '
+
+    case (8)
+       get_derived_name = 'alpha*         \alpha_{\mathrm{S}}     '
+
+    case (9)       
+       get_derived_name = 'lnRhoEnd*      \ln(\rho_{\mathrm{end}})'
+
+    case (10)
+       get_derived_name = 'lnRreh*        \ln(R_{\mathrm{reh}})   '
+       
+    case (11)
+       get_derived_name = 'lnRrad*        \ln(R_{\mathrm{rad}})   '
+       
+    case default
+       stop 'get_derived_name: incorrect parameters number!'
+
+    end select
+
+
+  end function get_derived_name
+
+  
+
+  subroutine allocate_and_set_allprior(pmin,pmax)
+    use aspicpriors, only : get_aspic_priors, get_aspic_numpriors
+    implicit none
+    real(fmn), dimension(:), allocatable, intent(out) :: pmin, pmax
+
+    real(kp), dimension(nparmax) :: aspmin,aspmax
+    character(len=lname), dimension(nparmax) :: ascmaps
+
+    integer :: npar, ntot, i
+    
+!model dependant
+
+    call get_aspic_priors(AspicModel%extname,aspmin,aspmax,ascmaps)
+
+    npar = get_aspic_numpriors()
+
+    if (npar.ge.AspicModel%nasp) then
+       AspicModel%nhid = npar - AspicModel%nasp
+    else
+       stop 'allocate_and_set_allprior: nprior < naspic!'
     endif
+    
+    
+    if (npar.gt.nparmax) stop 'allocate_and_set_allprior: npar > nparmax!'
+    
+    allocate(AspicModel%cmaps(npar))
+    allocate(AspicModel%params(npar))
+
+    do i=1,npar
+       AspicModel%cmaps(i) = ascmaps(i)
+    enddo
+       
+
+    
+!CMB amplitude
+    nextra = 1
+
+    select case (ReheatModel)
+
+    case ('Rrad','Rreh')
+       nextra = nextra + 1
+
+    case ('Rhow')
+       nextra = nextra + 2
+
+    case default
+       stop 'allocate_and_set_allprior: not such a reheating modelisation!'
+
+    end select
+       
+    ntot = npar + nextra
+    allocate(pmin(ntot),pmax(ntot))
+    
 
 !ln[10^10 P*]
     call get_prior_lnA(pmin(ilnA),pmax(ilnA))
-
+    
 !lnRrad or lnR
     select case (ReheatModel)
 
     case ('Rrad')
+
        call get_prior_lnRrad(pmin(ireh),pmax(ireh))
 
     case ('Rreh')
-       call get_prior_lnRreh(pmin(ireh),pmax(ireh))
 
+       call get_prior_lnRreh(pmin(ireh),pmax(ireh))
+       
     case ('Rhow')
+
        call get_prior_lnRhoReh(pmin(ireh),pmax(ireh))
        call get_prior_wreh(pmin(iw),pmax(iw))
-
+       
     case default
-       stop 'get_allprior: not such a reheating modelisation!'
+
+       stop 'allocate_and_set_allprior: not such a reheating modelisation!'
+
     end select
 
-!model dependant
 
-    call get_aspic_priors(AspicModel%extname,aspmin,aspmax,AspicModel%cmaps)
+!model parameter are in the last bits    
+    pmin(nextra+1:ntot) = aspmin(1:npar)
+    pmax(nextra+1:ntot) = aspmax(1:npar)
 
-!sanity check
-    if ((ntot-nextra).ne.nasp) stop 'get_allprior: size array mismatch!'
-    
+  end subroutine allocate_and_set_allprior
 
-    pmin(nextra+1:ntot) = aspmin(1:nasp)
-    pmax(nextra+1:ntot) = aspmax(1:nasp)
-
-  end subroutine get_allprior
-
-
-
+  
+  
   function map_power_amplitude(lnA)
     implicit none
     real(kp) :: map_power_amplitude
@@ -311,17 +393,17 @@ contains
 
 
 
-  function map_aspic_params(nasp,inparams,mapnames) result(outparams)
+  function map_aspic_params(npar,inparams,mapnames) result(outparams)
     use aspicpriors, only : redefine_aspic_params
     implicit none
-    integer, intent(in) :: nasp
-    real(fmn), intent(in), dimension(nasp) :: inparams
-    character(len=*), dimension(nasp), intent(in) :: mapnames
-    real(kp), dimension(nasp) :: outparams, scalparams
+    integer, intent(in) :: npar
+    real(fmn), intent(in), dimension(npar) :: inparams
+    character(len=*), dimension(npar), intent(in) :: mapnames
+    real(kp), dimension(npar) :: outparams, scalparams
 
     integer :: i
 
-    do i=1,nasp
+    do i=1,npar
     
        select case (trim(mapnames(i)))
 
@@ -365,7 +447,7 @@ contains
 
 !some models have redefined parameters, this is called after the prior
 !scaling
-    outparams =  redefine_aspic_params(AspicModel%extname,nasp,scalparams)
+    outparams =  redefine_aspic_params(AspicModel%extname,scalparams)
    
    
   end function map_aspic_params
@@ -390,9 +472,9 @@ contains
     real(fmn), dimension(:), intent(in) :: mnParams
 
     real(kp), dimension(nepsmax) :: epsVStar, epsHStar
-    real(kp), dimension(naspmax) :: asparams
+    real(kp), dimension(nparmax) :: asparams
     character(len=lname) :: aspname
-    character(len=lname), dimension(naspmax) :: mapnames
+    character(len=lname), dimension(nparmax) :: mapnames
 
     real(kp) :: bfoldstar, lnA
     real(kp) :: Pstar, lnRrad, lnRreh, lnRhoReh, w, lnM
@@ -400,11 +482,11 @@ contains
     real(kp) :: epsOneEnd
     real(kp) :: Vstar, lnRhoEnd, Vend
 
-    integer :: nasp, ntot, neps
+    integer :: npar, ntot, neps
     integer :: i
 
     ntot = get_ntot()
-    nasp = AspicModel%nasp
+    npar = AspicModel%nasp + AspicModel%nhid
     neps = nstar - 1
 
 
@@ -418,13 +500,13 @@ contains
 
 !let's get everything from libaspic
     aspname = trim(AspicModel%name)
-    do i=1,nasp
+    do i=1,npar
        mapnames(i) = AspicModel%cmaps(i)
     enddo
-!    asparams(1:nasp) = mnParams(nextra+1:ntot)
+!    asparams(1:npar) = mnParams(nextra+1:ntot)
 
-    asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
-         ,mapnames(1:nasp))
+    asparams(1:npar) = map_aspic_params(npar,mnparams(nextra+1:ntot) &
+         ,mapnames(1:npar))
 
 
     select case (ReheatModel)
@@ -483,7 +565,7 @@ contains
     AspicModel%Pstar = Pstar
     AspicModel%lnRrad = lnRrad
 !better displaying the aspic params rather than the mnparams
-    AspicModel%params(1:nasp) = asparams(1:nasp)
+    AspicModel%params(1:npar) = asparams(1:npar)
     AspicModel%lnM = lnM
     AspicModel%lnRreh = lnRreh
     AspicModel%logeps = log10(epsVStar(1))
@@ -533,13 +615,13 @@ contains
     logical :: test_aspic_hardprior
     real(fmn), dimension(:), intent(in) :: mnParams
 
-    real(kp), dimension(naspmax) :: asparams
-    character(len=lname), dimension(naspmax) :: mapnames
+    real(kp), dimension(nparmax) :: asparams
+    character(len=lname), dimension(nparmax) :: mapnames
     character(len=lname) :: extname
-    integer :: nasp, ntot, i
+    integer :: npar, ntot, i
 
     ntot = get_ntot()
-    nasp = AspicModel%nasp
+    npar = AspicModel%nasp + AspicModel%nhid
 
     if (size(mnParams,1).ne.ntot) then
        stop 'test_aspic_hardprior: size mismatch!'
@@ -547,14 +629,14 @@ contains
 
     extname = trim(AspicModel%extname)
 
-    forall (i=1:nasp)
+    do i=1,npar
        mapnames(i) = AspicModel%cmaps(i)
-    end forall
+    end do
 
-    asparams(1:nasp) = map_aspic_params(nasp,mnparams(nextra+1:ntot) &
-         ,mapnames(1:nasp))
+    asparams(1:npar) = map_aspic_params(npar,mnparams(nextra+1:ntot) &
+         ,mapnames(1:npar))
 
-    test_aspic_hardprior = check_aspic_hardprior(extname,asparams(1:nasp))
+    test_aspic_hardprior = check_aspic_hardprior(extname,asparams(1:npar))
 
   end function test_aspic_hardprior
 

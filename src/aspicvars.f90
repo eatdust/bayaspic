@@ -11,7 +11,7 @@ module aspicvars
   type infaspic     
      character(len=lname) :: name     
      character(len=lname) :: extname
-     integer :: nasp
+     integer :: nasp, nhid
      real(kp), dimension(:), pointer :: params
      character(len=lname), dimension(:), pointer :: cmaps
      real(kp) :: Pstar, lnRrad, lnRreh

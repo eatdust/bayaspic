@@ -11,7 +11,7 @@ module samplaspic
   private
 
   logical, parameter :: display = .true.
-  logical, parameter :: debug = .false.
+  logical, parameter :: debug = .true.
 
 
   character(len=*), parameter :: fileweights = 'rbfdata/weights.dat'
@@ -44,10 +44,10 @@ module samplaspic
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
 ! inverse shepard method
-!  character(len=*), parameter :: fastLikeName = 'shep'
+  character(len=*), parameter :: fastLikeName = 'shep'
 
 !feedforward neural network
-  character(len=*), parameter :: fastLikeName = 'fnn'
+!  character(len=*), parameter :: fastLikeName = 'fnn'
 
   public nest_init_aspic, nest_sample_aspic, nest_free_aspic
   public chord_init_aspic, chord_sample_aspic, chord_free_aspic
@@ -58,7 +58,7 @@ contains
    
   subroutine init_aspic(modelname)
     use wraspic, only : set_model, get_ntot
-    use wraspic, only : get_allprior
+    use wraspic, only : allocate_and_set_allprior
     use rbflike, only : initialize_rbf_like, check_rbf, get_rbf_fmin
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
     use sheplike, only : initialize_shep_like, check_shep, get_shep_fmin
@@ -90,14 +90,21 @@ contains
 
     endif
 
-   
+    call allocate_and_set_allprior(samplPmin,samplPmax)
+
+!sanity checks    
+    if (.not.(allocated(samplPmin)).or.(.not.(allocated(samplPmax)))) then
+       stop 'init_aspic: samplPmin/max allocation failed!'
+    endif
+
     samplNdim = get_ntot()
+    
+    if ((size(samplPmin,1).ne.samplNdim).or.(size(samplPmax,1).ne.samplNdim)) then
+       stop 'init_aspic: samplPmin/max size not matching ntot!'
+    endif
+    
     samplNpars = samplNdim + numDerivedParams
 
-    allocate(samplPmin(samplNdim))
-    allocate(samplPmax(samplNdim))
-
-    call get_allprior(samplPmin, samplPmax)
 
     select case (fastLikeName)
 
@@ -177,12 +184,12 @@ contains
   
 
   subroutine dump_aspic_priors(extname)
-    use wraspic, only : get_nextra, ReheatModel
+    use wraspic, only : get_nextra, ReheatModel, get_derived_name
     implicit none
     character(len=*), intent(in) :: extname
     character(len=lenmn) :: fileName
     integer, parameter :: nunit = 412, nname = 413, nrange = 414
-    integer :: nextra
+    integer :: i, nextra, nderived
     
     if ((.not.allocated(samplPmin)).or.(.not.allocated(samplPmax))) then
        stop 'dump_aspic_priors: prior not allocated!'
@@ -205,11 +212,11 @@ contains
        select case (ReheatModel)
        case ('Rreh')
           write(nunit,*)'limits[lnRreh]=',samplPmin(2),samplPmax(2)
-          write(nname,*)'lnRreh         \ln(R)'
+          write(nname,*)'lnRreh         \ln(R_{\mathrm{reh}})'
           write(nrange,*)'lnRreh                 ',samplPmin(2),samplPmax(2)
        case ('Rrad')
           write(nunit,*)'limits[lnRrad]=',samplPmin(2),samplPmax(2)
-          write(nname,*)'lnRrad         \ln(R_{\rm rad})'
+          write(nname,*)'lnRrad         \ln(R_{\mathrm{rad}})'
           write(nrange,*)'lnRrad                 ',samplPmin(2),samplPmax(2)
        case default
           stop 'dump_aspic_priors: internal error!'
@@ -221,8 +228,8 @@ contains
 
        write(nunit,*)'limits[lnRhoReh]=',samplPmin(2),samplPmax(2)
        write(nunit,*)'limits[wreh]=',samplPmin(3),samplPmax(3)
-       write(nname,*)'lnRhoReh       \ln(\rho_{\rm reh})'
-       write(nname,*)'wreh           \bar{w}_{\rm reh}'
+       write(nname,*)'lnRhoReh       \ln(\rho_{\mathrm{reh}})'
+       write(nname,*)'wreh           \bar{w}_{\mathrm{reh}}'
        write(nrange,*)'lnRhoReh               ',samplPmin(2),samplPmax(2)
        write(nrange,*)'wreh                   ',samplPmin(3),samplPmax(3)
 
@@ -271,6 +278,13 @@ contains
        stop 'dump_aspic_priors: case not implemented!'
     end select
 
+    nderived = samplNpars - samplNdim
+    
+    do i=1,nderived
+       write(nname,*) get_derived_name(i)
+    enddo
+
+    
     close(nunit)
     close(nname)
     close(nrange)

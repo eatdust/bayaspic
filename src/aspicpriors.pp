@@ -1,8 +1,8 @@
 !write down the prior associated with the aspic models. Syntax is of
 !the form: (p1min,p1max,maptype1,p2min,p2max,maptype2...). If the end
 !of inflation is an additional parameter, it is assumed to come after
-!the potential parameters, as any other additional and non-potential
-!parameters. Maptype denotes the relation between the aspic parameters
+!the potential parameters. Any other additional and non-potential
+!parameters comes next. Maptype denotes the relation between the aspic parameters
 !and the one we are sampling on, "flat" means they are identical,
 !"log" means we are sampling on the log10, "ln" means we are sampling
 !on the log Neper, "mlog" means -log() as "mln" for -ln(), "inv" means
@@ -14,7 +14,7 @@
 !and through the function redefine_aspic_params() in aspicpriors.F08,
 !itself called in map_aspic_params() found in wraspic.f90
 
-ZEROPRIOR(hi)
+ZEROPRIOR(si)
 
 ONEPRIOR(rchio,-48._kp,-20._kp,flat)
 ONEPRIOR(rchi,-65._kp,100._kp,flat)

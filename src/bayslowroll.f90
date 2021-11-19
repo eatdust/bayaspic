@@ -3,8 +3,8 @@ program bayslowroll
   use samplsr, only : chord_init_slowroll, chord_sample_slowroll
   implicit none
 
-!  character(len=*), parameter :: sampler = 'multinest'
-  character(len=*), parameter :: sampler = 'polychord'
+  character(len=*), parameter :: sampler = 'multinest'
+!  character(len=*), parameter :: sampler = 'polychord'
   
   write(*,*)
   write(*,*)'Sampling slow-roll parameter space with: ', sampler

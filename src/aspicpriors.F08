@@ -5,8 +5,12 @@ module aspicpriors
   private
 
   public get_aspic_priors, check_aspic_hardprior
+  public get_aspic_numpriors
   public redefine_aspic_params
 
+  integer, save :: numAspicPriors = 0
+
+  
 !hard prior: all models are assumed to support, at least, this number
 !of efolds which allows for all possible reheating history
   real(kp), parameter :: efoldNum = 120._kp
@@ -26,15 +30,13 @@ module aspicpriors
 contains
 
   subroutine get_aspic_priors(name,pmin,pmax,mapname)
-    use aspicmodels, only : get_aspic_numparams
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(out) :: pmin, pmax
     character(len=lname), dimension(:), intent(inout) :: mapname
 
-    integer :: naspic
 
-    naspic = get_aspic_numparams()
-
+    numAspicPriors = 0
+    
     select case (name)
 
 #define ZEROPRIOR(fooi) \
@@ -46,7 +48,7 @@ contains
        pmin(1) = foomin ; \
        pmax(1) = foomax ; \
        mapname(1) = 'foomap' ; \
-       if (naspic.ne.1) stop 'get_aspic_priors: wrong npriors'
+       numAspicPriors = 1
 
 #define TWOPRIORS(fooi,foo1min,foo1max,foo1map,foo2min,foo2max,foo2map) \
     case ('fooi'); \
@@ -56,7 +58,7 @@ contains
        pmin(2) = foo2min ; \
        pmax(2) = foo2max ; \
        mapname(2) = 'foo2map' ; \
-       if (naspic.ne.2) stop 'get_aspic_priors: wrong npriors'
+       numAspicPriors = 2
 
 #define THREEPRIORS(fooi,foo1min,foo1max,foo1map,foo2min,foo2max,foo2map \
        ,foo3min,foo3max,foo3map) \
@@ -70,7 +72,7 @@ contains
        pmin(3) = foo3min ; \
        pmax(3) = foo3max ; \
        mapname(3) = 'foo3map' ; \
-       if (naspic.ne.3) stop 'get_aspic_priors: wrong npriors'
+       numAspicPriors = 3
 
 #define FOURPRIORS(fooi,foo1min,foo1max,foo1map,foo2min,foo2max,foo2map \
        ,foo3min,foo3max,foo3map,foo4min,foo4max,foo4map) \
@@ -87,7 +89,7 @@ contains
        pmin(4) = foo4min ; \
        pmax(4) = foo4max ; \
        mapname(4) = 'foo4map' ; \
-       if (naspic.ne.4) stop 'get_aspic_priors: wrong npriors'
+       numAspicPriors = 4
 
 
 #include "aspicpriors.pp"
@@ -104,6 +106,17 @@ contains
 
   end subroutine get_aspic_priors
 
+
+  function get_aspic_numpriors()
+    implicit none
+    integer :: get_aspic_numpriors
+
+    get_aspic_numpriors = numAspicPriors
+
+  end function get_aspic_numpriors
+
+
+  
 
 !case by case model if the prior space is not cubic
   function check_aspic_hardprior(name,params) result(reject)
@@ -249,13 +262,12 @@ contains
 
 
 !redefinition of aspic params (called after change of priors, see wraspic)
-  function redefine_aspic_params(name,nasp,newparams) result(asparams)    
+  function redefine_aspic_params(name,newparams) result(asparams)    
     include 'aspicpriors.h'
     implicit none   
     character(len=*), intent(in) :: name
-    integer, intent(in) :: nasp
-    real(kp), dimension(nasp), intent(in) :: newparams
-    real(kp), dimension(nasp) :: asparams
+    real(kp), dimension(:), intent(in) :: newparams
+    real(kp), dimension(size(newparams,1)) :: asparams
 
     asparams = newparams
 
