@@ -228,7 +228,7 @@ contains
 
        write(nunit,*)'limits[lnRhoReh]=',samplPmin(2),samplPmax(2)
        write(nunit,*)'limits[wreh]=',samplPmin(3),samplPmax(3)
-       write(nname,*)'lnRhoReh       \ln(\rho_{\mathrm{reh}})'
+       write(nname,*)'lnRhoReh       \ln(\rho_{\mathrm{reh}}/M_{\mathrm{Pl}}^4)'
        write(nname,*)'wreh           \bar{w}_{\mathrm{reh}}'
        write(nrange,*)'lnRhoReh               ',samplPmin(2),samplPmax(2)
        write(nrange,*)'wreh                   ',samplPmin(3),samplPmax(3)

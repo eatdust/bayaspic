@@ -241,43 +241,43 @@ contains
   function get_derived_name(i)
     implicit none
     integer, intent(in) :: i
-    integer, parameter :: lenderived = 40
+    integer, parameter :: lenderived = 60
     character(len=lenderived) :: get_derived_name
 
     select case(i)
 
     case (1)
-       get_derived_name = 'lnM*           \ln(M)                  '
+       get_derived_name = 'lnM*           \ln(M/M_{\mathrm{Pl}})                    '
           
     case (2)
-       get_derived_name = 'bfold*         N_{\mathrm{end}}-N_*    '
+       get_derived_name = 'bfold*         N_{\mathrm{end}}-N_*                      '
 
     case (3)
-       get_derived_name = 'logeps*        \log(\epsilon_1)        '
+       get_derived_name = 'logeps*        \log(\epsilon_1)                          '
 
     case (4)
-       get_derived_name = 'eps2*          \epsilon_2              '
+       get_derived_name = 'eps2*          \epsilon_2                                '
 
     case (5)
-       get_derived_name = 'eps3*          \epsilon_3              '
+       get_derived_name = 'eps3*          \epsilon_3                                '
 
     case (6)
-       get_derived_name = 'ns*            n_{\mathrm{S}}          '
+       get_derived_name = 'ns*            n_{\mathrm{S}}                            '
 
     case (7)
-       get_derived_name = 'logr*          \log(r_\epsilon)        '
+       get_derived_name = 'logr*          \log(r_\epsilon)                          '
 
     case (8)
-       get_derived_name = 'alpha*         \alpha_{\mathrm{S}}     '
+       get_derived_name = 'alpha*         \alpha_{\mathrm{S}}                       '
 
     case (9)       
-       get_derived_name = 'lnRhoEnd*      \ln(\rho_{\mathrm{end}})'
+       get_derived_name = 'lnRhoEnd*      \ln(\rho_{\mathrm{end}}/M_{\mathrm{Pl}}^4)'
 
     case (10)
-       get_derived_name = 'lnRreh*        \ln(R_{\mathrm{reh}})   '
+       get_derived_name = 'lnRreh*        \ln(R_{\mathrm{reh}})                     '
        
     case (11)
-       get_derived_name = 'lnRrad*        \ln(R_{\mathrm{rad}})   '
+       get_derived_name = 'lnRrad*        \ln(R_{\mathrm{rad}})                     '
        
     case default
        stop 'get_derived_name: incorrect parameters number!'
