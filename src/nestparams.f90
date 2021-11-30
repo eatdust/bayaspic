@@ -9,7 +9,7 @@ module nestparams
 !whether to do Importance Nested Sampling
   logical, parameter :: nestINS = .false.
 
-!whether to do multimodal sampling
+!whether to do multimodal sampling (false)
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000

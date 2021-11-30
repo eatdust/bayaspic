@@ -4,11 +4,11 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DMPI
-#-DMPISCHED -DASPICQ 
+FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DMPISCHED
+#-DMPISCHED -DASPICQ -DDOUBLEFANN
 F08FLAGS = -ffree-line-length-none
 INCLUDE=-I/usr/local/include/aspic
-#-I/usr/local/include/aspicq
+#-I/usr/local/include/aspicq  -ldoublefann
 LFLAGS= -lblas -llapack -ldoublefann -L/usr/local/lib -laspic
 #-laspicq
 

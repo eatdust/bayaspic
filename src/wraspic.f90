@@ -432,8 +432,8 @@ contains
           scalparams(i) = 1._kp/inparams(i)
 
        case ('invsqrt')
-          stop 'this one is weird!'
-          scalparams(i) = 1._kp/sqrt(inparams(i))
+
+          scalparams(i) = 1._kp/inparams(i)**2
 
        
        case default

@@ -40,8 +40,8 @@ program bayaspic
 
 
 !  call initialize_onemodel('si')
-  call initialize_onemodel('kklti stg')
-!  call initialize_manymodels()
+!  call initialize_onemodel('kklti stg')
+  call initialize_manymodels()
   
   
 !  call initialize_filemodels('list_dpmodels.dat')
@@ -158,10 +158,10 @@ contains
 
     Modelnames(0) = 'lfi 1'
     Modelnames(1) = 'lfi 2'
-    Modelnames(2) = 'lfi 3'
-    Modelnames(3) = 'lfi'
-    Modelnames(4) = 'si'
-    Modelnames(5) = 'nfi3 p'
+    Modelnames(2) = 'lfi'
+    Modelnames(3) = 'si'
+    Modelnames(4) = 'rgi'
+    Modelnames(5) = 'kklti'
     
   end subroutine initialize_manymodels
 
