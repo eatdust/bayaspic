@@ -10,7 +10,7 @@ module nestparams
   logical, parameter :: nestINS = .false.
 
 !whether to do multimodal sampling (false)
-  logical, parameter :: nestMmodal = .false.
+  logical, parameter :: nestMmodal = .true.
 
 !max no. of live points !20000
   integer(imn), parameter :: nestNlive = 20000
@@ -19,7 +19,7 @@ module nestparams
   logical, parameter :: nestCteEff = .false.
 
 !evidence tolerance factor !1e-4
-  real(fmn), parameter :: nestZTol = 1e-4
+  real(fmn), parameter :: nestZTol = 1e-3
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5

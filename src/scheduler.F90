@@ -236,7 +236,7 @@ contains
     implicit none
     integer, intent(in) :: nq
 
-    type(qval), dimension(:), pointer :: ptrqvals
+    type(qval), dimension(:), pointer :: ptrqvals => null()
     type(qval), dimension(:), allocatable :: valbuffer
 
     type(node), pointer :: ptrnode

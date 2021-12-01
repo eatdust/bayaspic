@@ -41,10 +41,10 @@ program bayaspic
 
 !  call initialize_onemodel('si')
 !  call initialize_onemodel('kklti stg')
-  call initialize_manymodels()
+!  call initialize_manymodels()
   
   
-!  call initialize_filemodels('list_dpmodels.dat')
+  call initialize_filemodels('list_dpmodels.dat')
 
 
 
