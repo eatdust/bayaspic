@@ -31,6 +31,10 @@ module wraspic
 
   logical, parameter :: display = .false.
 
+!clamp eps1 at this values in case of slow-roll violations (end of
+!inflation)
+  real(kp), parameter :: epsVClamp = 2._kp
+  
 contains
 
 
@@ -539,16 +543,36 @@ contains
     epsVStar(2) = aspic_epsilon_two(aspname,xstar,asparams)
     epsVStar(3) = aspic_epsilon_three(aspname,xstar,asparams)
 
-    epsHstar = slowroll_to_hubble(epsVstar)
-    
+!ensure some sanity before trying to get subtle corrections, if the
+!predictions are completely out of slow-roll, do not convert epsV to
+!epsH, we may get negative eps1H for epsV2 > 3
+
+    if (any(epsVstar.gt.epsVclamp)) then
+       epsHstar = epsVstar
+    else
+       epsHstar = slowroll_to_hubble(epsVstar)
+    endif
+       
     Vstar = aspic_norm_potential(aspname,xstar,asparams)       
 
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vend = aspic_norm_potential(aspname,xend,asparams)
-                         
+
+!clamp unobservable slow-roll violations at the end of inflation that
+!would completely screw estimation of rhoend for instance
+    epsOneEnd = min(epsOneEnd,epsVClamp)
+    
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
     lnRhoEnd = ln_rho_endinf(Pstar,epsHStar(1) &
          ,epsOneEnd,Vend/Vstar)
+
+!safeguard against insane values
+    if (isnan(lnRhoEnd)) then
+       write(*,*)'xend= ',xend
+       write(*,*)'eps* epsend= ',epsHStar,epsOneEnd
+       write(*,*)'Vend= Vstar= ',Vend,Vstar
+       stop 'wraspic: NaN caught in lnRhoEnd!'
+    endif
 
     select case (ReheatModel)
     case ('Rrad')

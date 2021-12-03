@@ -38,8 +38,8 @@ module samplaspic
 
 !the name of the fastlike method we call
 
-!  character(len=*), parameter :: fastLikeName = 'null'
-
+#ifndef LIKENULL
+  
 ! radial basis functions
 !  character(len=*), parameter :: fastLikeName = 'rbf'
 
@@ -49,6 +49,12 @@ module samplaspic
 !feedforward neural network
 !  character(len=*), parameter :: fastLikeName = 'fnn'
 
+#else
+
+  character(len=*), parameter :: fastLikeName = 'null'
+
+#endif  
+  
   public nest_init_aspic, nest_sample_aspic, nest_free_aspic
   public chord_init_aspic, chord_sample_aspic, chord_free_aspic
 
