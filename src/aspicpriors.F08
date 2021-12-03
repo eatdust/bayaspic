@@ -278,7 +278,7 @@ contains
        asparams(2) = newparams(2)
 
     case ('rpi2')
-       asparams(2) = newparams(1)
+       asparams(1) = newparams(1)
        asparams(2) = newparams(2)*rpi_x_potmax(asparams(1))
 
     case ('kmiii')
