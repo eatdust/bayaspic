@@ -20,7 +20,7 @@ use rmi1sr, only : rmi1_numacc_xendmax
 use rmi2sr, only : rmi2_numacc_xendmin
 use rmi3sr, only : rmi3_numacc_xendmax, rmi3_numacc_xendmin
 use rmi4sr, only : rmi4_numacc_xendmin, rmi4_xendmax
-use rpi2, only : rpi2_numacc_xendmin
+use rpi2sr, only : rpi2_numacc_xendmin
 use vhisr, only : vhi_xendmin, vhi_xendmax
 use dsisr, only : dsi_mumax, dsi_xendmin, dsi_xendmax
 use cndisr, only : cndi_xendmax
