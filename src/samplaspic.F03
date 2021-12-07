@@ -38,22 +38,20 @@ module samplaspic
 
 !the name of the fastlike method we call
 
-#ifndef LIKENULL
-  
-! radial basis functions
-!  character(len=*), parameter :: fastLikeName = 'rbf'
-
-! inverse shepard method
-  character(len=*), parameter :: fastLikeName = 'shep'
-
-!feedforward neural network
-!  character(len=*), parameter :: fastLikeName = 'fnn'
-
-#else
-
+#ifdef LIKENULL
   character(len=*), parameter :: fastLikeName = 'null'
 
-#endif  
+#elif LIKERBF
+! radial basis functions
+  character(len=*), parameter :: fastLikeName = 'rbf'
+#elif LIKEFANN
+!feedforward neural network
+  character(len=*), parameter :: fastLikeName = 'fnn'
+#else
+! inverse shepard method
+  character(len=*), parameter :: fastLikeName = 'shep'
+#endif
+    
   
   public nest_init_aspic, nest_sample_aspic, nest_free_aspic
   public chord_init_aspic, chord_sample_aspic, chord_free_aspic
@@ -69,9 +67,11 @@ contains
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
     use sheplike, only : initialize_shep_like, check_shep, get_shep_fmin
     use sheplike, only : get_shep_ndim, get_shep_xpmin, get_shep_xpmax
+#ifndef NOFANN
     use fnnlike, only : initialize_fnn_like, check_fnn, get_fnn_fmin
     use fnnlike, only : get_fnn_ndim, get_fnn_xpmin, get_fnn_xpmax
-
+#endif
+    
     implicit none    
     integer :: cpos, lenmod
     character(len=*), intent(in) :: modelname
@@ -140,7 +140,7 @@ contains
        fitNdim = get_shep_ndim()
        fitLogZero = get_shep_fmin()
 
-
+#ifndef NOFANN
     case ('fnn')
 
        if (.not.check_fnn()) then
@@ -153,7 +153,7 @@ contains
 
        fitNdim = get_fnn_ndim()
        fitLogZero = get_fnn_fmin()
-
+#endif
 
     case ('null')
 
@@ -346,9 +346,11 @@ contains
     case ('shep')
        ptrnest_aspic_loglike => shep_multinest_aspic_loglike
 
+#ifndef NOFANN       
     case ('fnn')
        ptrnest_aspic_loglike => fnn_multinest_aspic_loglike
-
+#endif
+       
     case ('null')
        ptrnest_aspic_loglike => null_multinest_aspic_loglike
 
@@ -530,7 +532,7 @@ contains
   end subroutine shep_multinest_aspic_loglike
 
 
-
+#ifndef NOFANN
   subroutine fnn_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
     use fnnprec, only : fp
     use fnnlike, only : cubize_fnnparams, uncubize_fnnparams, check_fnn
@@ -608,7 +610,7 @@ contains
     end if
 
   end subroutine fnn_multinest_aspic_loglike
-
+#endif
 
 
 
@@ -728,9 +730,11 @@ contains
     case ('shep')
        ptrchord_aspic_loglike => shep_polychord_aspic_loglike
 
+#ifndef NOFANN       
     case ('fnn')
        ptrchord_aspic_loglike => fnn_polychord_aspic_loglike
-
+#endif
+       
     case ('null')
        ptrchord_aspic_loglike => null_polychord_aspic_loglike
 
@@ -917,7 +921,7 @@ contains
 
 
 
-
+#ifndef NOFANN
   function fnn_polychord_aspic_loglike(theta,phi) result(lnew)
     use chordparams, only : chordLogZero, chordNderived, chordNdim
     use fnnprec, only : fp
@@ -992,7 +996,7 @@ contains
     end if
 
   end function fnn_polychord_aspic_loglike
-
+#endif
 
   
 

@@ -13,11 +13,14 @@ module wraspic
   integer, save :: nextra = 0
 
 
+
+#ifdef RRAD
+  character(len=*), parameter :: ReheatModel = 'Rrad'
+#elif RHOW
+  character(len=*), parameter :: ReheatModel = 'Rhow'
+#else
   character(len=*), parameter :: ReheatModel = 'Rreh'
-!  character(len=*), parameter :: ReheatModel = 'Rrad'
-!  character(len=*), parameter :: ReheatModel = 'Rhow'
-
-
+#endif
 
   type(infaspic), save :: AspicModel
 

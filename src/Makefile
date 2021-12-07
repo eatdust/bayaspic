@@ -3,14 +3,22 @@ ext=$(shell uname | cut -c1-3)
 
 
 ifeq ($(ext),Lin)
-FC=mpif90
-FCFLAGS= -O2 -fopenmp -DASPIC -DDOUBLEFANN -DLIKENULL -DMPISCHED
-#-DMPISCHED -DASPICQ -DDOUBLEFANN -DLIKENULL
+FC = mpif90
+FCFLAGS = -O2 -fopenmp -DASPIC -DLIKESHEP -DMPISCHED
+#-DMPISCHED -DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
+
 F08FLAGS = -ffree-line-length-none
-INCLUDE=-I/usr/local/include/aspic
-#-I/usr/local/include/aspicq  -ldoublefann
-LFLAGS= -lblas -llapack -ldoublefann -L/usr/local/lib -laspic
+
+INCLUDE =-I/usr/local/include/aspic
+#-I/usr/local/include/aspicq
+
+#if the fann library is present, build the NN likelihood interface
+LDFANN =
+#LDFANN = -ldoublefann
+
+LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)
 #-laspicq
+
 
 ##ifort specific
 #FC=ifort
@@ -26,9 +34,16 @@ LIKEDIR = ../fastlikes
 NESTDIR = ../multinest
 CHORDDIR = ../polychord/src/polychord
 
+ifneq ($(LDFANN),)
+FANNLIKE = fnnprec.o fann.o fnnlike.o
+FCFLAGS += -DDOUBLEFANN
+else
+FCFLAGS += -DNOFANN
+endif
+
 OBJSLIKE =  mlprec.o ioml.o iocmb.o rbfprec.o iorbf.o rbfuncs.o rbfnd.o rbflike.o \
-	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o \
-	fnnprec.o fann.o fnnlike.o
+	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o $(FANNLIKE)
+
 
 #with -DASPIC
 OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
@@ -50,7 +65,7 @@ OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
 OBJSMIN = sampl.o $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
 	nestparams.o chordparams.o samplsr.o
 
-FCFLAGS+=$(INCLUDE)
+FCFLAGS += $(INCLUDE)
 
 
 bayaspic.$(ext): $(OBJFILES) $(OBJSMPI) bayaspic.o

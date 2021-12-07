@@ -32,16 +32,22 @@ module samplsr
 
 !the name of the fastlike method we call
 
-!  character(len=*), parameter :: fastLikeName = 'null'
+#ifdef LIKENULL  
+  character(len=*), parameter :: fastLikeName = 'null'
 
+#elif LIKERBF
 ! radial basis functions
-!  character(len=*), parameter :: fastLikeName = 'rbf'
+  character(len=*), parameter :: fastLikeName = 'rbf'
 
+#elif LIKEFANN  
+!feedforward neural network
+  character(len=*), parameter :: fastLikeName = 'fnn'
+
+#else  
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
+#endif
 
-!feedforward neural network
-!  character(len=*), parameter :: fastLikeName = 'fnn'
 
 
   public nest_init_slowroll,  nest_free_slowroll
@@ -60,9 +66,11 @@ contains
     use sheplike, only : initialize_shep_like
     use sheplike, only : get_shep_ndim, get_shep_fmin
     use sheplike, only : get_shep_xpmin, get_shep_xpmax
+#ifndef NOFANN
     use fnnlike, only : initialize_fnn_like
     use fnnlike, only : get_fnn_ndim, get_fnn_fmin
     use fnnlike, only : get_fnn_xpmin, get_fnn_xpmax
+#endif
     implicit none
 
     integer :: i
@@ -95,6 +103,7 @@ contains
           samplPmax(i) = get_shep_xpmax(i)
        enddo
 
+#ifndef NOFANN       
     case ('fnn')
 
        call initialize_fnn_like(filefnn,filefnnbounds)
@@ -107,7 +116,8 @@ contains
           samplPmin(i) = get_fnn_xpmin(i)
           samplPmax(i) = get_fnn_xpmax(i)
        enddo
-
+#endif
+       
     case default
 
        stop 'sampl_init_slowroll: fast like not found!'
@@ -244,9 +254,11 @@ contains
     case ('shep')
        ptrnest_slowroll_loglike => shep_multinest_slowroll_loglike
 
+#ifndef NOFANN       
     case ('fnn')
        ptrnest_slowroll_loglike => fnn_multinest_slowroll_loglike
-          
+#endif
+       
     case default
 
        stop 'nest_sample_slowroll: fast like not found!'
@@ -308,7 +320,7 @@ contains
   end subroutine shep_multinest_slowroll_loglike
 
 
-
+#ifndef NOFANN
   subroutine fnn_multinest_slowroll_loglike(cube,nestdim,nestpars,lnew,context)
     use fnnprec, only : fp
     use fnnlike, only : uncubize_fnnparams, check_fnn
@@ -329,7 +341,7 @@ contains
     cube(1:nestdim) = real(uncubize_fnnparams(nestdim,fnncube),fmn)
     
   end subroutine fnn_multinest_slowroll_loglike
-
+#endif
 
 
 
@@ -392,10 +404,12 @@ contains
        ptrchord_slowroll_loglike => shep_polychord_slowroll_loglike
        ptrchord_prior => shep_polychord_prior
 
+#ifndef NOFANN
     case ('fnn')
        ptrchord_slowroll_loglike => fnn_polychord_slowroll_loglike
        ptrchord_prior => fnn_polychord_prior
-
+#endif
+       
     case default
        stop 'chord_sample_slowroll: fast like not found!'
 
@@ -489,7 +503,7 @@ contains
   end function shep_polychord_slowroll_loglike
 
 
-
+#ifndef NOFANN
   function fnn_polychord_prior(cube)
     use fnnprec, only : fp
     use fnnlike, only :  uncubize_fnnparams
@@ -529,7 +543,7 @@ contains
 !    print *,'test',fnn_polychord_slowroll_loglike,phi
     
   end function fnn_polychord_slowroll_loglike
-
+#endif
 
 
 

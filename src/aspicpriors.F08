@@ -226,6 +226,13 @@ contains
 
     case ('rpi2')
        reject = params(2).lt.rpi2_numacc_xendmin(efoldNum,params(1))
+!rpi2 has lnOmega4End = 2*yend, which can be big and large differences
+!may exist between rhoendJF and rhoendEF. We put a hard prior forcing
+!lnRreh - 1/4 lnOmega4End to be in the expected range [-46,15]       
+       !reject = reject .or. (AspicModel%lnRreh - 0.5_kp*params(2).lt.-46._kp)
+       !reject = reject .or. (AspicModel%lnRreh - 0.5_kp*params(2).gt.15._kp)
+       !print *,'reject',reject,AspicModel%lnRreh - 0.25_kp*2._kp*params(2)
+
        
 !equivalent to an hard prior on mumin to get efoldnum
     case ('vhi12')

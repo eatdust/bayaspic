@@ -20,7 +20,10 @@ module aspicvars
      real(kp) :: ns, logr, alpha
   end type infaspic
 
+  
+  
   public infaspic, kp, pi, lname
+
 
 
 end module aspicvars
