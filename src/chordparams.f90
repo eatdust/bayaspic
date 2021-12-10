@@ -1,3 +1,21 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
 module chordparams
   use sampl
   implicit none
@@ -5,7 +23,7 @@ module chordparams
   public
 
 !max no. of live points !20000
-  integer(imn), parameter :: chordNlive = 30000
+  integer(imn), parameter :: chordNlive = 20000
 
 !evidence tolerance factor !1e-4
   real(fmn), parameter :: chordZTol = 1e-4

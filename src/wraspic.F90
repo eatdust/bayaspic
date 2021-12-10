@@ -1,3 +1,21 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
 module wraspic
   use sampl, only : fmn, imn
   use aspicvars, only : kp, infaspic, lname
@@ -511,12 +529,10 @@ contains
     do i=1,npar
        mapnames(i) = AspicModel%cmaps(i)
     enddo
-!    asparams(1:npar) = mnParams(nextra+1:ntot)
 
     asparams(1:npar) = map_aspic_params(npar,mnparams(nextra+1:ntot) &
          ,mapnames(1:npar))
-
-
+    
     select case (ReheatModel)
 
     case ('Rrad')
@@ -550,7 +566,8 @@ contains
 !predictions are completely out of slow-roll, do not convert epsV to
 !epsH, we may get negative eps1H for epsV2 > 3
 
-    if (any(epsVstar.gt.epsVclamp)) then
+    
+    if (any(abs(epsVstar).gt.epsVclamp)) then
        epsHstar = epsVstar
     else
        epsHstar = slowroll_to_hubble(epsVstar)

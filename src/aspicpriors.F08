@@ -1,3 +1,21 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
 module aspicpriors
   use aspicvars, only : kp, pi, lname
   implicit none
@@ -226,13 +244,6 @@ contains
 
     case ('rpi2')
        reject = params(2).lt.rpi2_numacc_xendmin(efoldNum,params(1))
-!rpi2 has lnOmega4End = 2*yend, which can be big and large differences
-!may exist between rhoendJF and rhoendEF. We put a hard prior forcing
-!lnRreh - 1/4 lnOmega4End to be in the expected range [-46,15]       
-       !reject = reject .or. (AspicModel%lnRreh - 0.5_kp*params(2).lt.-46._kp)
-       !reject = reject .or. (AspicModel%lnRreh - 0.5_kp*params(2).gt.15._kp)
-       !print *,'reject',reject,AspicModel%lnRreh - 0.25_kp*2._kp*params(2)
-
        
 !equivalent to an hard prior on mumin to get efoldnum
     case ('vhi12')

@@ -1,3 +1,23 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
 !sampling the slow-roll parameter space only
 module samplsr
   use sampl, only : imn, fmn, lenmn
@@ -265,7 +285,7 @@ contains
 
     end select
 
-    call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+    call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestTol,nestSampEff,nestNdim,nestNpars, &
          nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
          nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
          ,ptrnest_slowroll_loglike,nest_dumper,context)

@@ -5,9 +5,17 @@ ext=$(shell uname | cut -c1-3)
 ifeq ($(ext),Lin)
 FC = mpif90
 FCFLAGS = -O2 -fopenmp -DASPIC -DLIKESHEP -DMPISCHED
-#-DMPISCHED -DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
+#-DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
+#-DMPISCHED or -DMPI
 
+#extra flags for F08 cpp generated source files
 F08FLAGS = -ffree-line-length-none
+
+#for multinest
+FMNFLAGS = -ffree-line-length-none
+
+#for polychord
+FPCFLAGS = -ffree-line-length-none
 
 INCLUDE =-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
@@ -105,16 +113,16 @@ samplsr.o: settings.o interfaces.o
 	$(FC) $(FCFLAGS)  -c$<
 
 %.o: $(NESTDIR)/%.f90
-	$(FC) $(FCFLAGS) -c $<
+	$(FC) $(FCFLAGS) $(FMNFLAGS) -c $<
 
 %.o: $(NESTDIR)/%.F90
-	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+	$(FC) $(FCFLAGS) $(FMNFLAGS) -c $<
 
 %.o: $(CHORDDIR)/%.f90
-	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+	$(FC) $(FCFLAGS) $(FPCFLAGS) -c $<
 
 %.o: $(CHORDDIR)/%.F90
-	$(FC) $(FCFLAGS) $(F08FLAGS) -c $<
+	$(FC) $(FCFLAGS) $(FPCFLAGS) -c $<
 
 %.o: %.f90
 	$(FC) $(FCFLAGS) -c $<

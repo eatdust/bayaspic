@@ -1,3 +1,22 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
 module nestparams
   use sampl
   implicit none
@@ -18,8 +37,8 @@ module nestparams
 !sample with constant efficiency
   logical, parameter :: nestCteEff = .false.
 
-!evidence tolerance factor !1e-4
-  real(fmn), parameter :: nestZTol = 1e-3
+!evidence tolerance factor !1d-3
+  real(fmn), parameter :: nestTol = 1d-4
 
 !sampling efficiency (enlargement factor reduction parameter)
   real(fmn), parameter :: nestSampEff = 0.5
@@ -34,12 +53,12 @@ module nestparams
   integer(imn), save :: nestCdim = 0
 
 !max modes expected, for memory allocation
-  integer(imn), parameter :: nestMaxModes = 10
+  integer(imn), parameter :: nestMaxModes = 4
 
 !after how many iterations feedback is required & the output files
 !should be updated note: posterior files are updated & dumper routine
 !is called after every updInt*10 iterations
-  integer(imn), parameter :: nestUpdInt = 1000
+  integer(imn), parameter :: nestUpdInt = 5000
 
 !null evidence (set it to very high negative no. if null evidence is unknown)
   real(fmn), parameter :: nestNullZ = -1d99
@@ -95,7 +114,7 @@ contains
     write(*,*)'nestMmodal   =         ',nestMmodal
     write(*,*)'nestNlive    =         ',nestNlive
     write(*,*)'nestCteEff   =         ',nestCteEff
-    write(*,*)'nestZtol     =         ',nestZtol
+    write(*,*)'nestTol      =         ',nestTol
     write(*,*)'nestFeedBack =         ',nestFeedBack
     write(*,*)'nestResume   =         ',nestResume
     write(*,*)'nestRootName =         ',trim(nestRootName)
@@ -132,13 +151,13 @@ contains
     integer(imn) :: context
 
     write(*,*)
-    write(*,*)'*****************************************************'
+    write(*,*)'**************************************************************************'
     write(*,*)'nest_dumper: '
     write(*,*)'nestRoot: ',trim(nestRootName)
     write(*,*)'nSamples= ',nSamples
     write(*,*)'logZ= logZerr=        ',logZ, logZerr
     write(*,*)'maxLogLike= INSlogZ = ',maxLogLike, INSlogZ
-    write(*,*)'*****************************************************'
+    write(*,*)'**************************************************************************'
     write(*,*)
 
 

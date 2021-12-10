@@ -1,3 +1,21 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
 module samplaspic
   use sampl, only : imn, fmn, lenmn
   use sampl, only : samplNdim, samplNpars
@@ -360,7 +378,7 @@ contains
 
     end select
 
-    call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestZtol,nestSampEff,nestNdim,nestNpars, &
+    call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestTol,nestSampEff,nestNdim,nestNpars, &
          nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
          nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
          ,ptrnest_aspic_loglike,nest_dumper,context)
@@ -389,9 +407,9 @@ contains
 
 
     if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
-
+        
 !get the physical parameters we are sampling on
-    mnpars = uncubize_samplparams(nestdim,cube)
+    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars)) then
@@ -421,7 +439,7 @@ contains
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
              lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
-
+             lnew = max(lnew,nestLogZero)
           else
 
              lnew = rbflike_eval(rbfcube)
@@ -440,6 +458,8 @@ contains
        cube(nestdim+i) = get_derived(i)
     enddo
 
+    if (isnan(lnew)) stop 'rbf_multinest_aspic_loglike: like is NaN!'
+    
     if (debug) then
        write(*,*)
        write(*,*)'rbf_multinest_aspic_loglike: '
@@ -469,11 +489,11 @@ contains
     real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts
 
 
-    if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'
-
+    if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'       
+    
 !get the physical parameters we are sampling on
-    mnpars = uncubize_samplparams(nestdim,cube)
-
+    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
+    
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars)) then
 
@@ -502,7 +522,7 @@ contains
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
              lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
-       
+             lnew = max(lnew,nestLogZero)
           else
 
              lnew = sheplike_eval(shepcube)
@@ -521,6 +541,9 @@ contains
        cube(nestdim+i) = get_derived(i)
     enddo
 
+!sanity check
+    if (isnan(lnew)) stop 'shep_multinest_aspic_loglike: like is NaN!'
+    
     if (debug) then
        write(*,*)
        write(*,*)'shep_multinest_aspic_loglike: '
@@ -552,7 +575,7 @@ contains
     if (.not.check_fnn()) stop 'fnn_multinest_loglike: not initialized!'
 
 !get the physical parameters we are sampling on
-    mnpars = uncubize_samplparams(nestdim,cube)
+    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars)) then
@@ -582,7 +605,7 @@ contains
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
              lnew = fitLogZero * 4._fp*sum((fnncube(:)-0.5_fp)**2)
-       
+             lnew = max(lnew,nestLogZero)
           else
 
              lnew = fnnlike_eval(fnncube)
@@ -601,6 +624,9 @@ contains
        cube(nestdim+i) = get_derived(i)
     enddo
 
+!sanity check
+    if (isnan(lnew)) stop 'fnn_multinest_aspic_loglike: like is NaN!'
+    
     if (debug) then
        write(*,*)
        write(*,*)'fnn_multinest_aspic_loglike: '
@@ -627,7 +653,7 @@ contains
     real(fmn), dimension(fitNdim) :: nullpars
 
 !get the physical parameters we are sampling on
-    mnpars = uncubize_samplparams(nestdim,cube)
+    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars)) then

@@ -1,3 +1,22 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
 program bayaspic
   use sampl
   use samplaspic, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
@@ -39,7 +58,7 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('si')
+!  call initialize_onemodel('rcqi')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   
@@ -152,16 +171,20 @@ contains
   subroutine initialize_manymodels()
     implicit none
     
-    nmodels = 6
+    nmodels = 10
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'lfi 1'
-    Modelnames(1) = 'lfi 2'
-    Modelnames(2) = 'lfi'
-    Modelnames(3) = 'si'
-    Modelnames(4) = 'rgi'
-    Modelnames(5) = 'kklti'
+    Modelnames(0) = 'lpi1'
+    Modelnames(1) = 'lpi1 41'
+    Modelnames(2) = 'lpi1 42'
+    Modelnames(3) = 'lpi1 43'
+    Modelnames(4) = 'lpi2 2'
+    Modelnames(5) = 'lpi2 4'
+    Modelnames(6) = 'lpi2 6'
+    Modelnames(7) = 'lpi3 2'
+    Modelnames(8) = 'lpi3 4'
+    Modelnames(9) = 'lpi3 6'
     
   end subroutine initialize_manymodels
 

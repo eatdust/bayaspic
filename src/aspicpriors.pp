@@ -1,3 +1,24 @@
+!   This file is part of bayaspic
+!
+!   Copyright (C) 2021 C. Ringeval
+!   
+!   bayaspic is free software: you can redistribute it and/or modify
+!   it under the terms of the GNU General Public License as published by
+!   the Free Software Foundation, either version 3 of the License, or
+!   (at your option) any later version.
+!
+!   bayaspic is distributed in the hope that it will be useful,
+!   but WITHOUT ANY WARRANTY; without even the implied warranty of
+!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+!   GNU General Public License for more details.
+!
+!   You should have received a copy of the GNU General Public License
+!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+
+
+
+
+
 !write down the prior associated with the aspic models. Syntax is of
 !the form:
 
@@ -244,37 +265,37 @@ THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,0.01_kp,10._kp,flat,0._kp,2._kp,log)
 !rmi1* requires quadruple precision for aspic for some of these
 !two (four). Inflation can occur at the top of the potential with hyper-fine
 !tuned conditions (and ns=1...)
-THREEPRIORS(rmi1,0.01,0.2,flat,-2,0,log,exp(-1._kp),1._kp,flat)
-THREEPRIORS(rmi1l,-3.,-1.,log,-2,0,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi1,0.01_kp,0.2_kp,flat,-2._kp,0._kp,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi1l,-3._kp,-1._kp,log,-2._kp,0._kp,log,exp(-1._kp),1._kp,flat)
 
-THREEPRIORS(rmi2,0.01,0.2,flat,-2,0,log,1._kp,exp(1._kp),flat)
-THREEPRIORS(rmi2l,-3,-1,log,-2,0,log,1._kp,exp(1._kp),flat)
+THREEPRIORS(rmi2,0.01_kp,0.2_kp,flat,-2._kp,0._kp,log,1._kp,exp(1._kp),flat)
+THREEPRIORS(rmi2l,-3._kp,-1._kp,log,-2._kp,0._kp,log,1._kp,exp(1._kp),flat)
 
-THREEPRIORS(rmi3,-0.2,-0.01,flat,-2,0,log,exp(-1._kp),1._kp,flat)
-THREEPRIORS(rmi3l,-3,-1,mlog,-2,0,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi3,-0.2_kp,-0.01_kp,flat,-2._kp,0._kp,log,exp(-1._kp),1._kp,flat)
+THREEPRIORS(rmi3l,-3._kp,-1._kp,mlog,-2._kp,0._kp,log,exp(-1._kp),1._kp,flat)
 
 !the last params is y such that xend = 1 + y(xendmax-1)
-THREEPRIORS(rmi4,-0.2,-0.01,flat,-2,0,log,0._kp,1._kp,flat)
-THREEPRIORS(rmi4l,-3,-1,mlog,-2,0,log,0._kp,1._kp,flat)
+THREEPRIORS(rmi4,-0.2_kp,-0.01_kp,flat,-2._kp,0._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(rmi4l,-3._kp,-1._kp,mlog,-2._kp,0._kp,log,0._kp,1._kp,flat)
 
 !last params is y with xend=xendmin+y*(xendmax-xendmin)
-THREEPRIORS(vhi,1+epsilon(1._kp),6,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhi,1+epsilon(1._kp),6._kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
 
 !vhi l1 requires quadruple precision for aspic
-THREEPRIORS(vhil1,0,0.9,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhi1,1,1,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhi2,2,2,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhi3,3,3,flat,0,3,log,0,1,flat)
-THREEPRIORS(vhi4,4,4,flat,0,3,log,0,1,flat)
+THREEPRIORS(vhil1,0._kp,0.9_kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(vhi12,0.5_kp,0.5_kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(vhi1,1._kp,1._kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(vhi2,2._kp,2._kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(vhi3,3._kp,3._kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
+THREEPRIORS(vhi4,4._kp,4._kp,flat,0._kp,3._kp,log,0._kp,1._kp,flat)
 
 
 !second param is mu/mumax, last is y with xend=xendmin+y*(xendmax-xendmin)
-THREEPRIORS(dsi,1+epsilon(1._kp),6,flat,-5,0,log,-5,-0.7,log)
+THREEPRIORS(dsi,1._kp+epsilon(1._kp),6._kp,flat,-5._kp,0._kp,log,-5._kp,-0.7_kp,log)
 !second param is mu/Mpl + hard prior mu<mumax, last param is y, as for
 ! dsi
-THREEPRIORS(dsio,1+epsilon(1._kp),6,flat,1d-9,1d-6,flat,-5,-0.7,log)
-THREEPRIORS(dsi2,2,2,flat,1d-9,1d-6,flat,-5,-0.7,log)
+THREEPRIORS(dsio,1._kp+epsilon(1._kp),6._kp,flat,1d-9,1d-6,flat,-5._kp,-0.7_kp,log)
+THREEPRIORS(dsi2,2._kp,2._kp,flat,1d-9,1d-6,flat,-5._kp,-0.7_kp,log)
 
 !last params is xend/xendmax
 THREEPRIORS(cndi,-2._kp,-1._kp,log,1._kp,6._kp,flat,0._kp,1._kp,flat)
@@ -288,32 +309,32 @@ THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,fl
 
 !witout xend
 
-THREEPRIORS(gmlfi,1,6,flat,1,6,flat,-5,1,log)
-THREEPRIORS(gmlfi2313,2._kp/3._kp,2._kp/3._kp,flat,1._kp/3._kp,1._kp/3._kp,flat,-5,1,log)
-THREEPRIORS(gmlfi2343,2._kp/3._kp,2._kp/3._kp,flat,4._kp/3._kp,4._kp/3._kp,flat,-5,1,log)
-THREEPRIORS(gmlfi11,1,1,flat,1,1,flat,-5,1,log)
-THREEPRIORS(gmlfi12,1,1,flat,2,2,flat,-5,1,log)
-THREEPRIORS(gmlfi13,1,1,flat,3,3,flat,-5,1,log)
-THREEPRIORS(gmlfi21,2,2,flat,1,1,flat,-5,1,log)
-THREEPRIORS(gmlfi22,2,2,flat,2,2,flat,-5,1,log)
-THREEPRIORS(gmlfi23,2,2,flat,3,3,flat,-5,1,log)
-THREEPRIORS(gmlfi31,3,3,flat,1,1,flat,-5,1,log)
-THREEPRIORS(gmlfi32,3,3,flat,2,2,flat,-5,1,log)
-THREEPRIORS(gmlfi33,3,3,flat,3,3,flat,-5,1,log)
+THREEPRIORS(gmlfi,1._kp,6._kp,flat,1._kp,6._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi2313,2._kp/3._kp,2._kp/3._kp,flat,1._kp/3._kp,1._kp/3._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi2343,2._kp/3._kp,2._kp/3._kp,flat,4._kp/3._kp,4._kp/3._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi11,1._kp,1._kp,flat,1._kp,1._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi12,1._kp,1._kp,flat,2._kp,2._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi13,1._kp,1._kp,flat,3._kp,3._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi21,2._kp,2._kp,flat,1._kp,1._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi22,2._kp,2._kp,flat,2._kp,2._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi23,2._kp,2._kp,flat,3._kp,3._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi31,3._kp,3._kp,flat,1._kp,1._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi32,3._kp,3._kp,flat,2._kp,2._kp,flat,-5._kp,1._kp,log)
+THREEPRIORS(gmlfi33,3._kp,3._kp,flat,3._kp,3._kp,flat,-5._kp,1._kp,log)
 
-THREEPRIORS(lpi1,1,6,flat,1,6,flat,-3,3,log)
-THREEPRIORS(lpi141,4,4,flat,1,1,flat,-3,3,log)
-THREEPRIORS(lpi142,4,4,flat,2,2,flat,-3,3,log)
-THREEPRIORS(lpi143,4,4,flat,3,3,flat,-3,3,log)
+THREEPRIORS(lpi1,1._kp,6._kp,flat,1._kp,6._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(lpi141,4._kp,4._kp,flat,1._kp,1._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(lpi142,4._kp,4._kp,flat,2._kp,2._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(lpi143,4._kp,4._kp,flat,3._kp,3._kp,flat,-3._kp,3._kp,log)
 
 
-THREEPRIORS(lpi22,1,6,flat,2,2,flat,2,5,log)
-THREEPRIORS(lpi24,1,6,flat,4,4,flat,2,5,log)
-THREEPRIORS(lpi26,1,6,flat,6,6,flat,2,5,log)
+THREEPRIORS(lpi22,1._kp,6._kp,flat,2._kp,2._kp,flat,2._kp,5._kp,log)
+THREEPRIORS(lpi24,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
+THREEPRIORS(lpi26,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
-THREEPRIORS(lpi32,1,6,flat,2,2,flat,2,5,log)
-THREEPRIORS(lpi34,1,6,flat,4,4,flat,2,5,log)
-THREEPRIORS(lpi36,1,6,flat,6,6,flat,2,5,log)
+THREEPRIORS(lpi32,1._kp,6._kp,flat,2._kp,2._kp,flat,2._kp,5._kp,log)
+THREEPRIORS(lpi34,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
+THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
 
 !with xend and xini
