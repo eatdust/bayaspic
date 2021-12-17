@@ -53,7 +53,7 @@ module wraspic
   logical, parameter :: display = .false.
 
 !clamp eps1 at this values in case of slow-roll violations (end of
-!inflation)
+!inflation) to have meaningful derived parameter values
   real(kp), parameter :: epsVClamp = 2._kp
   
 contains
@@ -654,17 +654,20 @@ contains
 
 
 
-  function test_aspic_hardprior(mnParams)
+  function test_aspic_hardprior(mnParams,disfavour)
     use aspicpriors, only : check_aspic_hardprior
     implicit none    
     logical :: test_aspic_hardprior
     real(fmn), dimension(:), intent(in) :: mnParams
-
+    logical, intent(out), optional :: disfavour
+    
     real(kp), dimension(nparmax) :: asparams
     character(len=lname), dimension(nparmax) :: mapnames
     character(len=lname) :: extname
     integer :: npar, ntot, i
 
+    logical, dimension(2) :: checkAspic
+    
     ntot = get_ntot()
     npar = AspicModel%nasp + AspicModel%nhid
 
@@ -681,8 +684,14 @@ contains
     asparams(1:npar) = map_aspic_params(npar,mnparams(nextra+1:ntot) &
          ,mapnames(1:npar))
 
-    test_aspic_hardprior = check_aspic_hardprior(extname,asparams(1:npar))
+    checkAspic = check_aspic_hardprior(extname,asparams(1:npar))
 
+    test_aspic_hardprior = checkAspic(1)
+
+    if (present(disfavour)) then
+       disfavour = checkAspic(2)
+    endif
+    
   end function test_aspic_hardprior
 
 
@@ -714,10 +723,10 @@ contains
 
 
 
-  function check_lnrreh_hardprior(lnRreh) result(reject)
+  function check_lnrreh_hardprior(lnRreh) result(ignore)
     use cosmopar, only : lnRhoNuc
     implicit none
-    logical :: reject
+    logical :: ignore
     real(fmn), intent(in) :: lnRreh
     real(fmn) :: lnRrehMax, lnRrehMin
     real(fmn) :: lnRhoEnd
@@ -732,11 +741,11 @@ contains
 
     lnRrehMin = 1._kp/4._kp * lnRhoNuc
 
-    reject = (lnRreh.lt.lnRrehMin).or.(lnRreh.gt.lnRrehMax) &
+    ignore = (lnRreh.lt.lnRrehMin).or.(lnRreh.gt.lnRrehMax) &
          .or.(lnRhoEnd.lt.lnRhoNuc)
 
     if (display) then
-       if (reject) then
+       if (ignore) then
           write(*,*)
           write(*,*)'check_lnrreh_hardprior:'
           write(*,*)'lnRhoEnd= lnRhoNuc= ',lnrhoEnd,lnRhoNuc
@@ -749,10 +758,10 @@ contains
 
 
 
-  function check_lnrrad_hardprior(lnRrad) result(reject)
+  function check_lnrrad_hardprior(lnRrad) result(ignore)
     use cosmopar, only : lnRhoNuc
     implicit none
-    logical :: reject
+    logical :: ignore
     real(fmn), intent(in) :: lnRrad
     real(fmn) :: lnRhoEnd, lnRradMax, lnRradMin
 
@@ -767,11 +776,11 @@ contains
 
     lnRradMin = 0.25_kp * ( lnRhoNuc - lnRhoEnd)
 
-    reject = (lnRrad.lt.lnRradMin).or.(lnRrad.gt.lnRradMax) &
+    ignore = (lnRrad.lt.lnRradMin).or.(lnRrad.gt.lnRradMax) &
          .or.(lnRhoEnd.lt.lnRhoNuc)
 
     if (display) then
-       if (reject) then
+       if (ignore) then
           write(*,*)
           write(*,*)'check_lnrrad_hardprior:'
           write(*,*)'lnRhoEnd= lnRhoNuc= ',lnRhoEnd,lnRhoNuc
@@ -784,20 +793,20 @@ contains
 
 
 
-  function check_rhow_hardprior(lnRhoReh,w) result(reject)
+  function check_rhow_hardprior(lnRhoReh,w) result(ignore)
     use cosmopar, only : lnRhoNuc
     implicit none
-    logical :: reject
+    logical :: ignore
     real(fmn), intent(in) :: lnRhoReh,w
     real(fmn) :: lnRhoEnd
     
     lnRhoEnd = AspicModel%lnRhoEnd
     
-    reject = (lnRhoReh.lt.lnRhoNuc).or.(lnRhoReh.gt.lnRhoEnd) &
+    ignore = (lnRhoReh.lt.lnRhoNuc).or.(lnRhoReh.gt.lnRhoEnd) &
          .or.(lnRhoEnd.lt.lnRhoNuc)
 
     if (display) then
-       if (reject) then
+       if (ignore) then
           write(*,*)
           write(*,*)'check_rhow_hardprior:'
           write(*,*)'lnRhoEnd= lnRhoNuc= ',lnRhoEnd,lnRhoNuc

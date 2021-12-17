@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
 
@@ -137,12 +137,12 @@ TWOPRIORS(twiA2,-4._kp,-1._kp,log,log10(2._kp),log10(40._kp),log)
 TWOPRIORS(twiB1,1._kp,100._kp,flat,log10(2._kp),log10(20._kp),log)
 TWOPRIORS(twiB2,1._kp,100._kp,flat,log10(2._kp),log10(40._kp),log)
 
-TWOPRIORS(bsusybif,0._kp,0.3_kp,flat,-200._kp,-0._kp,flat)
-TWOPRIORS(bsusybil,-3._kp,-1._kp,log,-200._kp,-0._kp,flat)
+TWOPRIORS(bsusybif,0._kp,0.3_kp,flat,-90._kp,-0._kp,flat)
+TWOPRIORS(bsusybil,-3._kp,-1._kp,log,-90._kp,-0._kp,flat)
 
-TWOPRIORS(csi,-5,-1,log,0,1,flat)
+TWOPRIORS(csi,-5._kp,-1._kp,log,0._kp,1._kp,flat)
 
-TWOPRIORS(cnci,-5,-1,log,1,10,flat)
+TWOPRIORS(cnci,-5._kp,-1._kp,log,1._kp,10._kp,flat)
 
 TWOPRIORS(imi,1._kp,6._kp,flat,1._kp,100._kp,flat)
 TWOPRIORS(imi1,1._kp,1._kp,flat,1._kp,100._kp,flat)
@@ -235,14 +235,14 @@ TWOPRIORS(sbialphamin,1._kp,1._kp,flat,-4._kp,-1._kp,log)
 TWOPRIORS(ssbi1,-3._kp,1._kp,log,-5._kp,1._kp,log)
 TWOPRIORS(ssbi2,-5._kp,-1._kp,mlog,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi3,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
-TWOPRIORS(ssbi4,-5._kp,1._kp,log,-5._kp,1._kp,mlog)
+TWOPRIORS(ssbi4,-5._kp,-1._kp,log,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
 TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
 
 TWOPRIORS(ssbi1f,0.001,10._kp,flat,0.00001_kp,10._kp,flat)
 TWOPRIORS(ssbi2f,-0.1_kp,-0.00001_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi3f,0.00001_kp,10._kp,flat,-10._kp,-0.00001_kp,flat)
-TWOPRIORS(ssbi4f,0.00001,10._kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi4f,0.00001,0.1_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
@@ -337,26 +337,25 @@ THREEPRIORS(lpi34,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
 
+!bi/kklti pheno, xstg and xuv have no role and they are fixed to
+!unphysical values (xstg=-1,xuv is omitted). Inflation ends at xeps1
+
+THREEPRIORS(kklti,2._kp,10._kp,flat,-3._kp,3._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(kkltis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+
+THREEPRIORS(bi,2._kp,10._kp,flat,-3._kp,3._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi1s,1._kp,1._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi2s,2._kp,2._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi3s,3._kp,3._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi4s,4._kp,4._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi5s,5._kp,5._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+THREEPRIORS(bi6s,6._kp,6._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
+
 !with xend and xini
 
 !bi/kklti within string scenarios. The parameters are p=4, mu<<Mpl, xstg and
 !the last is phiuv=xuv*mu
 FOURPRIORS(bistg,4._kp,4._kp,flat,-6._kp,log10(2._kp),log,0._kp,3._kp,log,-2._kp,log10(2._kp),log)
 FOURPRIORS(kkltistg,4._kp,4._kp,flat,-6._kp,log10(2._kp),log,0._kp,3._kp,log,-2._kp,log10(2._kp),log)
-
-!bi/kklti pheno, xstg and xuv have no role and they are fixed to
-!unphysical values (xstg=-1,xuv=-1). Inflation ends at xeps1
-
-FOURPRIORS(kklti,2._kp,10._kp,flat,-3._kp,3._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(kkltis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-
-FOURPRIORS(bi,2._kp,10._kp,flat,-3._kp,3._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi1s,1._kp,1._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi2s,2._kp,2._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi3s,3._kp,3._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi4s,4._kp,4._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi5s,5._kp,5._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-FOURPRIORS(bi6s,6._kp,6._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat,-1._kp,-1._kp,flat)
-
 

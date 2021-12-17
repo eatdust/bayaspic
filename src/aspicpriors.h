@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 use iisr, only : ii_xendmin
 use rpicommon, only : rpi_x_potmax
@@ -21,8 +21,9 @@ use sbisr, only : sbi_alphamin
 use lmicommon, only : lmi_epstwo_potmax ,lmi_numacc_x_big
 use lmi2sr, only : lmi2_xendmin, lmi2_epsilon_one
 use lmi2sr, only : lmi2_numacc_betamin
-use bsusybisr, only : bsusybi_xendmax
-use csisr, only : csi_xendmax, csi_numacc_x_epsonenull
+use bsusybisr, only : bsusybi_xendmax, bsusybi_numacc_xendmin
+use csisr, only : csi_xendmax, csi_numacc_x_epsonesmall
+use csisr, only : csi_numacc_x_epsonenull
 use cncisr, only : cnci_xendmin
 use imisr, only : imi_xendmin
 use sbisr, only : sbi_alphamin

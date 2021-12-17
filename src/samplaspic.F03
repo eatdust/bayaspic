@@ -53,7 +53,11 @@ module samplaspic
 
   real(fmn), save :: fitLogZero = 0._fmn
 
+  integer, parameter :: lenlabel = 16
+  character(len=lenlabel) :: label
 
+  integer, parameter :: countmax = 2000000
+  
 !the name of the fastlike method we call
 
 #ifdef LIKENULL
@@ -97,6 +101,8 @@ contains
 
     character, parameter :: separator=' '
 
+    label = trim(modelname)
+    
     lenmod = len(modelname)
 
     cpos = scan(modelname,separator)
@@ -403,19 +409,27 @@ contains
     real(fmn) :: lnew
     integer(imn) :: context,i
     real(fmn), dimension(nestdim) :: mnpars
-    real(fp), dimension(fitNdim) :: rbfcube, rbfpars, rbfcuts
+    real(fp), dimension(fitNdim) :: rbfcube, rbfpars, rbfcuts, rbfclamp
 
-
+    integer, save :: counthard = 0
+    logical :: disfavour
+    
     if (.not.check_rbf()) stop 'rbf_multinest_loglike: not initialized!'
         
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(mnpars)) then
+    if (test_aspic_hardprior(mnpars,disfavour)) then
 
-       lnew = nestLogZero
+       if (disfavour) then
+          lnew = nestLogZero / 10._fmn
+       else
+          lnew = nestLogZero 
+       endif
 
+       counthard = counthard + 1
+       
     else
        
 !use aspic to get the slowroll parameters
@@ -425,9 +439,12 @@ contains
        if (test_reheating_hardprior(mnpars)) then
           
           lnew = nestLogZero
-
+          counthard = counthard + 1
+          
        else
 
+          counthard = 0
+          
 !if eps1<eps1min, the likelihood is flat
           rbfcuts = cutmin_rbfparams(fitNdim,eps1pos,rbfpars)
 
@@ -437,9 +454,11 @@ contains
           if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
 !if outside rbffits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
-             lnew = max(lnew,nestLogZero)
+
+             rbfclamp = max(0._fp,min(rbfcube,1._fp))
+             
+             lnew = rbflike_eval(rbfclamp) - sum((rbfcube-rbfclamp)**2)
+             
           else
 
              lnew = rbflike_eval(rbfcube)
@@ -459,6 +478,13 @@ contains
     enddo
 
     if (isnan(lnew)) stop 'rbf_multinest_aspic_loglike: like is NaN!'
+
+    if (counthard.gt.countmax) then
+       write(*,*)'rbf_multinest_aspic_loglike: trapped into hard prior regions'
+       write(*,*)'model is: ',label
+       write(*,*)'mnparams= ',mnpars(1:nestdim)
+       stop
+    endif
     
     if (debug) then
        write(*,*)
@@ -486,19 +512,27 @@ contains
     real(fmn) :: lnew
     integer(imn) :: context,i
     real(fmn), dimension(nestdim) :: mnpars
-    real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts
+    real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts, shepclamp
 
-
+    integer, save :: counthard = 0
+    logical :: disfavour
+    
     if (.not.check_shep()) stop 'shep_multinest_loglike: not initialized!'       
     
 !get the physical parameters we are sampling on
-    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
+    mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim),label)
     
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(mnpars)) then
+    if (test_aspic_hardprior(mnpars, disfavour)) then
 
-       lnew = nestLogZero
-
+       if (disfavour) then
+          lnew = nestLogZero / 10._fmn
+       else
+          lnew = nestLogZero
+       endif
+       
+       counthard = counthard + 1
+       
     else
        
 !use aspic to get the slowroll parameters
@@ -508,9 +542,11 @@ contains
        if (test_reheating_hardprior(mnpars)) then
 
           lnew = nestLogZero
-
+          counthard = counthard + 1
        else
 
+          counthard = 0
+          
 !if eps1<eps1min, the likelihood is flat
           shepcuts = cutmin_shepparams(fitNdim,eps1pos,sheppars)
 
@@ -520,9 +556,11 @@ contains
           if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
 !if outside shepfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
-             lnew = max(lnew,nestLogZero)
+
+             shepclamp = max(0._fp,min(shepcube,1._fp))
+             
+             lnew = sheplike_eval(shepclamp) -  sum((shepcube-shepclamp)**2)
+             
           else
 
              lnew = sheplike_eval(shepcube)
@@ -543,6 +581,13 @@ contains
 
 !sanity check
     if (isnan(lnew)) stop 'shep_multinest_aspic_loglike: like is NaN!'
+
+    if (counthard.gt.countmax) then
+       write(*,*)'shep_multinest_aspic_loglike: trapped into hard prior regions'
+       write(*,*)'model is: ',label
+       write(*,*)'mnparams= ',mnpars(1:nestdim)
+       stop
+    endif
     
     if (debug) then
        write(*,*)
@@ -569,8 +614,10 @@ contains
     real(fmn) :: lnew
     integer(imn) :: context,i
     real(fmn), dimension(nestdim) :: mnpars
-    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts
+    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts, fnnclamp
 
+    integer, save :: counthard = 0
+    logical :: disfavour
 
     if (.not.check_fnn()) stop 'fnn_multinest_loglike: not initialized!'
 
@@ -578,10 +625,16 @@ contains
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(mnpars)) then
+    if (test_aspic_hardprior(mnpars,disfavour)) then
 
-       lnew = nestLogZero
-
+       if (disfavour) then
+          lnew = nestLogZero / 10._fmn
+       else
+          lnew = nestLogZero
+       endif
+      
+       counthard = counthard + 1
+       
     else
        
 !use aspic to get the slowroll parameters
@@ -591,9 +644,12 @@ contains
        if (test_reheating_hardprior(mnpars)) then
 
           lnew = nestLogZero
-
+          counthard = counthard + 1
+          
        else
 
+          counthard=0
+          
 !if eps1<eps1min, the likelihood is flat
           fnncuts = cutmin_fnnparams(fitNdim,eps1pos,fnnpars)
 
@@ -603,9 +659,12 @@ contains
           if (any(fnncube.gt.1._fp).or.any(fnncube.lt.0._fp)) then
 !if outside fnnfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((fnncube(:)-0.5_fp)**2)
-             lnew = max(lnew,nestLogZero)
+             
+             fnnclamp = max(0._fp,min(fnncube,1._fp))
+             
+             lnew = fnnlike_eval(fnnclamp) - sum((fnncube-fnnclamp)**2)
+
+             
           else
 
              lnew = fnnlike_eval(fnncube)
@@ -626,6 +685,13 @@ contains
 
 !sanity check
     if (isnan(lnew)) stop 'fnn_multinest_aspic_loglike: like is NaN!'
+
+    if (counthard.gt.countmax) then
+       write(*,*)'fnn_multinest_aspic_loglike: trapped into hard prior regions'
+       write(*,*)'model is: ',label
+       write(*,*)'mnparams= ',mnpars(1:nestdim)
+       stop
+    endif
     
     if (debug) then
        write(*,*)
@@ -652,13 +718,19 @@ contains
     real(fmn), dimension(nestdim) :: mnpars    
     real(fmn), dimension(fitNdim) :: nullpars
 
+    logical :: disfavour
+    
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(mnpars)) then
+    if (test_aspic_hardprior(mnpars,disfavour)) then
 
-       lnew = nestLogZero
+       if (disfavour) then
+          lnew = nestLogZero / 10._fmn
+       else
+          lnew = nestLogZero
+       endif
 
     else
 
@@ -805,18 +877,24 @@ contains
     real(fmn), dimension(:), intent(in) :: theta
     real(fmn), dimension(:), intent(out) :: phi
 
-    real(fp), dimension(fitNdim) :: rbfcube, rbfcuts, rbfpars
+    real(fp), dimension(fitNdim) :: rbfcube, rbfcuts, rbfpars, rbfclamp
     integer(imn) :: ndim, i
 
+    logical :: disfavour
+    
     ndim = size(theta,1)
 
     if (.not.check_rbf()) stop 'rbf_polychord_aspic_loglike: not initialized!'
     if (ndim.ne.chordNdim) stop 'rbf_polychord_aspic_loglike: dim mismatch!'
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(theta)) then
+    if (test_aspic_hardprior(theta,disfavour)) then
 
-       lnew = chordLogZero
+       if (disfavour) then
+          lnew = chordLogZero / 10._fmn
+       else
+          lnew = chordLogZero
+       endif       
 
     else
        
@@ -839,9 +917,11 @@ contains
           if (any(rbfcube.gt.1._fp).or.any(rbfcube.lt.0._fp)) then
 !if outside rbffits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((rbfcube(:)-0.5_fp)**2)
 
+             rbfclamp = max(0._fp,min(rbfcube,1._fp))
+             
+             lnew = rbflike_eval(rbfclamp) - sum((rbfcube-rbfclamp)**2)
+             
           else
 
              lnew = rbflike_eval(rbfcube)
@@ -883,16 +963,22 @@ contains
     real(fmn), dimension(:), intent(out) :: phi
 
     integer(imn) :: ndim, i
-    real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts
+    real(fp), dimension(fitNdim) :: shepcube, sheppars, shepcuts, shepclamp
 
+    logical :: disfavour
+    
     ndim = size(theta,1)
     if (.not.check_shep()) stop 'shep_polychord_aspic_loglike: not initialized!'
     if (ndim.ne.chordNdim) stop 'shep_polychord_aspic_loglike: dim mismatch!'
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(theta)) then
+    if (test_aspic_hardprior(theta,disfavour)) then
 
-       lnew = chordLogZero
+       if (disfavour) then
+          lnew = chordLogZero / 10._fmn
+       else
+          lnew = chordLogZero
+       endif              
 
     else
        
@@ -915,9 +1001,10 @@ contains
           if (any(shepcube.gt.1._fp).or.any(shepcube.lt.0._fp)) then
 !if outside shepfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
-!than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((shepcube(:)-0.5_fp)**2)
-       
+
+             shepclamp = max(0._fp,min(shepcube,1._fp))             
+             lnew = sheplike_eval(shepclamp) - sum((shepcube-shepclamp)**2)
+             
           else
 
              lnew = sheplike_eval(shepcube)
@@ -961,17 +1048,23 @@ contains
     real(fmn), dimension(:), intent(out) :: phi
 
     integer(imn) :: ndim, i
-    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts
+    real(fp), dimension(fitNdim) :: fnncube, fnnpars, fnncuts, fnnclamp
 
+    logical :: disfavour
+    
     ndim = size(theta,1)
     if (.not.check_fnn()) stop 'fnn_polychord_aspic_loglike: not initialized!'
     if (ndim.ne.chordNdim) stop 'fnn_polychord_aspic_loglike: dim mismatch!'
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(theta)) then
+    if (test_aspic_hardprior(theta,disfavour)) then
 
-       lnew = chordLogZero
-
+       if (disfavour) then
+          lnew = chordLogZero / 10._fmn
+       else
+          lnew = chordLogZero
+       endif              
+       
     else
        
 !use aspic to get the slowroll parameters
@@ -994,8 +1087,9 @@ contains
 !if outside fnnfits box, the real likelihood is so small that we
 !cannot calculate it numerically, but we can define a junk one smaller
 !than fitLogZero
-             lnew = fitLogZero * 4._fp*sum((fnncube(:)-0.5_fp)**2)
-       
+             fnnclamp = max(0._fp,min(fnncube,1._fp))
+             lnew = fnnlike_eval(fnnclamp) - sum((fnncube-fnnclamp)**2)
+
           else
 
              lnew = fnnlike_eval(fnncube)
@@ -1038,14 +1132,20 @@ contains
     real(fmn) :: lnew
     integer(imn) :: ndim, i
     real(fmn), dimension(size(theta,1)) :: nullpars
-   
+
+    logical :: disfavour
+    
     ndim = size(theta,1)
     if (ndim.ne.chordNdim) stop 'null_polychord_aspic_loglike: dim mismatch!'
 
 !check for any hard prior in aspic model parameters
-    if (test_aspic_hardprior(theta)) then
+    if (test_aspic_hardprior(theta,disfavour)) then
 
-       lnew = chordLogZero
+       if (disfavour) then
+          lnew = chordLogZero / 10._fmn
+       else
+          lnew = chordLogZero
+       endif                            
 
     else
 

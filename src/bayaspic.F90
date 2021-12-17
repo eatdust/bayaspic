@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
 
@@ -21,6 +21,9 @@ program bayaspic
   use sampl
   use samplaspic, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use samplaspic, only : chord_init_aspic, chord_sample_aspic, chord_free_aspic
+#ifdef MPISCHED
+  use mpi
+#endif  
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
   use scheduler, only : restore_scheduler, scheduler_save_queue
@@ -31,7 +34,6 @@ program bayaspic
 
 
 #ifdef MPISCHED
-  include "mpif.h"
   integer :: mpiCode
 #endif  
 
@@ -58,11 +60,11 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('rcqi')
+!  call initialize_onemodel('ssbi3 f')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   
-  
+!  call initialize_filemodels('list_ootest.dat')
   call initialize_filemodels('list_rreh_dpmodels.dat')
 
 
@@ -141,13 +143,13 @@ program bayaspic
   call free_listmodels()
 
 #ifdef MPISCHED   
+  write(*,*)'process on barrier: mpiRank= ',mpiRank
   call MPI_BARRIER(MPI_COMM_WORLD,mpiCode)
   call MPI_FINALIZE(mpiCode)
 #endif      
 
-  if (mpiRank.ne.0) then
-     write(*,*)'process stopped: mpiRank= ',mpiRank
-     stop
+  if (mpiRank.eq.0) then
+     write(*,*)'all models done!'
   endif
   
 

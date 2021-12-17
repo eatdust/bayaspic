@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
 module scheduler
@@ -410,8 +410,8 @@ contains
     if (nsize.eq.1) return
 
 
-            
-    if (qbounds%size.gt.2*chunk) then
+    if (qbounds%size.ge.2*chunk) then
+!    if (qbounds%size.gt.2*chunk) then
 
        call give_nodes(chunk)
      

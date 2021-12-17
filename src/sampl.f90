@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
 module sampl
@@ -84,36 +84,44 @@ contains
    
     if (allocated(samplPmin)) deallocate(samplPmin)
     if (allocated(samplPmax)) deallocate(samplPmax)
-    
+        
   end subroutine free_samplparams
   
 
 
-  function uncubize_samplparams(ndim,cube)
+  function uncubize_samplparams(ndimout,cube,alabel)
     implicit none
-    integer(imn), intent(in) :: ndim
-    real(fmn), dimension(ndim) :: cube
-    real(fmn), dimension(ndim) :: uncubize_samplparams
+    integer(imn), intent(in) :: ndimout
+    real(fmn), dimension(ndimout) :: cube
+    real(fmn), dimension(ndimout) :: uncubize_samplparams
+    character(len=*), optional :: alabel
     integer :: i
 
-!some subtle bug catchers added    
+!some subtle bug catchers added everwhere as this function is called
+!from all sampling methods
+    
     if (.not.allocated(samplPmin).or..not.allocated(samplPmax)) then
        stop 'uncubize_samplparams: prior not allocated!'
     endif
 
-    if ((size(samplPmin).ne.ndim).or.(size(samplPmax).ne.ndim)) then
-       stop 'uncubize_samplparams: prior size not matching cube input!'
+    if ((size(samplPmin).ne.ndimout).or.(size(samplPmax).ne.ndimout)) then
+       stop 'uncubize_samplparams: prior size not matching uncube output!'
     endif
 
 !cube directly comes from the sampler, when this happens, check out
 !multinest, polychord et al. :(
     if (any(isnan(cube))) then
        write(*,*)'uncubize_samplparams: cube= ',cube
-       stop 'Faulty sampler: NaN caught in cube input :('
+       if (present(alabel)) write(*,*)'model is: ',alabel
+       stop 'faulty sampler: NaN caught in cube output :('
     endif
-    
-    uncubize_samplparams = samplPmin + (samplPmax-samplPmin)*cube
 
+    do i=1,ndimout
+       uncubize_samplparams(i) = samplPmin(i) + (samplPmax(i)-samplPmin(i))*cube(i)
+    enddo
+
+
+    
   end function uncubize_samplparams
 
 

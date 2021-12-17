@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2021 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -13,7 +13,7 @@
 !   GNU General Public License for more details.
 !
 !   You should have received a copy of the GNU General Public License
-!   along with Foobar.  If not, see <https://www.gnu.org/licenses/>.
+!   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
 
@@ -29,19 +29,21 @@ module nestparams
   logical, parameter :: nestINS = .false.
 
 !whether to do multimodal sampling (false)
-  logical, parameter :: nestMmodal = .true.
+  logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000
-  integer(imn), parameter :: nestNlive = 20000
+  integer(imn), parameter :: nestNlive = 15000
 
-!sample with constant efficiency
-  logical, parameter :: nestCteEff = .false.
+!sample with constant efficiency (false). Should be true if hard prior
+!regions are large and the chains remain trapped inside
+!(evidence accuracy ensured in INS mode only)
+  logical, parameter :: nestCteEff = .true.
 
-!evidence tolerance factor !1d-3
-  real(fmn), parameter :: nestTol = 1d-4
+!evidence tolerance factor (<0.5)
+  real(fmn), parameter :: nestTol = 0.1_fmn
 
-!sampling efficiency (enlargement factor reduction parameter)
-  real(fmn), parameter :: nestSampEff = 0.5
+!sampling efficiency (enlargement factor reduction parameter, around 5%)
+  real(fmn), parameter :: nestSampEff = 0.05
 
 !dimension
   integer(imn), save :: nestNdim = 0
@@ -53,15 +55,15 @@ module nestparams
   integer(imn), save :: nestCdim = 0
 
 !max modes expected, for memory allocation
-  integer(imn), parameter :: nestMaxModes = 4
+  integer(imn), parameter :: nestMaxModes = 5
 
 !after how many iterations feedback is required & the output files
 !should be updated note: posterior files are updated & dumper routine
 !is called after every updInt*10 iterations
-  integer(imn), parameter :: nestUpdInt = 5000
+  integer(imn), parameter :: nestUpdInt = 2000
 
 !null evidence (set it to very high negative no. if null evidence is unknown)
-  real(fmn), parameter :: nestNullZ = -1d99
+  real(fmn), parameter :: nestNullZ = -1.0d99
 
 !file output name
   character(len=lenmn), parameter :: nestRootPrefix = 'chains/bayesinf_'
@@ -79,8 +81,9 @@ module nestparams
 !need update on sampling progress?
   logical, parameter :: nestFeedBack = .false.
 
-!whether to resume from a previous run
-  logical, parameter :: nestResume = .true.
+!whether to resume from a previous run (within one model, bayaspic may
+!still be resumed with this option set to false)
+  logical, parameter :: nestResume = .false.
 
 !whether to write output files
   logical, parameter ::  nestOutfile = .true.
@@ -89,8 +92,7 @@ module nestparams
   logical, parameter :: nestInitMPI = .true.
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: nestLogZero = -1d99
-
+  real(fmn), parameter :: nestLogZero = -1.0d50
 
  !max no. of iterations, a non-positive value means
  !infinity. MultiNest will terminate if either it has done max no. of
