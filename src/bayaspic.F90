@@ -31,7 +31,7 @@ program bayaspic
 
 
   character(len=*), parameter :: sampler = 'multinest'
-
+!  character(len=*), parameter :: sampler = 'polychord'
 
 #ifdef MPISCHED
   integer :: mpiCode

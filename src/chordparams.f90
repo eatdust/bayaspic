@@ -26,7 +26,7 @@ module chordparams
   integer(imn), parameter :: chordNlive = 20000
 
 !evidence tolerance factor < 0.5
-  real(fmn), parameter :: chordZTol = 0.1_fmn
+  real(fmn), parameter :: chordZTol = 0.01_fmn
 
 !dimension
   integer(imn), save :: chordNdim = 0
@@ -59,8 +59,8 @@ module chordparams
   character(len=lenmn), save :: chordDir = 'chains'
   character(len=lenmn), save :: chordName = 'bayesinf_'
 
-!need update on sampling progress?
-  integer(imn), parameter :: chordFeedBack = 3
+!need update on sampling progress? (3)
+  integer(imn), parameter :: chordFeedBack = 1
 
 !whether to resume/save from a previous run
   logical, parameter :: chordSave = .true.

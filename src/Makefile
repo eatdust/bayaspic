@@ -4,7 +4,7 @@ ext=$(shell uname | cut -c1-3)
 
 ifeq ($(ext),Lin)
 FC = mpif90
-FCFLAGS = -O2 -g  -fopenmp -DASPIC -DLIKESHEP -DMPISCHED
+FCFLAGS = -O2  -fopenmp -DASPIC -DLIKESHEP -DMPISCHED
 #-DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
 #-DMPISCHED or -DMPI
 

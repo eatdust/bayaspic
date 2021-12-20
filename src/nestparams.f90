@@ -32,7 +32,7 @@ module nestparams
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000
-  integer(imn), parameter :: nestNlive = 15000
+  integer(imn), parameter :: nestNlive = 20000
 
 !sample with constant efficiency (false). Should be true if hard prior
 !regions are large and the chains remain trapped inside
