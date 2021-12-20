@@ -1,6 +1,6 @@
 [submodule "fastlikes"]
 	path = fastlikes
-	url = ../../../mlearn
+	url = ../mlearn
 	branch = fastlikes
 [submodule "polychord"]
 	path = polychord
