@@ -60,12 +60,12 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('ssbi3 f')
+  call initialize_onemodel('vfmi')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   
 !  call initialize_filemodels('list_ootest.dat')
-  call initialize_filemodels('list_rreh_dpmodels.dat')
+!  call initialize_filemodels('list_rreh_dpmodels.dat')
 
 
 

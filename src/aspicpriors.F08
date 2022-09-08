@@ -308,7 +308,13 @@ contains
     case ('nfi4n', 'nfi4p')
        ignore = nfi4_xendmin(efoldNum,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
-       
+
+    case ('vfmi')
+!Such that exp{-3 beta exp[-x/sqrt(3 beta)]} is computable, the
+!potential should not become too large.
+
+       ignore = params(2).ge.vfmi_numacc_betamax(efoldNum,params(1))       
+
     end select
 
 !let's never disfavour
