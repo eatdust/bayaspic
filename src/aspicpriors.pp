@@ -258,7 +258,7 @@ TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
 TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
 
 TWOPRIORS(vfmi,0.1_kp,10._kp,flat,0.1_kp,10._kp,flat)
-
+TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)

@@ -60,7 +60,7 @@ program bayaspic
 
 
 
-  call initialize_onemodel('vfmi')
+  call initialize_onemodel('vfmi s')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   

@@ -30,7 +30,10 @@ module wraspic
 
   integer, save :: nextra = 0
 
-
+!Equation of state inflation predicts epsH exactly, as opposed to epsV
+!for usual slow-roll. We don't need to convert epsV to epsH and this
+!requires a special treatment.
+  character(len=*), dimension(1), parameter :: eosnames = (/'vfmi'/)
 
 #ifdef RRAD
   character(len=*), parameter :: ReheatModel = 'Rrad'
@@ -565,9 +568,8 @@ contains
 !ensure some sanity before trying to get subtle corrections, if the
 !predictions are completely out of slow-roll, do not convert epsV to
 !epsH, we may get negative eps1H for epsV2 > 3
-
     
-    if (any(abs(epsVstar).gt.epsVclamp)) then
+    if ( (any(abs(epsVstar).gt.epsVclamp)).or.(any(aspname == eosnames)) ) then
        epsHstar = epsVstar
     else
        epsHstar = slowroll_to_hubble(epsVstar)

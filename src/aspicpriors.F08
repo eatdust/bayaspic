@@ -309,7 +309,7 @@ contains
        ignore = nfi4_xendmin(efoldNum,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
 
-    case ('vfmi')
+    case ('vfmi', 'vfmis')
 !Such that exp{-3 beta exp[-x/sqrt(3 beta)]} is computable, the
 !potential should not become too large.
 
