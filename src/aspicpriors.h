@@ -1,7 +1,7 @@
 !   This file is part of bayaspic
 !
 !   Copyright (C) 2013-2021 C. Ringeval
-!   
+!
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
 !   the Free Software Foundation, either version 3 of the License, or
@@ -52,3 +52,10 @@ use nfi2sr, only : nfi2_numacc_xendmin,nfi2_numacc_xendmax
 use nfi2sr, only : nfi2_epsilon_one, nfi2_numacc_amin
 use nfi3sr, only : nfi3_numacc_absamax
 use nfi4sr, only : nfi4_xendmin, nfi4_numacc_xendmax
+use sbkisr, only : sbki_efoldmax, sbki_epsilon_one_min, &
+                   sbki_alphamin, sbki_alphamax
+use fisr, only : fi_check_params
+use nclisr, only : ncli_check_params
+use hni1sr, only : hni1_alphamin, hni1_numacc_efoldmax
+use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
+use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax

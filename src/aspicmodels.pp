@@ -1,7 +1,7 @@
 !   This file is part of bayaspic
 !
 !   Copyright (C) 2013-2021 C. Ringeval
-!   
+!
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
 !   the Free Software Foundation, either version 3 of the License, or
@@ -45,6 +45,10 @@ ONE(cnbi)
 ONE(osti)
 ONE(wri)
 ONE(saai)
+ONE(pai)
+ONE(sbki)
+ONE(ahi)
+
 
 TWO(cwi)
 TWO(sfi)
@@ -67,6 +71,9 @@ TWO(ssbi6)
 TWO(nfi1)
 TWO(nfi3)
 TWO(sabi)
+TWO(saci)
+TWO(fi)
+TWO(hni1)
 
 TWO_XEND(rpi2)
 TWO_XEND(ii)
@@ -75,12 +82,15 @@ TWO_XEND(bsusybi)
 TWO_XEND(csi)
 TWO_XEND(cnci)
 TWO_XEND(imi)
+TWO_XEND(sdi)
+
 
 
 THREE(gmlfi)
 THREE(lpi1)
 THREE(lpi2)
 THREE(lpi3)
+THREE(ncli)
 
 THREE_XEND(lmi2)
 THREE_XEND(rmi1)
@@ -95,3 +105,4 @@ THREE_XEND(nfi4)
 
 THREE_XEND(bi)
 THREE_XEND(kklti)
+THREE_XEND(hni2)

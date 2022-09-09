@@ -1,7 +1,7 @@
 !   This file is part of bayaspic
 !
 !   Copyright (C) 2013-2021 C. Ringeval
-!   
+!
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
 !   the Free Software Foundation, either version 3 of the License, or
@@ -28,7 +28,7 @@ module aspicpriors
 
   integer, save :: numAspicPriors = 0
 
-  
+
 !hard prior: all models are assumed to support, at least, this number
 !of efolds which allows for all possible reheating history
   real(kp), parameter :: efoldNum = 120._kp
@@ -55,7 +55,7 @@ contains
 
 
     numAspicPriors = 0
-    
+
     select case (name)
 
 #define ZEROPRIOR(fooi) \
@@ -135,7 +135,7 @@ contains
   end function get_aspic_numpriors
 
 
-  
+
 
 !case by case model if the prior space is not cubic
   function check_aspic_hardprior(name,params) result(answer)
@@ -161,19 +161,53 @@ contains
 
     select case (name)
 
+    case('sdi')
+      ignore = params(2).lt.sdi_numacc_xendmin(efoldNum,params(1)) .or. &
+              params(2).gt.sdi_numacc_xendmax(params(1))
+
+    case('hni1f')
+      ignore = params(1).le.hni1_alphamin(params(2)) .or. &
+               hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
+
+    case('hni2f','hni2l')
+      ignore = params(3).ge.hni2_xendmax(params(1),params(2)) .or. &
+               hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
+
+    case('ncli1','ncli2','ncli3','ncli4', 'ncli')
+      ignore = .not.(ncli_check_params(efoldMini,epsilonMax, &
+                params(1),params(2),params(3)))
+      disfavour = .not.(ncli_check_params(efoldMini,epsilonMax, &
+                          params(1),params(2),params(3)))
+
+
+    case('fi0')
+      disfavour = .not.(fi_check_params(100._kp,epsilonMax,params(1),params(2)))
+      ignore = disfavour
+    case('fi1')
+      ignore = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
+      ignore = disfavour
+    case('fi2')
+      disfavour = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
+      ignore = disfavour
+
+    case('sbkin','sbkip')
+      disfavour = (sbki_efoldmax(params(1)).lt.efoldNum) &
+              .or. (sbki_epsilon_one_min(params(1)).gt.efoldMini)
+      ignore = disfavour
+
     case ('ii','iif','iilambda')
        ignore = params(2).lt.ii_xendmin(efoldNum,params(1))
 
     case ('lmi1o', 'lmi1p')
-       ignore = lmi_epstwo_potmax(params(1),params(2)).gt.epsilonMax      
+       ignore = lmi_epstwo_potmax(params(1),params(2)).gt.epsilonMax
        disfavour = .true.
-       
+
     case ('lmi2o','lmi2p')
 !Such that exp(-beta xend^gamma) is computable; and epsilon1>numacc;
 !and epsilon1< 0.2 during inflation
        ignore = (params(3).gt.lmi_numacc_x_big(params(1),params(2))) &
             .or. (params(2).lt.lmi2_numacc_betamin(params(1)))
-       
+
 !eps1>0.2 all along inflation is ruled out
        if (lmi2_epsilon_one(params(3),params(1),params(2)) &
             .gt.epsilonMax) then
@@ -183,7 +217,7 @@ contains
 
     case('twiA1','twiA2','twiB1','twiB2')
        ignore = (params(2).gt.1._kp)
-       
+
     case ('bsusybif', 'bsusybil')
        ignore = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
 !this is roughly -95
@@ -207,7 +241,7 @@ contains
           ignore = .true.
           disfavour = .true.
        endif
-          
+
     case ('gripiopA','gripiopB','gripiomA','gripiomB')
        ignore = params(1).lt.gripi_alphamin(efoldNum,params(2))
 
@@ -215,7 +249,7 @@ contains
        ignore = params(1).lt.li_alphamin(efoldNum)
 
     case ('li')
-       ignore = params(1) .gt. -0.1_kp .and. params(1) .lt. 0.003_kp 
+       ignore = params(1) .gt. -0.1_kp .and. params(1) .lt. 0.003_kp
 
     case ('tiB1', 'tiD1', 'tiF1')
        ignore = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
@@ -237,28 +271,28 @@ contains
 
     case ('ssbi1', 'ssbi1f')
 !otherwise inflation does not stop
-      ignore = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), & 
+      ignore = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), &
                params(1),params(2)).lt.1._kp
 
     case ('ssbi3', 'ssbi3f')
-      ignore = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), & 
+      ignore = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), &
            params(1),params(2)).lt.1._kp)
 
       if (ssbi3_epstwo_potmax(params(1),params(2)) .gt. epsilonMax) then
          ignore = .true.
          disfavour = .true.
       endif
-         
+
     case ('ssbi4', 'ssbi4f')
       ignore = ssbi4_epstwo_potmax(params(1),params(2)) .gt. epsilonMax
       disfavour = .true.
-      
+
     case ('ssbi5','ssbi5f')
        ignore = params(1).gt.ssbi5_alphamax(params(2))
 
     case ('ssbi6','ssbi6f')
        ignore = params(1).gt.ssbi6_alphamax(params(2))
-              
+
     case ('rmi1', 'rmi1l')
        ignore = params(3).gt.rmi1_numacc_xendmax(efoldNum,params(1),params(2))
 
@@ -274,7 +308,7 @@ contains
 
     case ('rpi2')
        ignore = params(2).lt.rpi2_numacc_xendmin(efoldNum,params(1))
-       
+
 !equivalent to an hard prior on mumin to get efoldnum
     case ('vhi12')
        ignore = vhi_xendmax(efoldNum,params(1),params(2)) &
@@ -294,7 +328,7 @@ contains
     case ('nfi1')
        ignore = (params(1).gt.nfi1_numacc_amax(efoldNum,params(2))) &
             .or.(params(1).lt.nfi1_numacc_amin(params(2)))
-                  
+
     case ('nfi2')
        ignore = (params(1).lt.nfi2_numacc_amin(efoldNum,params(2)))
        if (nfi2_epsilon_one(params(3),params(1),params(2)).gt.epsilonMax) then
@@ -308,12 +342,12 @@ contains
     case ('nfi4n', 'nfi4p')
        ignore = nfi4_xendmin(efoldNum,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
-       
+
     end select
 
 !let's never disfavour
     disfavour = .false.
-    
+
     answer = (/ignore,disfavour/)
 
   end function check_aspic_hardprior
@@ -321,9 +355,9 @@ contains
 
 
 !redefinition of aspic params (called after change of priors, see wraspic)
-  function redefine_aspic_params(name,newparams) result(asparams)    
+  function redefine_aspic_params(name,newparams) result(asparams)
     include 'aspicpriors.h'
-    implicit none   
+    implicit none
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: newparams
     real(kp), dimension(size(newparams,1)) :: asparams
@@ -369,13 +403,13 @@ contains
     case ('twiB1','twiB2')
        asparams(1) = 10._kp**(-5._kp)/sqrt(newparams(1))
        asparams(2) = newparams(2)*asparams(1)
-       
+
     case ('csi')
        asparams(1) = newparams(1)
        asparams(2) = csi_numacc_x_epsonesmall(asparams(1),1d-5) &
             + newparams(2) * ( csi_xendmax(efoldNum,asparams(1)) &
             - csi_numacc_x_epsonesmall(asparams(1),1d-5) )
-       
+
     case ('cnci')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * cnci_xendmin(efoldNum,asparams(1))
@@ -386,7 +420,7 @@ contains
 
     case ('gmssmiopA','gmssmiopB')
        asparams(1) = 1._kp + newparams(1)
-       asparams(2) = newparams(2)    
+       asparams(2) = newparams(2)
 
     case ('gmssmiomA','gmssmiomB')
        asparams(1) = 1._kp - newparams(1)
@@ -394,7 +428,7 @@ contains
 
     case ('gripiopA','gripiopB')
        asparams(1) = 1._kp + newparams(1)
-       asparams(2) = newparams(2)      
+       asparams(2) = newparams(2)
 
     case ('gripiomA','gripiomB')
        asparams(1) = 1._kp - newparams(1)
@@ -444,20 +478,20 @@ contains
        asparams(3) = dsi_xendmin(efoldNum,asparams(1),asparams(2)) &
             + newparams(3) * ( dsi_xendmax(asparams(1),asparams(2),qDSI) &
             - dsi_xendmin(efoldNum,asparams(1),asparams(2)) )
-            
+
     case ('bi','bis','bi1s','bi2s','bi3s','bi4s','bi5s','bi6s')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
 !overload xend with xeps1 for the pheno bi models
        asparams(3) = bi_x_epsoneunity(asparams(1),asparams(2))
 
-       
+
     case ('kklti','kkltis','kklti1s','kklti2s','kklti3s','kklti4s','kklti5s','kklti6s')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
 !overload xend with xeps1 for the pheno kklti models
        asparams(3) = kklti_x_epsoneunity(asparams(1),asparams(2))
-        
+
     case ('bistg')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
