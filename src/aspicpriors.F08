@@ -304,22 +304,34 @@ contains
 
     case ('nfi3n','nfi3p')
        ignore = abs(params(1)).gt.0.1_kp*nfi3_numacc_absamax(params(2))
-
+       disfavour = .false.
+       
     case ('nfi4n', 'nfi4p')
        ignore = nfi4_xendmin(efoldNum,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
-
+       disfavour = .false.
+       
     case ('vfmi', 'vfmis')
 !Such that exp{-3 beta exp[-x/sqrt(3 beta)]} is computable, the
 !potential should not become too large.
        ignore = params(2).ge.vfmi_numacc_betamax(efoldNum,params(1))       
-
-!hard prior is nf < nphi
+       disfavour = .false.
+       
     case ('hbio','hbip')
        if (hbi_epsonemin(params(1),params(2)).gt.epsilonMax) then
           ignore = .true.
           disfavour = .true.
        endif
+
+    case ('shi')
+       if (shi_epstwomin(params(1),params(2)).gt.epsilonMax) then
+          ignore = .true.
+          disfavour = .true.
+       endif
+
+    case ('ccsi1')
+       ignore = ccsi1_numacc_efoldmax(params(1)).lt.efoldNum
+       disfavour = .false.
        
     end select
 
@@ -504,7 +516,17 @@ contains
 !n and mu as a function of nphi and nf
        asparams(1) = 2._kp*(newparams(1)+newparams(2))/newparams(2)
        asparams(2) = 2._kp*sqrt(newparams(1)+newparams(2))/newparams(2)
-       
+
+!we sample on alpha/ccsi3_alphamin(efoldNum) where alphamin < 0      
+    case ('ccsi3')
+       asparams(1) = newparams(1)*ccsi3_alphamin(efoldNum)
+
+!first param is alpha, second is xend/xendmin with xendmin the closest possible to xVmax
+    case ('ccsi2')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * ccsi2_numacc_xendmin(efoldNum,asparams(1))
+
+
     end select
 
   end function redefine_aspic_params

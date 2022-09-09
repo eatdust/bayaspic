@@ -585,6 +585,8 @@ contains
     epsOneEnd = min(epsOneEnd,epsVClamp)
     
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
+
+!without the conformal term, this implies RhoEnd is always Einstein Frame
     lnRhoEnd = ln_rho_endinf(Pstar,epsHStar(1) &
          ,epsOneEnd,Vend/Vstar)
 

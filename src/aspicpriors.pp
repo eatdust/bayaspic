@@ -122,6 +122,10 @@ ONEPRIOR(osti,1._kp,4._kp,log)
 ONEPRIOR(wrig,-3._kp,3._kp,log)
 ONEPRIOR(wrio,1._kp,1._kp,flat)
 
+ONEPRIOR(ccsi1,-6._kp,0._kp,log)
+!alpha/alphamin(efold=120)
+ONEPRIOR(ccsi3,-6._kp,0._kp,log)
+
 !with xend
 
 TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.2_kp,flat,0.5_kp,2._kp,log)
@@ -152,7 +156,8 @@ TWOPRIORS(imi4,4._kp,4._kp,flat,1._kp,100._kp,flat)
 TWOPRIORS(imi5,5._kp,5._kp,flat,1._kp,100._kp,flat)
 TWOPRIORS(imi6,6._kp,6._kp,flat,1._kp,100._kp,flat)
 
-
+!second param is xend/xendmin
+TWOPRIORS(ccsi2,-6._kp,-3._kp,log,1._kp,5._kp,flat)
 
 
 !witout xend
@@ -264,6 +269,8 @@ TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
 TWOPRIORS(hbio,0._kp,1._kp,flat,0.01_kp,1._kp,flat)
 !hbi pheno, n and mu
 TWOPRIORS(hbip,0._kp,5._kp,flat,0._kp,3._kp,log)
+
+TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)

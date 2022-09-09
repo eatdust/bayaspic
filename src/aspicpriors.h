@@ -54,3 +54,7 @@ use nfi3sr, only : nfi3_numacc_absamax
 use nfi4sr, only : nfi4_xendmin, nfi4_numacc_xendmax
 use vfmisr, only : vfmi_numacc_betamax
 use hbisr, only : hbi_epsonemin
+use shisr, only : shi_epstwomin
+use ccsi1sr, only : ccsi1_numacc_efoldmax
+use ccsi2sr, only : ccsi2_numacc_xendmin
+use ccsi3sr, only : ccsi3_alphamin

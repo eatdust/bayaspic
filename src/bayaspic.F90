@@ -60,7 +60,7 @@ program bayaspic
 
 
 
-  call initialize_onemodel('hbi o')
+  call initialize_onemodel('ccsi2')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
   
