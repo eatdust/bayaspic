@@ -1,7 +1,7 @@
 !   This file is part of bayaspic
 !
 !   Copyright (C) 2013-2021 C. Ringeval
-!   
+!
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
 !   the Free Software Foundation, either version 3 of the License, or
@@ -31,8 +31,8 @@
 !The "maptype" entry denotes the relation between the aspic parameters
 !and the one we are sampling on, "flat" means they are identical,
 !"log" means we are sampling on the log10(aspicparam), "ln" means we
-!are sampling on the log Neper, "mlog" means -log() as "mln" for
-!-ln(), "inv" means inverse 1/(), "invsqrt" means the square root of
+!are sampling on the log Neper, "mlog" means log(-) as "mln" for
+!ln(-), "inv" means inverse 1/(), "invsqrt" means the square root of
 !the inverse 1/sqrt() etc...
 
 !The prior bounds are assumed to be on the actual *sampled
@@ -126,6 +126,16 @@ ONEPRIOR(ccsi1,-6._kp,0._kp,log)
 !alpha/alphamin(efold=120)
 ONEPRIOR(ccsi3,-6._kp,0._kp,log)
 
+ONEPRIOR(pai,-3._kp,3.1_kp,log)
+ONEPRIOR(pais,-3._kp,0._kp,log)
+ONEPRIOR(pail,-3._kp,0._kp,log)
+
+ONEPRIOR(sbkin,-4._kp,-1._kp,mlog)
+ONEPRIOR(sbkip,-4._kp,-1._kp,log)
+
+ONEPRIOR(ahi,-3._kp,3._kp,log)
+
+
 !with xend
 
 TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.2_kp,flat,0.5_kp,2._kp,log)
@@ -159,6 +169,9 @@ TWOPRIORS(imi6,6._kp,6._kp,flat,1._kp,100._kp,flat)
 !second param is xend/xendmin
 TWOPRIORS(ccsi2,-6._kp,-3._kp,log,1._kp,5._kp,flat)
 
+TWOPRIORS(sdi,1._kp/sqrt(2._kp)+epsilon(1._kp),3._kp,log,-2._kp,2._kp,log)
+
+
 
 !witout xend
 
@@ -191,7 +204,7 @@ TWOPRIORS(gmssmiopB,-28._kp,-21.5_kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomA,-28._kp,-23._kp,log,0.00002_kp,0.0002_kp,flat)
 TWOPRIORS(gmssmiomB,-28._kp,-20._kp,log,0.00002_kp,0.0002_kp,flat)
 
-!grippi requires aspic quad-precision lnR>0
+!gripi requires aspic quad-precision lnR>0
 TWOPRIORS(gripi,0.9_kp,1.1_kp,flat,-5._kp,5._kp,log)
 TWOPRIORS(gripiopA,-15._kp,-10._kp,log,0.02_kp,0.2_kp,flat)
 TWOPRIORS(gripiopB,-15._kp,-8._kp,log,0.02_kp,0.2_kp,flat)
@@ -256,11 +269,13 @@ TWOPRIORS(nfi3n,-10._kp,-epsilon(1._kp),flat,epsilon(1._kp),1._kp-epsilon(1._kp)
 TWOPRIORS(nfi3p,epsilon(1._kp),10._kp,flat,-10._kp,-epsilon(1._kp),flat)
 
 TWOPRIORS(saai,-3._kp,3._kp,log,1._kp/3._kp,2._kp,flat)
+
 TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
 TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
 TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
 TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+
 
 TWOPRIORS(vfmi,0.1_kp,10._kp,flat,0.1_kp,10._kp,flat)
 TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
@@ -271,6 +286,19 @@ TWOPRIORS(hbio,0._kp,1._kp,flat,0.01_kp,1._kp,flat)
 TWOPRIORS(hbip,0._kp,5._kp,flat,0._kp,3._kp,log)
 
 TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
+
+TWOPRIORS(saci13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(saci12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
+TWOPRIORS(saci1,-3._kp,3._kp,log,1._kp,1._kp,flat)
+TWOPRIORS(saci32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
+TWOPRIORS(saci2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+
+TWOPRIORS(fi0,-8._kp,-4._kp,log,0._kp,0._kp,flat)
+TWOPRIORS(fi1,-32._kp/3._kp,-16._kp/3._kp,log,1._kp,1._kp,flat)
+TWOPRIORS(fi2,-40._kp/3._kp,-20._kp/3._kp,log,2._kp,2._kp,flat)
+
+TWOPRIORS(hni1f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log)
+
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
@@ -321,6 +349,9 @@ THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,1._kp
 THREEPRIORS(nfi4p,epsilon(1._kp),10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
 THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 
+THREEPRIORS(hni2f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
+THREEPRIORS(hni2l,-3._kp,-epsilon(1._kp),log,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
+
 !witout xend
 
 THREEPRIORS(gmlfi,1._kp,6._kp,flat,1._kp,6._kp,flat,-5._kp,1._kp,log)
@@ -350,6 +381,12 @@ THREEPRIORS(lpi32,1._kp,6._kp,flat,2._kp,2._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi34,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
+THREEPRIORS(ncli1,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,1._kp,flat)
+THREEPRIORS(ncli2,-6._kp,-1._kp,log,-3._kp,0._kp,log,2._kp,2._kp,flat)
+THREEPRIORS(ncli3,-6._kp,-1._kp,log,-3._kp,0._kp,log,3._kp,3._kp,flat)
+THREEPRIORS(ncli4,-6._kp,-1._kp,log,-3._kp,0._kp,log,4._kp,4._kp,flat)
+THREEPRIORS(ncli,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,10._kp,flat)
+
 
 !bi/kklti pheno, xstg and xuv have no role and they are fixed to
 !unphysical values (xstg=-1,xuv is omitted). Inflation ends at xeps1
@@ -372,4 +409,3 @@ THREEPRIORS(bi6s,6._kp,6._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
 !the last is phiuv=xuv*mu
 FOURPRIORS(bistg,4._kp,4._kp,flat,-6._kp,log10(2._kp),log,0._kp,3._kp,log,-2._kp,log10(2._kp),log)
 FOURPRIORS(kkltistg,4._kp,4._kp,flat,-6._kp,log10(2._kp),log,0._kp,3._kp,log,-2._kp,log10(2._kp),log)
-

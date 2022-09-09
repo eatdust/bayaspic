@@ -1,7 +1,7 @@
 !   This file is part of bayaspic
 !
 !   Copyright (C) 2013-2021 C. Ringeval
-!   
+!
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
 !   the Free Software Foundation, either version 3 of the License, or
@@ -23,7 +23,7 @@ program bayaspic
   use samplaspic, only : chord_init_aspic, chord_sample_aspic, chord_free_aspic
 #ifdef MPISCHED
   use mpi
-#endif  
+#endif
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
   use scheduler, only : restore_scheduler, scheduler_save_queue
@@ -35,7 +35,7 @@ program bayaspic
 
 #ifdef MPISCHED
   integer :: mpiCode
-#endif  
+#endif
 
   integer, save :: mpiRank = 0
   integer, save :: mpiSize = 1
@@ -63,7 +63,7 @@ program bayaspic
   call initialize_onemodel('ccsi2')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
-  
+
 !  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
 
@@ -74,7 +74,7 @@ program bayaspic
   call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
   call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
 #endif
-  
+
 
   if (mpiPrevSize.eq.0) mpiPrevSize = mpiSize
 
@@ -90,7 +90,7 @@ program bayaspic
      call start_scheduling(imodel)
 
      call irq_scheduler()
- 
+
      name = modelNames(imodel)
 
      if (display) then
@@ -111,7 +111,7 @@ program bayaspic
 
 
      case ('polychord')
-        
+
         call chord_init_aspic(trim(name))
         call chord_sample_aspic()
         call chord_free_aspic()
@@ -129,8 +129,8 @@ program bayaspic
 
      end select
 
-        
-    
+
+
      if (cpSave) then
         call scheduler_save_queue(mpiRank)
      endif
@@ -142,16 +142,16 @@ program bayaspic
   call free_scheduler()
   call free_listmodels()
 
-#ifdef MPISCHED   
+#ifdef MPISCHED
   write(*,*)'process on barrier: mpiRank= ',mpiRank
   call MPI_BARRIER(MPI_COMM_WORLD,mpiCode)
   call MPI_FINALIZE(mpiCode)
-#endif      
+#endif
 
   if (mpiRank.eq.0) then
      write(*,*)'all models done!'
   endif
-  
+
 
 contains
 
@@ -172,7 +172,7 @@ contains
 
   subroutine initialize_manymodels()
     implicit none
-    
+
     nmodels = 10
 
     allocate(ModelNames(0:nmodels-1))
@@ -187,7 +187,7 @@ contains
     Modelnames(7) = 'lpi3 2'
     Modelnames(8) = 'lpi3 4'
     Modelnames(9) = 'lpi3 6'
-    
+
   end subroutine initialize_manymodels
 
 
@@ -208,7 +208,7 @@ contains
 
     counter = 0
     open(unit=nunit,file=filename,status='old')
-    do 
+    do
        read(nunit,fmod,iostat=ioerr) mname
        if (ioerr.ne.0) exit
        counter = counter + 1
