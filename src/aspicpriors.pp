@@ -260,6 +260,11 @@ TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
 TWOPRIORS(vfmi,0.1_kp,10._kp,flat,0.1_kp,10._kp,flat)
 TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
 
+!hbi original, these are nf and nphi-nf
+TWOPRIORS(hbio,0._kp,1._kp,flat,0.01_kp,1._kp,flat)
+!hbi pheno, n and mu
+TWOPRIORS(hbip,0._kp,5._kp,flat,0._kp,3._kp,log)
+
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
 THREEPRIORS(lmi2p,0.1_kp,0.99_kp,flat,0.01_kp,10._kp,flat,0._kp,2._kp,log)

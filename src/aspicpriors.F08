@@ -312,9 +312,15 @@ contains
     case ('vfmi', 'vfmis')
 !Such that exp{-3 beta exp[-x/sqrt(3 beta)]} is computable, the
 !potential should not become too large.
-
        ignore = params(2).ge.vfmi_numacc_betamax(efoldNum,params(1))       
 
+!hard prior is nf < nphi
+    case ('hbio','hbip')
+       if (hbi_epsonemin(params(1),params(2)).gt.epsilonMax) then
+          ignore = .true.
+          disfavour = .true.
+       endif
+       
     end select
 
 !let's never disfavour
@@ -494,6 +500,11 @@ contains
             +newparams(3)*(nfi4_numacc_xendmax(asparams(1),asparams(2)) &
             -nfi4_xendmin(efoldNum,asparams(1),asparams(2)))
 
+    case ('hbio')
+!n and mu as a function of nphi and nf
+       asparams(1) = 2._kp*(newparams(1)+newparams(2))/newparams(2)
+       asparams(2) = 2._kp*sqrt(newparams(1)+newparams(2))/newparams(2)
+       
     end select
 
   end function redefine_aspic_params

@@ -53,3 +53,4 @@ use nfi2sr, only : nfi2_epsilon_one, nfi2_numacc_amin
 use nfi3sr, only : nfi3_numacc_absamax
 use nfi4sr, only : nfi4_xendmin, nfi4_numacc_xendmax
 use vfmisr, only : vfmi_numacc_betamax
+use hbisr, only : hbi_epsonemin

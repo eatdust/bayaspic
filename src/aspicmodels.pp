@@ -68,6 +68,7 @@ TWO(nfi1)
 TWO(nfi3)
 TWO(sabi)
 TWO(vfmi)
+TWO(hbi)
 
 TWO_XEND(rpi2)
 TWO_XEND(ii)
