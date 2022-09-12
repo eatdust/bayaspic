@@ -123,6 +123,7 @@ ONEPRIOR(wrig,-3._kp,3._kp,log)
 ONEPRIOR(wrio,1._kp,1._kp,flat)
 
 ONEPRIOR(ccsi1,-6._kp,0._kp,log)
+
 !alpha/alphamin(efold=120)
 ONEPRIOR(ccsi3,-6._kp,0._kp,log)
 
