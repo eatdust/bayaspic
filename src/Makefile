@@ -2,10 +2,10 @@ ext=$(shell uname | cut -c1-3)
 
 
 
-ifeq ($(ext),Lin)
-FC = mpif90
-FCFLAGS = -O2  -fopenmp -DASPIC -DLIKESHEP -DMPISCHED
-#-DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
+ifeq ($(ext),Dar)
+FC = gfortran
+FCFLAGS = -O2  -fopenmp -DASPIC -DLIKESHEP -DNOFANN #-DMPISCHED
+#-DASPICQ -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
 #-DMPISCHED or -DMPI
 
 #extra flags for F08 cpp generated source files
@@ -21,7 +21,7 @@ INCLUDE =-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
 
 #if the fann library is present, build the NN likelihood
-LDFANN = -l doublefann
+#LDFANN = -l doublefann
 #LDFANN = -ldoublefann
 
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)
@@ -35,7 +35,7 @@ LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)
 #INCLUDE=-I/opt/intel/aspic/include/aspic
 #LFLAGS= -mkl -L/opt/intel/aspic/lib -laspic
 #CPP=cpp -P -traditional-cpp $(FCFLAGS)
-endif 
+endif
 
 
 LIKEDIR = ../fastlikes
@@ -54,7 +54,7 @@ OBJSLIKE =  mlprec.o ioml.o iocmb.o rbfprec.o iorbf.o rbfuncs.o rbfnd.o rbflike.
 
 
 #with -DASPIC
-OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
+OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o
 
 OBJSMPI = fifo.o iofifo.o scheduler.o
 
@@ -64,7 +64,7 @@ OBJSNEST = utilsMN.o utils1.o priorsMN.o kmeans_clstr.o \
 OBJSCHORD = utilsPC.o abort.o settings.o mpi_utils.o random_utils.o  \
 	array_utils.o calculate.o run_time_info.o params.o priorsPC.o \
 	read_write.o feedback.o chordal_sampling.o clustering.o \
-	generate.o nelder_mead.o maximiser.o nested_sampling.o ini.o interfaces.o 
+	generate.o nelder_mead.o maximiser.o nested_sampling.o ini.o interfaces.o
 
 #nestwrap.o
 OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
@@ -77,10 +77,10 @@ FCFLAGS += $(INCLUDE)
 
 
 bayaspic.$(ext): $(OBJFILES) $(OBJSMPI) bayaspic.o
-	$(FC) $(FCFLAGS) $(OBJFILES) $(OBJSMPI) bayaspic.o -o ../$@ $(LFLAGS) 
+	$(FC) $(FCFLAGS) $(OBJFILES) $(OBJSMPI) bayaspic.o -o ../$@ $(LFLAGS)
 
 bayslowroll.$(ext): $(OBJSMIN) bayslowroll.o
-	$(FC) $(FCFLAGS) $(OBJSMIN) bayslowroll.o -o ../$@ $(LFLAGS) 
+	$(FC) $(FCFLAGS) $(OBJSMIN) bayslowroll.o -o ../$@ $(LFLAGS)
 
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
@@ -142,7 +142,7 @@ ifeq ($(FC),ifort)
 %.ifort: %.f03
 	$(CPP) $< -o $@
 %.o: %.ifort
-	$(FC) $(FCFLAGS) -c -free -Tf$< 
+	$(FC) $(FCFLAGS) -c -free -Tf$<
 else
 %.o: $(LIKEDIR)/fnn/%.F03
 	$(FC) $(FCFLAGS) -c $<

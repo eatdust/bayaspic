@@ -38,6 +38,9 @@ module aspicpriors
 !we ask for the minimum possible efold number
   real(kp), parameter :: efoldMini = 60._kp
 
+!conversely, in some models the potential runs over so many orders of magnitude that a larger number of efolds need to be realised
+  real(kp), parameter :: efoldMaxi = 180._kp
+
 !hard prior: all the parameter space inflating in a domain with
 !eps2>eps2minMax is ignored
   real(kp), parameter :: epsilonMax = 0.2_kp
@@ -160,6 +163,12 @@ contains
     disfavour = .false.
 
     select case (name)
+
+    case('saii1n', 'saii1p', 'saii1f')
+      ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+
+    case('saii2n', 'saii2p', 'saii2f')
+        ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
 
     case('sdi')
       ignore = params(2).lt.sdi_numacc_xendmin(efoldNum,params(1)) .or. &
@@ -325,12 +334,20 @@ contains
 !enforce the hard prior bound xini<xuv (asparams(4) is xuv)
        ignore = params(4).lt.kklti_x_trajectory(-efoldNum,params(3),params(1),params(2))
 
-    case ('nfi1')
-       ignore = (params(1).gt.nfi1_numacc_amax(efoldNum,params(2))) &
-            .or.(params(1).lt.nfi1_numacc_amin(params(2)))
+    case('nfi1')
+          ignore = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
+                  (params(2).lt.2._kp .and. &
+                  params(1).gt.nfi1_amax(efoldNum,params(2))) .or. &
+                  params(1).gt.nfi1_numacc_amax(efoldNum,params(2))
+         disfavour = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
+                    params(2).lt.2._kp .and. &
+                    params(1).gt.nfi1_amax(efoldNum,params(2))
 
     case ('nfi2')
-       ignore = (params(1).lt.nfi2_numacc_amin(efoldNum,params(2)))
+       ignore = (params(1).lt.nfi2_numacc_amin(efoldMaxi,params(2))) .or. &
+                nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
+       disfavour = (params(1).lt.nfi2_numacc_amin(efoldMaxi,params(2))) .or. &
+                nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
        if (nfi2_epsilon_one(params(3),params(1),params(2)).gt.epsilonMax) then
           ignore = .true.
           disfavour = .true.
@@ -339,19 +356,19 @@ contains
     case ('nfi3n','nfi3p')
        ignore = abs(params(1)).gt.0.1_kp*nfi3_numacc_absamax(params(2))
        disfavour = .false.
-       
+
     case ('nfi4n', 'nfi4p')
-       ignore = nfi4_xendmin(efoldNum,params(1),params(2)) &
+       ignore = nfi4_xendmin(efoldMaxi,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
 
        disfavour = .false.
-       
+
     case ('vfmi', 'vfmis')
 !Such that exp{-3 beta exp[-x/sqrt(3 beta)]} is computable, the
 !potential should not become too large.
-       ignore = params(2).ge.vfmi_numacc_betamax(efoldNum,params(1))       
+       ignore = params(2).ge.vfmi_numacc_betamax(efoldNum,params(1))
        disfavour = .false.
-       
+
     case ('hbio','hbip')
        if (hbi_epsonemin(params(1),params(2)).gt.epsilonMax) then
           ignore = .true.
@@ -367,7 +384,7 @@ contains
     case ('ccsi1')
        ignore = ccsi1_numacc_efoldmax(params(1)).lt.efoldNum
        disfavour = .false.
-       
+
 
     end select
 
@@ -538,22 +555,22 @@ contains
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
        asparams(3) = nfi2_numacc_xendmin(asparams(1),asparams(2)) &
-            + newparams(3)*(nfi2_numacc_xendmax(efoldNum,asparams(1),asparams(2)) &
+            + newparams(3)*(nfi2_numacc_xendmax(efoldMaxi,asparams(1),asparams(2)) &
             - nfi2_numacc_xendmin(asparams(1),asparams(2)))
 
     case ('nfi4p','nfi4n')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2)
-       asparams(3) = nfi4_xendmin(efoldNum,asparams(1),asparams(2)) &
+       asparams(3) = nfi4_xendmin(efoldMaxi,asparams(1),asparams(2)) &
             +newparams(3)*(nfi4_numacc_xendmax(asparams(1),asparams(2)) &
-            -nfi4_xendmin(efoldNum,asparams(1),asparams(2)))
+            -nfi4_xendmin(efoldMaxi,asparams(1),asparams(2)))
 
     case ('hbio')
 !n and mu as a function of nphi and nf
        asparams(1) = 2._kp*(newparams(1)+newparams(2))/newparams(2)
        asparams(2) = 2._kp*sqrt(newparams(1)+newparams(2))/newparams(2)
 
-!we sample on alpha/ccsi3_alphamin(efoldNum) where alphamin < 0      
+!we sample on alpha/ccsi3_alphamin(efoldNum) where alphamin < 0
     case ('ccsi3')
        asparams(1) = newparams(1)*ccsi3_alphamin(efoldNum)
 
