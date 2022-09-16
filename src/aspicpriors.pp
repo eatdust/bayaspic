@@ -300,6 +300,15 @@ TWOPRIORS(fi2,-40._kp/3._kp,-20._kp/3._kp,log,2._kp,2._kp,flat)
 
 TWOPRIORS(hni1f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log)
 
+TWOPRIORS(saii1n,-3._kp,-3._kp,mlog,0._kp,3._kp,log)
+TWOPRIORS(saii1p,-3._kp,3._kp,log,0._kp,3._kp,log)
+TWOPRIORS(saii1f,-10._kp,10._kp,flat,0._kp,3._kp,log)
+
+TWOPRIORS(saii2n,-3._kp,3._kp,mlog,0._kp,3._kp,log)
+TWOPRIORS(saii2p,-3._kp,3._kp,log,0._kp,3._kp,log)
+TWOPRIORS(saii2f,-10._kp,10._kp,flat,0._kp,3._kp,log)
+
+
 
 !with xend
 THREEPRIORS(lmi2o,1.1_kp,6._kp,flat,-2._kp,2._kp,log,0._kp,2._kp,log)
@@ -343,10 +352,10 @@ THREEPRIORS(dsi2,2._kp,2._kp,flat,1d-9,1d-6,flat,-5._kp,-0.7_kp,log)
 !last params is xend/xendmax
 THREEPRIORS(cndi,-2._kp,-1._kp,log,1._kp,6._kp,flat,0._kp,1._kp,flat)
 
-!last aprams is y such that xend = xendmin+y(xendmax-xendmin)
+!last params is y such that xend = xendmin+y(xendmax-xendmin)
 THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,1._kp,flat)
 
-!last aprams is y such that xend = xendmin+y(xendmax-xendmin)
+!last params is y such that xend = xendmin+y(xendmax-xendmin)
 THREEPRIORS(nfi4p,epsilon(1._kp),10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
 THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 

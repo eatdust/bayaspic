@@ -47,9 +47,9 @@ use gripisr, only : gripi_epstwomin, gripi_alphamin
 use lisr, only : li_alphamin
 use bisr, only : bi_x_epsoneunity, bi_x_trajectory
 use kkltisr, only : kklti_x_epsoneunity, kklti_x_trajectory
-use nfi1sr, only : nfi1_numacc_amax, nfi1_numacc_amin
+use nfi1sr, only : nfi1_numacc_amin, nfi1_amax, nfi1_numacc_amax
 use nfi2sr, only : nfi2_numacc_xendmin,nfi2_numacc_xendmax
-use nfi2sr, only : nfi2_epsilon_one, nfi2_numacc_amin
+use nfi2sr, only : nfi2_epsilon_one, nfi2_numacc_amin, nfi2_efold_max
 use nfi3sr, only : nfi3_numacc_absamax
 use nfi4sr, only : nfi4_xendmin, nfi4_numacc_xendmax
 use vfmisr, only : vfmi_numacc_betamax
@@ -65,3 +65,5 @@ use nclisr, only : ncli_check_params
 use hni1sr, only : hni1_alphamin, hni1_numacc_efoldmax
 use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
 use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax
+use saii1sr, only : saii1_numacc_mumin
+use saii2sr, only : saii2_numacc_mumin
