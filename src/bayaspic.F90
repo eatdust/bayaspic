@@ -60,9 +60,9 @@ program bayaspic
 
 
 
-  call initialize_onemodel('saii2 f')
+!  call initialize_onemodel('ccsi1')
 !  call initialize_onemodel('kklti stg')
-!  call initialize_manymodels()
+  call initialize_manymodels()
 
 !  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
@@ -173,20 +173,20 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 10
+    nmodels = 6
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'lpi1'
-    Modelnames(1) = 'lpi1 41'
-    Modelnames(2) = 'lpi1 42'
-    Modelnames(3) = 'lpi1 43'
-    Modelnames(4) = 'lpi2 2'
-    Modelnames(5) = 'lpi2 4'
-    Modelnames(6) = 'lpi2 6'
-    Modelnames(7) = 'lpi3 2'
-    Modelnames(8) = 'lpi3 4'
-    Modelnames(9) = 'lpi3 6'
+    Modelnames(0) = 'saii1 n'
+    Modelnames(1) = 'saii1 p'
+    Modelnames(2) = 'saii1 f'
+    Modelnames(3) = 'saii2 n'
+    Modelnames(4) = 'saii2 p'
+    Modelnames(5) = 'saii2 f'
+!    Modelnames(6) = 'lpi2 6'
+!    Modelnames(7) = 'lpi3 2'
+!    Modelnames(8) = 'lpi3 4'
+!    Modelnames(9) = 'lpi3 6'
 
   end subroutine initialize_manymodels
 
