@@ -81,6 +81,7 @@ TWO(fi)
 TWO(hni1)
 TWO(saii1)
 TWO(saii2)
+TWO(gdwi)
 
 TWO_XEND(rpi2)
 TWO_XEND(ii)

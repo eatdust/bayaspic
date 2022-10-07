@@ -60,9 +60,9 @@ program bayaspic
 
 
 
-!  call initialize_onemodel('ccsi1')
+  call initialize_onemodel('gdwi l')
 !  call initialize_onemodel('kklti stg')
-  call initialize_manymodels()
+!  call initialize_manymodels()
 
 !  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')

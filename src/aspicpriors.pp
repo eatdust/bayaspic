@@ -139,6 +139,15 @@ ONEPRIOR(ahi,-3._kp,3._kp,log)
 
 !with xend
 
+TWOPRIORS(gdwi2s,2._kp,2._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(gdwi2l,2._kp,2._kp,flat,0._kp,3._kp,log)
+TWOPRIORS(gdwi3s,3._kp,3._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(gdwi3l,3._kp,3._kp,flat,0._kp,3._kp,log)
+TWOPRIORS(gdwi4s,4._kp,4._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(gdwi4l,4._kp,4._kp,flat,0._kp,3._kp,log)
+TWOPRIORS(gdwis,1.5_kp,10._kp,flat,-3._kp,0._kp,log)
+TWOPRIORS(gdwil,1.5_kp,10._kp,flat,0._kp,3._kp,log)
+
 TWOPRIORS(rpi2,1._kp+epsilon(1._kp),1.2_kp,flat,0.5_kp,2._kp,log)
 
 TWOPRIORS(ii,0._kp,10._kp,flat,-1._kp,4._kp,log)
