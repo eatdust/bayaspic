@@ -280,12 +280,6 @@ TWOPRIORS(nfi3p,epsilon(1._kp),10._kp,flat,-10._kp,-epsilon(1._kp),flat)
 
 TWOPRIORS(saai,-3._kp,3._kp,log,1._kp/3._kp,2._kp,flat)
 
-TWOPRIORS(sati13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
-TWOPRIORS(sati12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
-TWOPRIORS(sati1,-3._kp,3._kp,log,1._kp,1._kp,flat)
-TWOPRIORS(sati32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
-TWOPRIORS(sati2,-3._kp,3._kp,log,2._kp,2._kp,flat)
-
 
 TWOPRIORS(vfmi,0.1_kp,10._kp,flat,0.1_kp,10._kp,flat)
 TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
@@ -297,11 +291,18 @@ TWOPRIORS(hbip,0._kp,5._kp,flat,0._kp,3._kp,log)
 
 TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
 
-TWOPRIORS(saci13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
-TWOPRIORS(saci12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
-TWOPRIORS(saci1,-3._kp,3._kp,log,1._kp,1._kp,flat)
-TWOPRIORS(saci32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
-TWOPRIORS(saci2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
+TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
+TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
+TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+
+TWOPRIORS(satione,1._kp,1._kp,flat,1._kp, 10._kp,flat)
+TWOPRIORS(sati13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(sati12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
+TWOPRIORS(sati1,-3._kp,3._kp,log,1._kp,1._kp,flat)
+TWOPRIORS(sati32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
+TWOPRIORS(sati2,-3._kp,3._kp,log,2._kp,2._kp,flat)
 
 TWOPRIORS(fi0,-8._kp,-4._kp,log,0._kp,0._kp,flat)
 TWOPRIORS(fi1,-32._kp/3._kp,-16._kp/3._kp,log,1._kp,1._kp,flat)
