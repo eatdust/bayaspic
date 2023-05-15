@@ -2,11 +2,11 @@
 	path = fastlikes
 	url = ../mlearn
 	branch = fastlikes
-[submodule "polychord"]
-	path = polychord
-	url = ../polychord.rs
-	branch = bayaspic
 [submodule "multinest"]
 	path = multinest
 	url = ../multinest.rs
+	branch = bayaspic
+[submodule "polychord"]
+	path = polychord
+	url = ../polychord.rs
 	branch = bayaspic
