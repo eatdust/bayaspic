@@ -72,6 +72,9 @@ module chordparams
   logical, parameter :: chordOutStats = .true.
   logical, parameter :: chordOutParamNames = .false. 
 
+  !synchronous parallisation (false if likes are same speed)
+  logical, parameter :: chordSync = .false.
+  
 
 contains
 
@@ -101,6 +104,7 @@ contains
     write(*,*)'chordOutDead  =         ',chordOutDead
     write(*,*)'chordOutStats =         ',chordOutStats
     write(*,*)'chordOutPNames=         ',chordOutParamNames
+    write(*,*)'chordSync     =         ',chordSync
     write(*,*)'chordDir      =         ',trim(chordDir)
     write(*,*)'chordName     =         ',trim(chordName)
     write(*,*)'-----------------------------------------------------'
@@ -135,6 +139,7 @@ contains
     set%cluster_posteriors = chordClusterPost
     set%feedback = chordFeedBack
     set%boost_posterior = chordBoost
+    set%synchronous = chordSync
     
 
   end subroutine chord_settings
