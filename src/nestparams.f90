@@ -32,7 +32,7 @@ module nestparams
   logical, parameter :: nestMmodal = .false.
 
 !max no. of live points !20000
-  integer(imn), parameter :: nestNlive = 20000
+  integer(imn), parameter :: nestNlive = 80000
 
 !sample with constant efficiency (false). Should be true if hard prior
 !regions are large and the chains remain trapped inside
@@ -40,10 +40,10 @@ module nestparams
   logical, parameter :: nestCteEff = .true.
 
 !evidence tolerance factor (<0.5)
-  real(fmn), parameter :: nestTol = 0.1_fmn
+  real(fmn), parameter :: nestTol = 0.05_fmn
 
 !sampling efficiency (enlargement factor reduction parameter, around 5%)
-  real(fmn), parameter :: nestSampEff = 0.05
+  real(fmn), parameter :: nestSampEff = 0.05_fmn
 
 !dimension
   integer(imn), save :: nestNdim = 0
