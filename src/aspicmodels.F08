@@ -322,12 +322,12 @@ contains
 
 
 
-  function aspic_x_rreh(name,params,xend,lnRreh,bfoldstar)
+  function aspic_x_rreh(name,params,xend,lnRreh,Pstar,bfoldstar)
     implicit none
     real(kp) :: aspic_x_rreh
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params   
-    real(kp), intent(in) :: xend, lnRreh
+    real(kp), intent(in) :: xend, lnRreh,Pstar
     real(kp), intent(out), optional :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'

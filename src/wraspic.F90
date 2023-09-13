@@ -548,7 +548,7 @@ contains
 
        lnRreh = mnParams(ireh)
        xend = aspic_x_endinf(aspname,asparams)
-       xstar = aspic_x_rreh(aspname,asparams,xend,lnRreh,bfoldstar)
+       xstar = aspic_x_rreh(aspname,asparams,xend,lnRreh,Pstar,bfoldstar)
 
     case ('Rhow')
        lnRhoReh = mnParams(ireh)
