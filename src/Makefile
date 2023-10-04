@@ -54,7 +54,7 @@ OBJSLIKE =  mlprec.o ioml.o iocmb.o rbfprec.o iorbf.o rbfuncs.o rbfnd.o rbflike.
 
 
 #with -DASPIC
-OBJSASPIC = aspicvars.o aspicmodels.o aspicpriors.o wraspic.o 
+OBJSASPIC = aspicvars.o aspicnonstd.o aspicmodels.o aspicpriors.o wraspic.o 
 
 OBJSMPI = fifo.o iofifo.o scheduler.o
 

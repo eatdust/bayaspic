@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 module wraspic
   use sampl, only : fmn, imn
   use aspicvars, only : kp, infaspic, lname
+  use aspicvars, only : AspicModel
   implicit none
 
   private
@@ -28,8 +29,13 @@ module wraspic
   integer, parameter :: ireh= 2
   integer, parameter :: iw=3
 
+!number of hardcoded derived parameters (power-law & cosmo params)  
+  integer, parameter :: nminderived = 11
+  
   integer, save :: nextra = 0
 
+
+  
 !Equation of state inflation predicts epsH exactly, as opposed to epsV
 !for usual slow-roll. We don't need to convert epsV to epsH and this
 !requires a special treatment.
@@ -43,14 +49,12 @@ module wraspic
   character(len=*), parameter :: ReheatModel = 'Rreh'
 #endif
 
-  type(infaspic), save :: AspicModel
-
   integer, parameter :: nparmax = 4
   integer, parameter :: nepsmax = 3
 
   public ReheatModel
   public set_model, check_model, free_model, allocate_and_set_allprior
-  public get_hubbleflow, get_ntot, get_nextra, get_derived, get_derived_name
+  public get_hubbleflow, get_ntot, get_nextra, get_nderived, get_derived, get_derived_name
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
@@ -65,7 +69,7 @@ contains
 
   subroutine set_model(mname,msubname)
     use aspicmodels, only : initialize_aspic_ptrs
-    use aspicmodels, only : get_aspic_numparams
+    use aspicmodels, only : get_aspic_numparams, get_aspic_numderived
 
     implicit none
     character(len=*), intent(in) :: mname
@@ -82,6 +86,7 @@ contains
 
     AspicModel%nasp = get_aspic_numparams()
     AspicModel%nhid = 0
+    AspicModel%nder = get_aspic_numderived()
     
     if (AspicModel%nasp.gt.nparmax) stop 'set_model: nparmax too small!'
 
@@ -93,7 +98,7 @@ contains
     implicit none
     logical :: check_model
 
-    check_model = associated(AspicModel%params)
+    check_model = associated(AspicModel%params).and.associated(AspicModel%derived)
 
   end function check_model
   
@@ -106,6 +111,8 @@ contains
        
     call free_aspic_ptrs()
 
+    if (associated(AspicModel%derived)) deallocate(AspicModel%derived)
+    AspicModel%derived => null()
     if (associated(AspicModel%params)) deallocate(AspicModel%params)
     AspicModel%params => null()
     if (associated(AspicModel%cmaps)) deallocate(AspicModel%cmaps)
@@ -135,6 +142,17 @@ contains
 
   end function get_nhid
 
+
+
+  function get_nderived()
+    implicit none
+    integer :: get_nderived
+    if (.not.check_model()) stop 'get_nderived: aspic not set!'    
+
+    get_nderived = nminderived + AspicModel%nder
+
+  end function get_nderived
+  
   
 
   function get_nextra()
@@ -255,6 +273,9 @@ contains
        
     case (11)
        get_derived = AspicModel%lnRrad
+
+    case (nminderived+1:)
+       get_derived = AspicModel%derived(i-nminderived)
        
     case default
        stop 'get_derived: incorrect parameters number!'
@@ -272,6 +293,9 @@ contains
     integer, parameter :: lenderived = 60
     character(len=lenderived) :: get_derived_name
 
+    character(len=lenderived) :: numtostrg
+    character :: cnum
+    
     select case(i)
 
     case (1)
@@ -307,6 +331,11 @@ contains
     case (11)
        get_derived_name = 'lnRrad*        \ln(R_{\mathrm{rad}})                     '
        
+    case (nminderived+1:)
+       write(numtostrg,*)(i-nminderived)
+       cnum = adjustr(trim(adjustl(numtostrg)))
+       get_derived_name = 'aspder'//cnum//'*       A_{\mathrm{der}}^{'//cnum//'}           '
+
     case default
        stop 'get_derived_name: incorrect parameters number!'
 
@@ -319,19 +348,21 @@ contains
 
   subroutine allocate_and_set_allprior(pmin,pmax)
     use aspicpriors, only : get_aspic_priors, get_aspic_numpriors
+    use aspicmodels, only : get_aspic_numderived
     implicit none
     real(fmn), dimension(:), allocatable, intent(out) :: pmin, pmax
 
     real(kp), dimension(nparmax) :: aspmin,aspmax
     character(len=lname), dimension(nparmax) :: ascmaps
 
-    integer :: npar, ntot, i
+    integer :: npar, nder, ntot, i
     
 !model dependant
 
     call get_aspic_priors(AspicModel%extname,aspmin,aspmax,ascmaps)
 
     npar = get_aspic_numpriors()
+    nder = get_aspic_numderived()
 
     if (npar.ge.AspicModel%nasp) then
        AspicModel%nhid = npar - AspicModel%nasp
@@ -344,7 +375,8 @@ contains
     
     allocate(AspicModel%cmaps(npar))
     allocate(AspicModel%params(npar))
-
+    allocate(AspicModel%derived(nder))
+    
     do i=1,npar
        AspicModel%cmaps(i) = ascmaps(i)
     enddo
@@ -485,7 +517,6 @@ contains
 
   function get_hubbleflow(nstar,mnParams)
     use srreheat, only : potential_normalization
-    use srreheat, only : ln_rho_endinf
     use srreheat, only : get_lnrreh_rrad, get_lnrrad_rreh
     use srreheat, only : get_lnrreh_rhow, get_lnrrad_rhow
     use srflow, only : slowroll_to_hubble
@@ -586,10 +617,11 @@ contains
     
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
 
-!without the conformal term, this implies RhoEnd is always Einstein Frame
-    lnRhoEnd = ln_rho_endinf(Pstar,epsHStar(1) &
-         ,epsOneEnd,Vend/Vstar)
+!the conformal term is computed in the aspicnonstd module for non
+!standard reheating. This quantity is therefore Jordan Frame
+    lnRhoEnd = aspic_ln_rho_endinf(aspname,Pstar,xstar,epsHStar(1),Vstar,xend,epsOneEnd,Vend)
 
+    
 !safeguard against insane values
     if (isnan(lnRhoEnd)) then
        write(*,*)'xend= ',xend
@@ -598,6 +630,7 @@ contains
        stop 'wraspic: NaN caught in lnRhoEnd!'
     endif
 
+!this conversions work for Jordan Frame lnRhoEnd    
     select case (ReheatModel)
     case ('Rrad')
        lnRreh = get_lnrreh_rrad(lnRrad,lnRhoEnd)

@@ -49,6 +49,7 @@
 !sampled parameter inverse rescaling.
 
 ZEROPRIOR(si)
+ZEROPRIOR(hi)
 
 ONEPRIOR(rchio,-48._kp,-20._kp,flat)
 ONEPRIOR(rchi,-65._kp,100._kp,flat)
