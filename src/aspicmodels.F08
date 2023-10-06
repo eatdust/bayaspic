@@ -104,14 +104,32 @@ contains
 
     numAspicParams = 0
     numAspicDerived = 0
-    nonMinimalCoupling = .false.
     nonStandardReheat = .false.
 
+!initialize pointers to conformal factor function for non-minimal
+!models
+    select case (trim(name))
+
+#define NONMIN(fooi) \
+    case ('fooi'); \
+       ptronep_ln_omega4 => fooi/**/_ln_omega4
+
+#include "aspicnonmin.pp"
+#undef NONMIN
+
+    case default
+       ptronep_ln_omega4 => null()
+       
+    end select
+
+
     
+!initialize pointers to Hubble flow and reheating functions for all
+!models
     select case (trim(name))
 
 !reminder: cpp is only used in "traditional mode" for fortran
-#define ZERO(fooi,foononmin) \
+#define ZERO(fooi) \
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
@@ -122,10 +140,9 @@ contains
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        ptrzerop_x_endinf => fooi/**/_x_endinf ; \
        xEndIsParam = .false. ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 0
-
-#define ONE(fooi,foononmin) \
+          
+#define ONE(fooi) \
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
@@ -136,11 +153,10 @@ contains
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptronep_x_endinf => fooi/**/_x_endinf ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 1
 
 
-#define ONE_XEND(fooi,foononmin) \
+#define ONE_XEND(fooi) \
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
@@ -151,11 +167,10 @@ contains
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptrzerop_x_endinf => null() ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 1
 
 
-#define TWO(fooi,foononmin) \
+#define TWO(fooi) \
     case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
@@ -166,11 +181,10 @@ contains
        ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptrtwop_x_endinf => fooi/**/_x_endinf ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 2
 
        
-#define TWO_XEND(fooi,foononmin) \
+#define TWO_XEND(fooi) \
     case ('fooi') ; \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
@@ -181,11 +195,10 @@ contains
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptronep_x_endinf => null() ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 2       
 
 
-#define THREE(fooi,foononmin) \
+#define THREE(fooi) \
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
@@ -196,11 +209,10 @@ contains
        ptrthreep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptrthreep_x_endinf => fooi/**/_x_endinf ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 3
 
        
-#define THREE_XEND(fooi,foononmin) \
+#define THREE_XEND(fooi) \
     case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
@@ -211,9 +223,8 @@ contains
        ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptrtwop_x_endinf => null() ; \
-       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 3
-              
+       
 #include "aspicmodels.pp"
 #undef ONE
 #undef ONE_XEND       
@@ -237,6 +248,7 @@ contains
        xEndIsParam = .false.
 !this is the dimensionless parameter f
        numAspicParams = 1
+       numAspicDerived = 1
        ptronep_ln_omega4 => null()
        
     case default
@@ -327,7 +339,7 @@ contains
     if (associated(ptrthreep_x_rreh)) ptrthreep_x_rreh => null()
     if (associated(ptrthreep_x_rhow)) ptrthreep_x_rhow => null()
 
-    if (associated(ptronep_ln_omega4) ptronep_ln_omega4 => null()
+    if (associated(ptronep_ln_omega4)) ptronep_ln_omega4 => null()
     
     CheckAspicPtrs = .false.
 

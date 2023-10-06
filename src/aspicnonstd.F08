@@ -150,12 +150,12 @@ contains
 
     select case(trim(name))
 
-    case('hi','si')
+    case('hi','si','di')
 !cannot be determined without solving the reheating equation. Let's return junk inside
        aspic_nonstd_endinf = 0._kp
 
     case default
-       stop 'aspic_nonstd_rreh: name not found!'
+       stop 'aspic_nonstd_endinf: name not found!'
        
     end select
        
@@ -186,7 +186,7 @@ contains
        aspic_nonstd_potential = di_norm_parametric_potential(x,params(1))
        
     case default
-       stop 'aspic_nonstd_rreh: name not found!'
+       stop 'aspic_nonstd_potential: name not found!'
        
     end select
 
@@ -216,7 +216,7 @@ contains
        aspic_nonstd_epsilon_one = di_parametric_epsilon_one(x,params(1))/AspicModel%derived(1)**2
        
     case default
-       stop 'aspic_nonstd_rreh: name not found!'
+       stop 'aspic_nonstd_epsilon_one: name not found!'
        
     end select
 
@@ -247,7 +247,7 @@ contains
        
        
     case default
-       stop 'aspic_nonstd_rreh: name not found!'
+       stop 'aspic_nonstd_epsilon_two: name not found!'
        
     end select
 
@@ -277,7 +277,7 @@ contains
        aspic_nonstd_epsilon_three = di_parametric_epsilon_three(x,params(1))/AspicModel%derived(1)**2
        
     case default
-       stop 'aspic_nonstd_rreh: name not found!'
+       stop 'aspic_nonstd_epsilon_three: name not found!'
        
     end select    
     

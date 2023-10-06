@@ -59,7 +59,7 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('hi')
+  call initialize_onemodel('saiii1 p')
 !  call initialize_onemodel('gdwi l')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()

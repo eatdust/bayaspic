@@ -19,6 +19,7 @@
 
 !ln[1/A^4] for non-minimal models
      function onep_ln_omega4(x)
+       use infprec, only : kp
        implicit none
        real(kp) :: onep_ln_omega4
        real(kp), intent(in) :: x
