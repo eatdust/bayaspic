@@ -155,49 +155,57 @@ contains
     ignore = .false.
 
 !disfavour is for ruling out, these regions will be associated to
-!logZero (this will change the evidence).
-!
-!Currently unused, even though these models have many regions
-!trivially ruled out, we just ignore them and give these model a
-!chance... (see wraspic & samplaspic modules)
+!logZero (this is changing the evidence)
     disfavour = .false.
 
     select case (name)
 
+    case ('saiii1p','saiii1n')
+       ignore = .not.saiii1_check_params(params(1),params(2),params(3))
+       if (.not.ignore) then
+          ignore = params(3).lt.saiii1_numacc_mumin(efoldNum,params(1),params(2))
+       endif
+       disfavour = .false.
+
     case('saii1n', 'saii1p', 'saii1f')
-      ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       disfavour = .false.
 
     case('saii2n', 'saii2p', 'saii2f')
-        ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       disfavour = .false.
 
     case('sdi')
-      ignore = params(2).lt.sdi_numacc_xendmin(efoldNum,params(1)) .or. &
-              params(2).gt.sdi_numacc_xendmax(params(1))
+       ignore = params(2).lt.sdi_numacc_xendmin(efoldNum,params(1)) .or. &
+            params(2).gt.sdi_numacc_xendmax(params(1))
+       disfavour = .false.
 
     case('hni1f')
-      ignore = params(1).le.hni1_alphamin(params(2)) .or. &
-               hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       ignore = params(1).le.hni1_alphamin(params(2)) .or. &
+            hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       disfavour = .false.
 
     case('hni2f','hni2l')
-      ignore = params(3).ge.hni2_xendmax(params(1),params(2)) .or. &
-               hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       ignore = params(3).ge.hni2_xendmax(params(1),params(2)) .or. &
+            hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       disfavour = .false.
 
     case('ncli1','ncli2','ncli3','ncli4', 'ncli')
-      ignore = .not.(ncli_check_params(efoldMini,epsilonMax, &
-                params(1),params(2),params(3)))
-      disfavour = .not.(ncli_check_params(efoldMini,epsilonMax, &
-                          params(1),params(2),params(3)))
-
-
+       disfavour = .not.(ncli_check_params(efoldMini,epsilonMax, &
+            params(1),params(2),params(3)))
+       ignore = disfavour
+       
     case('fi0')
-      disfavour = .not.(fi_check_params(100._kp,epsilonMax,params(1),params(2)))
-      ignore = disfavour
+       disfavour = .not.(fi_check_params(100._kp,epsilonMax,params(1),params(2)))
+       ignore = disfavour
+
     case('fi1')
-      ignore = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
-      ignore = disfavour
+       disfavour = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
+       ignore = disfavour
+
     case('fi2')
-      disfavour = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
-      ignore = disfavour
+       disfavour = .not.(fi_check_params(80._kp,epsilonMax,params(1),params(2)))
+       ignore = disfavour
 
     case('sbkin','sbkip')
       disfavour = (sbki_efoldmax(params(1)).lt.efoldNum) &
@@ -205,11 +213,12 @@ contains
       ignore = disfavour
 
     case ('ii','iif','iilambda')
-       ignore = params(2).lt.ii_xendmin(efoldNum,params(1))
+       disfavour = params(2).lt.ii_xendmin(efoldNum,params(1))
+       ignore = disfavour
 
     case ('lmi1o', 'lmi1p')
-       ignore = lmi_epstwo_potmax(params(1),params(2)).gt.epsilonMax
-       disfavour = .true.
+       disfavour = lmi_epstwo_potmax(params(1),params(2)).gt.epsilonMax
+       ignore = disfavour
 
     case ('lmi2o','lmi2p')
 !Such that exp(-beta xend^gamma) is computable; and epsilon1>numacc;
@@ -226,9 +235,11 @@ contains
 
     case('twiA1','twiA2','twiB1','twiB2')
        ignore = (params(2).gt.1._kp)
-
+       disfavour = .false.
+       
     case ('bsusybif', 'bsusybil')
-       ignore = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
+       disfavour = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
+       ignore = disfavour
 !this is roughly -95
        ignore = ignore .or. (params(2).lt.bsusybi_numacc_xendmin(1d-99,params(1)))
 
@@ -241,8 +252,9 @@ contains
        endif
 
     case ('gmssmiopA','gmssmiopB','gmssmiomA','gmssmiomB')
-       ignore = params(1).lt.gmssmi_alphamin(efoldMini,params(2))
-
+       disfavour = params(1).lt.gmssmi_alphamin(efoldMini,params(2))
+       ignore = disfavour
+       
     case ('gripi')
        ignore = (params(1).lt.gripi_alphamin(efoldNum,params(2)) &
             .or. (abs(params(1)-1._kp).lt.epsilon(1._kp)))
@@ -252,37 +264,47 @@ contains
        endif
 
     case ('gripiopA','gripiopB','gripiomA','gripiomB')
-       ignore = params(1).lt.gripi_alphamin(efoldNum,params(2))
-
+       disfavour = params(1).lt.gripi_alphamin(efoldNum,params(2))
+       ignore = disfavour
+       
     case ('lin')
-       ignore = params(1).lt.li_alphamin(efoldNum)
-
+       disfavour = params(1).lt.li_alphamin(efoldNum)
+       ignore = disfavour
+       
     case ('li')
        ignore = params(1) .gt. -0.1_kp .and. params(1) .lt. 0.003_kp
-
+       disfavour = .false.
+       
     case ('tiB1', 'tiD1', 'tiF1')
        ignore = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
-
+       disfavour = .false.
+       
     case ('tiB2')
        ignore = abs(1._kp-2._kp*params(1)).gt.0.2_kp*params(2)**2
-
+       disfavour = .false.
+       
     case ('tiB3', 'tiD2', 'tiF2')
        ignore = abs(1._kp-2._kp*params(1)).gt.1._kp*params(2)**2
-
+       disfavour = .false.
+       
     case ('tiD3', 'tiF3')
        ignore = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
-
+       disfavour = .false.
+       
     case ('psnioA', 'psnioB', 'psnioC')
        ignore = (params(1).gt.0.5_kp*epsilonMax*params(2)**2)
-
+       disfavour = .false.
+       
     case ('sbi')
        ignore = params(1).lt.(sbi_alphamin(params(2)) +epsilon(1._kp))
-
+       disfavour = .false.
+       
     case ('ssbi1', 'ssbi1f')
 !otherwise inflation does not stop
       ignore = ssbi1_epsilon_one(ssbi1_x_epsonemax(params(1),params(2)), &
                params(1),params(2)).lt.1._kp
-
+      disfavour = .false.
+      
     case ('ssbi3', 'ssbi3f')
       ignore = (ssbi3_epsilon_one(ssbi3_x_epsonemax(params(1),params(2)), &
            params(1),params(2)).lt.1._kp)
@@ -293,61 +315,72 @@ contains
       endif
 
     case ('ssbi4', 'ssbi4f')
-      ignore = ssbi4_epstwo_potmax(params(1),params(2)) .gt. epsilonMax
-      disfavour = .true.
+      disfavour = ssbi4_epstwo_potmax(params(1),params(2)) .gt. epsilonMax
+      ignore = disfavour
 
     case ('ssbi5','ssbi5f')
        ignore = params(1).gt.ssbi5_alphamax(params(2))
-
+       disfavour = .false.
+       
     case ('ssbi6','ssbi6f')
        ignore = params(1).gt.ssbi6_alphamax(params(2))
-
+       disfavour = .false.
+       
     case ('rmi1', 'rmi1l')
        ignore = params(3).gt.rmi1_numacc_xendmax(efoldNum,params(1),params(2))
-
+       disfavour = .false.
+       
     case ('rmi2', 'rmi2l')
        ignore = params(3).lt.rmi2_numacc_xendmin(efoldNum,params(1),params(2))
-
+       disfavour = .false.
+       
     case ('rmi3', 'rmi3l')
        ignore = (params(3).gt.rmi3_numacc_xendmax(params(1),params(2))) &
             .or. (params(3).lt.rmi3_numacc_xendmin(efoldNum,params(1),params(2)))
-
+       disfavour = .false.
+       
     case ('rmi4', 'rmi4l')
        ignore = params(3).lt.rmi4_numacc_xendmin(params(1),params(2))
-
+       disfavour = .false.
+       
     case ('rpi2')
        ignore = params(2).lt.rpi2_numacc_xendmin(efoldNum,params(1))
-
+       disfavour = .false.
+       
 !equivalent to an hard prior on mumin to get efoldnum
     case ('vhi12')
        ignore = vhi_xendmax(efoldNum,params(1),params(2)) &
             .eq.vhi_xendmin(params(1),params(2))
-
+       disfavour = .false.
+       
     case ('dsio', 'dsi2')
        ignore = params(2) .gt. dsi_mumax(efoldNum,params(1),qDsi)
-
+       disfavour = .false.
+       
     case ('bistg')
 !enforce the hard prior bound xini<xuv (asparams(4) is xuv)
        ignore = params(4).lt.bi_x_trajectory(-efoldNum,params(3),params(1),params(2))
-
+       disfavour = .false.
+       
     case ('kkltistg')
 !enforce the hard prior bound xini<xuv (asparams(4) is xuv)
        ignore = params(4).lt.kklti_x_trajectory(-efoldNum,params(3),params(1),params(2))
-
+       disfavour = .false.
+       
     case('nfi1')
-          ignore = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
-                  (params(2).lt.2._kp .and. &
-                  params(1).gt.nfi1_amax(efoldNum,params(2))) .or. &
-                  params(1).gt.nfi1_numacc_amax(efoldNum,params(2))
-         disfavour = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
-                    params(2).lt.2._kp .and. &
-                    params(1).gt.nfi1_amax(efoldNum,params(2))
+       ignore = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
+            (params(2).lt.2._kp .and. &
+            params(1).gt.nfi1_amax(efoldNum,params(2))) .or. &
+            params(1).gt.nfi1_numacc_amax(efoldNum,params(2))
+       disfavour = params(1).lt.nfi1_numacc_amin(params(2)) .or. &
+            params(2).lt.2._kp .and. &
+            params(1).gt.nfi1_amax(efoldNum,params(2))
 
     case ('nfi2')
        ignore = (params(1).lt.nfi2_numacc_amin(efoldMaxi,params(2))) .or. &
-                nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
+            nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
        disfavour = (params(1).lt.nfi2_numacc_amin(efoldMaxi,params(2))) .or. &
-                nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
+            nfi2_efold_max(params(1),params(2)) .lt. efoldMaxi
        if (nfi2_epsilon_one(params(3),params(1),params(2)).gt.epsilonMax) then
           ignore = .true.
           disfavour = .true.
@@ -360,7 +393,6 @@ contains
     case ('nfi4n', 'nfi4p')
        ignore = nfi4_xendmin(efoldMaxi,params(1),params(2)) &
             .ge.nfi4_numacc_xendmax(params(1),params(2))
-
        disfavour = .false.
 
     case ('vfmi', 'vfmis')
@@ -384,10 +416,12 @@ contains
     case ('ccsi1')
        ignore = ccsi1_numacc_efoldmax(params(1)).lt.efoldNum
        disfavour = .false.
-
-
+       
     end select
 
+!Currently, even though some models have many regions
+!trivially ruled out, we just ignore them and give these model a
+!chance... (see wraspic & samplaspic modules)  
 !let's never disfavour
     disfavour = .false.
 
@@ -579,7 +613,7 @@ contains
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * ccsi2_numacc_xendmin(efoldNum,asparams(1))
 
-
+       
     end select
 
   end function redefine_aspic_params

@@ -38,6 +38,8 @@ module aspicmodels
 !non-standard reheating history (see aspicnonstd.F08 module)
   logical, save :: nonStandardReheat = .false.
 
+  procedure(onep_ln_omega4), pointer :: ptronep_ln_omega4 => null()
+  
   procedure(zerop_x_rrad), pointer :: ptrzerop_x_rrad => null()
   procedure(zerop_x_rreh), pointer :: ptrzerop_x_rreh => null()
   procedure(zerop_x_rhow), pointer :: ptrzerop_x_rhow => null()
@@ -101,13 +103,15 @@ contains
     if (CheckAspicPtrs) return
 
     numAspicParams = 0
-    nonStandardReheat = .false.
     numAspicDerived = 0
+    nonMinimalCoupling = .false.
+    nonStandardReheat = .false.
+
     
     select case (trim(name))
 
 !reminder: cpp is only used in "traditional mode" for fortran
-#define ZERO(fooi) \
+#define ZERO(fooi,foononmin) \
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
@@ -118,9 +122,10 @@ contains
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        ptrzerop_x_endinf => fooi/**/_x_endinf ; \
        xEndIsParam = .false. ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 0
 
-#define ONE(fooi) \
+#define ONE(fooi,foononmin) \
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
@@ -131,10 +136,11 @@ contains
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptronep_x_endinf => fooi/**/_x_endinf ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 1
 
 
-#define ONE_XEND(fooi) \
+#define ONE_XEND(fooi,foononmin) \
     case ('fooi'); \
        ptrzerop_x_rrad => fooi/**/_x_rrad ; \
        ptrzerop_x_rreh => fooi/**/_x_rreh ; \
@@ -145,10 +151,11 @@ contains
        ptrzerop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptrzerop_x_endinf => null() ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 1
 
 
-#define TWO(fooi) \
+#define TWO(fooi,foononmin) \
     case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
@@ -159,10 +166,11 @@ contains
        ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptrtwop_x_endinf => fooi/**/_x_endinf ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 2
 
        
-#define TWO_XEND(fooi) \
+#define TWO_XEND(fooi,foononmin) \
     case ('fooi') ; \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
        ptronep_x_rreh => fooi/**/_x_rreh ; \
@@ -173,10 +181,11 @@ contains
        ptronep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptronep_x_endinf => null() ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 2       
 
 
-#define THREE(fooi) \
+#define THREE(fooi,foononmin) \
     case ('fooi') ; \
        ptrthreep_x_rrad => fooi/**/_x_rrad ; \
        ptrthreep_x_rreh => fooi/**/_x_rreh ; \
@@ -187,10 +196,11 @@ contains
        ptrthreep_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .false. ; \
        ptrthreep_x_endinf => fooi/**/_x_endinf ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 3
 
        
-#define THREE_XEND(fooi) \
+#define THREE_XEND(fooi,foononmin) \
     case ('fooi') ; \
        ptrtwop_x_rrad => fooi/**/_x_rrad ; \
        ptrtwop_x_rreh => fooi/**/_x_rreh ; \
@@ -201,6 +211,7 @@ contains
        ptrtwop_epsilon_three => fooi/**/_epsilon_three ; \
        xEndIsParam = .true. ; \
        ptrtwop_x_endinf => null() ; \
+       if (foononmin) ptronep_ln_omega4 => fooi/**/_ln_omega4 ; \
        numAspicParams = 3
               
 #include "aspicmodels.pp"
@@ -211,20 +222,28 @@ contains
 #undef THREE
 #undef THREE_XEND
 
+!the remaining case are non-standard reheating histories and require a
+!case-by-case treatment
     case ('hi')
        nonStandardReheat = .true.
        xEndIsParam = .false.
        numAspicParams = 0
 !we solve for xistar matching the CMB amplitude in aspic
        numAspicDerived = 1
+       ptronep_ln_omega4 => hi_parametric_ln_omega4
        
+    case ('di')
+       nonStandardReheat = .true.
+       xEndIsParam = .false.
+!this is the dimensionless parameter f
+       numAspicParams = 1
+       ptronep_ln_omega4 => null()
        
     case default
        stop 'initialize_aspic_ptrs: model not found!'
 
     end select
-
-  
+      
     CheckAspicPtrs = .true.
 
   end subroutine initialize_aspic_ptrs
@@ -308,6 +327,8 @@ contains
     if (associated(ptrthreep_x_rreh)) ptrthreep_x_rreh => null()
     if (associated(ptrthreep_x_rhow)) ptrthreep_x_rhow => null()
 
+    if (associated(ptronep_ln_omega4) ptronep_ln_omega4 => null()
+    
     CheckAspicPtrs = .false.
 
   end subroutine free_aspic_ptrs
@@ -625,21 +646,23 @@ contains
   end function aspic_x_endinf
 
 
+  
   function aspic_ln_rho_endinf(name,Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend)
     use srreheat, only : ln_rho_endinf
-    use aspicnonstd, only : aspic_nonstd_ln_rho_endinf
     implicit none
     real(kp) :: aspic_ln_rho_endinf
     character(len=*), intent(in) :: name
     real(kp), intent(in) :: Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend
+    real(kp) :: lnOmega4End
 
-    if (.not.nonStandardReheat) then
+    if (associated(ptronep_ln_omega4)) then
 
-       aspic_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar)
+       lnOmega4End = ptronep_ln_omega4(xend)
+       aspic_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar,lnOmega4End)
 
     else
 
-       aspic_ln_rho_endinf = aspic_nonstd_ln_rho_endinf(name,Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend)
+       aspic_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar)
 
     end if
        

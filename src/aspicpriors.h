@@ -67,3 +67,4 @@ use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
 use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax
 use saii1sr, only : saii1_numacc_mumin
 use saii2sr, only : saii2_numacc_mumin
+use saiii1sr, only : saiii1_check_params,saiii1_numacc_mumin

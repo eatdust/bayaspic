@@ -123,6 +123,8 @@ ONEPRIOR(osti,1._kp,4._kp,log)
 ONEPRIOR(wrig,-3._kp,3._kp,log)
 ONEPRIOR(wrio,1._kp,1._kp,flat)
 
+ONEPRIOR(di,-5._kp,-1.5_kp,log)
+
 ONEPRIOR(ccsi1,-6._kp,0._kp,log)
 
 !alpha/alphamin(efold=120)
@@ -373,7 +375,7 @@ THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,fl
 THREEPRIORS(hni2f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 THREEPRIORS(hni2l,-3._kp,-epsilon(1._kp),log,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 
-!witout xend
+!without xend
 
 THREEPRIORS(gmlfi,1._kp,6._kp,flat,1._kp,6._kp,flat,-5._kp,1._kp,log)
 THREEPRIORS(gmlfi2313,2._kp/3._kp,2._kp/3._kp,flat,1._kp/3._kp,1._kp/3._kp,flat,-5._kp,1._kp,log)
@@ -401,6 +403,11 @@ THREEPRIORS(lpi26,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi32,1._kp,6._kp,flat,2._kp,2._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi34,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
+
+
+THREEPRIORS(saiii1p,0._kp,3._kp,flat,0._kp,3._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii1n,-3._kp,-0._kp,flat,-3._kp,-0._kp,flat,-1._kp,2._kp,log)
+
 
 THREEPRIORS(ncli1,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,1._kp,flat)
 THREEPRIORS(ncli2,-6._kp,-1._kp,log,-3._kp,0._kp,log,2._kp,2._kp,flat)

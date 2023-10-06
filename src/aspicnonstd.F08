@@ -30,7 +30,7 @@ module aspicnonstd
   private
 
   public aspic_nonstd_rrad, aspic_nonstd_rreh, aspic_nonstd_rhow
-  public aspic_nonstd_endinf, aspic_nonstd_ln_rho_endinf, aspic_nonstd_potential
+  public aspic_nonstd_endinf, aspic_nonstd_potential
   public aspic_nonstd_epsilon_one, aspic_nonstd_epsilon_two, aspic_nonstd_epsilon_three
   
 contains
@@ -53,6 +53,15 @@ contains
        aspic_nonstd_rrad = hi_hbar_rrad(lnRrad,Pstar,bfoldstar,AspicModel%derived(1))
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
+    case ('di')
+!We outout the modulus k2star, params(1) is f and Lambda will be put
+!into the first derived parameter. k2end is also computed here as it
+!depends on k2star and Lambda
+       aspic_nonstd_rrad = di_k2_rrad(params(1),lnRrad,Pstar,bfoldstar)
+       AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rrad,params(1),Pstar)
+       xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
+
+       
     case default
        stop 'aspic_nonstd_rrad: name not found!'
        
@@ -81,6 +90,14 @@ contains
        aspic_nonstd_rreh = hi_hbar_rreh(lnRreh,Pstar,bfoldstar,AspicModel%derived(1))
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
+    case ('di')
+!We outout the modulus k2star, params(1) is f and Lambda will be put
+!into the first derived parameter. k2end is also computed here as it
+!depends on k2star and Lambda
+       aspic_nonstd_rreh = di_k2_rreh(params(1),lnRreh,Pstar,bfoldstar)
+       AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rreh,params(1),Pstar)
+       xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
+       
     case default
        stop 'aspic_nonstd_rreh: name not found!'
        
@@ -108,6 +125,13 @@ contains
        aspic_nonstd_rhow = hi_hbar_star(w,lnRhoReh,Pstar,bfoldstar,AspicModel%derived(1))
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
+!We outout the modulus k2star, params(1) is f and Lambda will be put
+!into the first derived parameter. k2end is also computed here as it
+!depends on k2star and Lambda
+       aspic_nonstd_rhow = di_k2_star(params(1),w,lnRhoReh,Pstar,bfoldstar)
+       AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rhow,params(1),Pstar)
+       xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
+       
     case default
        stop 'aspic_nonstd_rhow: name not found!'
        
@@ -126,7 +150,7 @@ contains
 
     select case(trim(name))
 
-    case('hi')
+    case('hi','si')
 !cannot be determined without solving the reheating equation. Let's return junk inside
        aspic_nonstd_endinf = 0._kp
 
@@ -155,6 +179,12 @@ contains
 !computed to xistar before calling this function)
        aspic_nonstd_potential = hi_norm_parametric_potential(x,AspicModel%derived(1))
 
+    case('di')
+!we are using the modulus field k2 in the computations (x should
+!be k2 on input and the first derived parameter should have been
+!computed to Lambda before calling this function)
+       aspic_nonstd_potential = di_norm_parametric_potential(x,params(1))
+       
     case default
        stop 'aspic_nonstd_rreh: name not found!'
        
@@ -180,6 +210,11 @@ contains
 !computed to xistar before calling this function)
        aspic_nonstd_epsilon_one = hi_parametric_epsilon_one(x,AspicModel%derived(1))
 
+    case('di')
+!we are using the modulus field k2 in the computations (x should
+!be k2 on input) and the first derived parameter should be set to Lambda
+       aspic_nonstd_epsilon_one = di_parametric_epsilon_one(x,params(1))/AspicModel%derived(1)**2
+       
     case default
        stop 'aspic_nonstd_rreh: name not found!'
        
@@ -205,6 +240,12 @@ contains
 !computed to xistar before calling this function)
        aspic_nonstd_epsilon_two = hi_parametric_epsilon_two(x,AspicModel%derived(1))
 
+    case('di')
+!we are using the modulus field k2 in the computations (x should
+!be k2 on input) and the first derived parameter should be set to Lambda
+       aspic_nonstd_epsilon_two = di_parametric_epsilon_two(x,params(1))/AspicModel%derived(1)**2
+       
+       
     case default
        stop 'aspic_nonstd_rreh: name not found!'
        
@@ -223,49 +264,24 @@ contains
     real(kp), dimension(:), intent(in) :: params
 
     select case(trim(name))
+       
     case('hi')
 !we are using the parametric field hbar in the computations (x should
 !be hbar on input and the first derived parameter should have been
 !computed to xistar before calling this function)
        aspic_nonstd_epsilon_three = hi_parametric_epsilon_three(x,AspicModel%derived(1))
 
+    case('di')
+!we are using the modulus field k2 in the computations (x should
+!be k2 on input) and the first derived parameter should be set to Lambda
+       aspic_nonstd_epsilon_three = di_parametric_epsilon_three(x,params(1))/AspicModel%derived(1)**2
+       
     case default
        stop 'aspic_nonstd_rreh: name not found!'
        
     end select    
     
   end function aspic_nonstd_epsilon_three
-
-
-  
-  function aspic_nonstd_ln_rho_endinf(name,Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend)
-    use srreheat, only : ln_rho_endinf
-    implicit none
-    real(kp) :: aspic_nonstd_ln_rho_endinf
-    character(len=*), intent(in) :: name
-    real(kp), intent(in) :: Pstar,xstar,epsStar,Vstar
-    real(kp), intent(in) :: xend,epsEnd,Vend
-
-    real(kp) :: lnOmega4End
-    
-    select case(trim(name))
-
-    case('hi')
-!we are using the parametric field hbar in the computations (x should
-!be hbar on input and the first derived parameter should have been
-!computed to xistar before calling this function)
-
-       lnOmega4End = 2._kp*log(1._kp + xend*xend)
-       
-       aspic_nonstd_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar,lnOmega4End)
-
-    case default
-       stop 'aspic_nonstd_rreh: name not found!'
-       
-    end select    
-    
-  end function aspic_nonstd_ln_rho_endinf
-
-
+ 
   
 end module aspicnonstd

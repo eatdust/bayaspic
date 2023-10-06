@@ -17,6 +17,13 @@
 
   abstract interface
 
+!ln[1/A^4] for non-minimal models
+     function onep_ln_omega4(x)
+       implicit none
+       real(kp) :: onep_ln_omega4
+       real(kp), intent(in) :: x
+     end function onep_ln_omega4
+     
 !for zero potential parameter models
      function zerop_norm_potential(x)
        use infprec, only : kp
@@ -264,5 +271,5 @@
        real(kp), intent(out), optional :: bfoldstar
      end function threep_x_rhow
 
-
+     
   end interface
