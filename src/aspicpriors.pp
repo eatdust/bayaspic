@@ -321,6 +321,9 @@ TWOPRIORS(saii2n,-3._kp,3._kp,mlog,0._kp,3._kp,log)
 TWOPRIORS(saii2p,-3._kp,3._kp,log,0._kp,3._kp,log)
 TWOPRIORS(saii2f,-10._kp,10._kp,flat,0._kp,3._kp,log)
 
+TWOPRIORS(nmlfi1s,-5._kp,2._kp,log,0.5_kp,4._kp,flat)
+TWOPRIORS(nmlfi1l,-5._kp,2._kp,log,4._kp,10._kp,flat)
+
 
 
 !with xend
@@ -407,6 +410,10 @@ THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
 THREEPRIORS(saiii1p,0._kp,3._kp,flat,0._kp,3._kp,flat,-1._kp,2._kp,log)
 THREEPRIORS(saiii1n,-3._kp,-0._kp,flat,-3._kp,-0._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii2p,0._kp,3._kp,flat,0._kp,beta2,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii2n,-3._kp,-0._kp,flat,beta3,0._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii3p,0._kp,3._kp,flat,beta0,3._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii3n,-3._kp,-0._kp,flat,-3._kp,-1._kp,flat,-1._kp,2._kp,log)
 
 
 THREEPRIORS(ncli1,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,1._kp,flat)

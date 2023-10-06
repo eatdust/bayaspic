@@ -105,6 +105,9 @@ THREE(lpi2)
 THREE(lpi3)
 THREE(ncli)
 THREE(saiii1)
+THREE(saiii2)
+THREE(saiii3)
+
 
 THREE_XEND(lmi2)
 THREE_XEND(rmi1)

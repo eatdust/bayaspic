@@ -18,8 +18,13 @@
 
 module aspicpriors
   use aspicvars, only : kp, pi, lname
+
+  include 'aspicpriors.h'
+  
   implicit none
 
+
+  
   private
 
   public get_aspic_priors, check_aspic_hardprior
@@ -47,8 +52,7 @@ module aspicpriors
 
 !dsi correction power
   real(kp), parameter :: qDSI = 8._kp
-
-
+  
 contains
 
   subroutine get_aspic_priors(name,pmin,pmax,mapname)
@@ -142,9 +146,6 @@ contains
 
 !case by case model if the prior space is not cubic
   function check_aspic_hardprior(name,params) result(answer)
-
-    include 'aspicpriors.h'
-
     implicit none
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
@@ -160,13 +161,49 @@ contains
 
     select case (name)
 
+    case ('nmlfi1s','nmlfi1l')
+       ignore = .not.nmlfi1_check_params(params(1),params(2))
+       if (.not.ignore) ignore = nmlfi1_numacc_efoldmax(params(1),params(2)).lt.efoldNum
+       if (.not.ignore) ignore = nmlfi_epsilon_one_infinity(params(1),params(2)).gt.epsilonMax
+       disfavour = .false.
+       
     case ('saiii1p','saiii1n')
        ignore = .not.saiii1_check_params(params(1),params(2),params(3))
        if (.not.ignore) then
-          ignore = params(3).lt.saiii1_numacc_mumin(efoldNum,params(1),params(2))
+          ignore = saiii1_numacc_efoldmax(params(1),params(2),params(3)).lt.efoldNum
        endif
        disfavour = .false.
 
+    case ('saiii2p','saiii2n')
+
+       ignore = .not.saiii2_check_params(params(1),params(2),params(3))
+
+       if (.not.ignore) then
+          ignore = saiii2_numacc_efoldmax(params(1),params(2),params(3)).lt.efoldNum
+       endif
+       disfavour = .false.
+       
+       
+    case ('saiii3p')
+       ignore = .not.saiii3_check_params(params(1),params(2),params(3))
+
+!not too close to the model boundary (trajectory integration
+!takes ages)
+       ignore = ignore .or. params(1).lt.1.1_kp*saiii_alpha_two(params(2))
+       disfavour = .false.
+
+    case ('saiii3n')
+       ignore = .not.saiii3_check_params(params(1),params(2),params(3))
+
+!not too close to the model boundary (trajectory integration
+!takes ages)
+       ignore = ignore .or. params(1).gt.1.1_kp*saiii_alpha_one(params(2))
+       if ((.not.ignore).and.(params(2).gt.beta1)) then
+          ignore = params(1).lt.0.98_kp*saiii_alpha_three(params(2))
+       endif
+       disfavour = .false.
+
+       
     case('saii1n', 'saii1p', 'saii1f')
        ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
        disfavour = .false.
@@ -433,7 +470,6 @@ contains
 
 !redefinition of aspic params (called after change of priors, see wraspic)
   function redefine_aspic_params(name,newparams) result(asparams)
-    include 'aspicpriors.h'
     implicit none
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: newparams

@@ -250,6 +250,13 @@ contains
        numAspicParams = 1
        numAspicDerived = 1
        ptronep_ln_omega4 => null()
+
+    case ('nmlfi1')
+       nonStandardReheat = .true.
+       xEndIsParam = .false.
+       numAspicParams = 2
+       numAspicDerived = 0
+       ptronep_ln_omega4 => nmlfi_parametric_ln_omega4
        
     case default
        stop 'initialize_aspic_ptrs: model not found!'

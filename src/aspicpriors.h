@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -67,4 +67,10 @@ use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
 use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax
 use saii1sr, only : saii1_numacc_mumin
 use saii2sr, only : saii2_numacc_mumin
-use saiii1sr, only : saiii1_check_params,saiii1_numacc_mumin
+use saiiicommon, only : beta0, beta1, beta2, beta3, saiii_alpha_potneg
+use saiiicommon, only : saiii_alpha_one, saiii_alpha_two, saiii_alpha_three
+use saiii1sr, only : saiii1_check_params, saiii1_numacc_efoldmax
+use saiii2sr, only : saiii2_check_params, saiii2_numacc_efoldmax
+use saiii3sr, only : saiii3_check_params
+use nmlficommon, only : nmlfi_parametric_ln_omega4, nmlfi_epsilon_one_infinity
+use nmlfi1sr, only : nmlfi1_check_params, nmlfi1_numacc_efoldmax
