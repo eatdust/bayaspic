@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -59,7 +59,7 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('saiii1 p')
+  call initialize_onemodel('rclfi4 m')
 !  call initialize_onemodel('gdwi l')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()

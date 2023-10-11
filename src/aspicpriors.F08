@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 
 module aspicpriors
   use aspicvars, only : kp, pi, lname
+  use aspicvars, only : AspicModel
 
   include 'aspicpriors.h'
   
@@ -161,10 +162,47 @@ contains
 
     select case (name)
 
+    case ('rclfi1pm','rclfi1mm')
+       ignore = .not.rclfi1_check_params(params(1),params(2),params(3))
+       disfavour = .false.
+
+    case ('rclfi1mp')
+       ignore = .not.rclfi1_check_params(params(1),params(2),params(3))
+       if (.not.ignore) ignore = params(2).gt.rclfi1_numacc_alphamax(params(1))
+       disfavour = .false.
+
+    case ('rclfi2pm','rclfi2mm')
+       ignore = .not.rclfi2_check_params(params(1),params(2),params(3))
+       disfavour = .false.
+
+    case ('rclfi2mp')
+       ignore = .not.rclfi2_check_params(params(1),params(2),params(3))
+       if (.not.ignore) ignore = params(2).gt.rclfi2_numacc_alphamax(params(1))
+       disfavour = .false.
+
+    case ('rclfi3pp','rclfi3mp')
+       ignore = .not.rclfi3_check_params(params(1),params(2),params(3))
+       disfavour = .false.
+
+    case ('rclfi3pm')
+       ignore = .not.rclfi3_check_params(params(1),params(2),params(3))
+       if (.not.ignore) ignore = (params(1).lt.rclfi3_numacc_pmin()) .or. &
+            (params(2).lt.rclfi3_numacc_alphamin(params(1)))
+       disfavour = .false.
+
+    case ('rclfi4p','rclfi4m')
+       ignore = .not.rclfi4_check_params(params(1),params(2),params(3))
+       disfavour = .false.
+       
     case ('nmlfi1s','nmlfi1l')
        ignore = .not.nmlfi1_check_params(params(1),params(2))
        if (.not.ignore) ignore = nmlfi1_numacc_efoldmax(params(1),params(2)).lt.efoldNum
        if (.not.ignore) ignore = nmlfi_epsilon_one_infinity(params(1),params(2)).gt.epsilonMax
+       disfavour = .false.
+
+    case ('nmlfi3s','nmlfi3l')
+       ignore = .not.nmlfi3_check_params(params(1),params(2))
+       if (.not.ignore) ignore = params(3).lt.nmlfi3_numacc_hbarendmin(efoldNum,params(1),params(2))
        disfavour = .false.
        
     case ('saiii1p','saiii1n')
@@ -648,7 +686,47 @@ contains
     case ('ccsi2')
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * ccsi2_numacc_xendmin(efoldNum,asparams(1))
+       
+    case ('rclfi1pm')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * rclfi_alpha_one(asparams(1))
+!for test       AspicModel%derived(1) = rclfi1_numacc_mumin(efoldNum,asparams(1),asparams(2))
+       asparams(3) = newparams(3) * rclfi1_numacc_mumin(efoldNum,asparams(1),asparams(2))
 
+    case ('rclfi1mm')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = newparams(3) * rclfi1_numacc_mumin(efoldNum,asparams(1),asparams(2))
+
+    case ('rclfi1mp')
+       asparams(1) = newparams(1) * rclfi1_numacc_pmax()
+       asparams(2) = newparams(2) * rclfi_alpha_one(asparams(1))
+       asparams(3) = newparams(3) * rclfi1_numacc_mumin(efoldNum,asparams(1),asparams(2))       
+
+    case ('rclfi2pm')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * rclfi_alpha_zero(asparams(1))
+       asparams(3) = newparams(3) * rclfi2_numacc_mumin(efoldNum,asparams(1),asparams(2))
+
+    case ('rclfi2mm')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2)
+       asparams(3) = newparams(3) * rclfi2_numacc_mumin(efoldNum,asparams(1),asparams(2))
+       
+    case ('rclfi2mp')
+       asparams(1) = newparams(1) * rclfi2_numacc_pmax()
+       asparams(2) = newparams(2) * rclfi_alpha_zero(asparams(1))
+       asparams(3) = newparams(3) * rclfi2_numacc_mumin(efoldNum,asparams(1),asparams(2))
+
+    case ('rclfi3pm','rclfi3mp')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * rclfi_alpha_zero(asparams(1))
+       asparams(3) = newparams(3)
+
+    case ('rclfi4p','rclfi4m')
+       asparams(1) = newparams(1)
+       asparams(2) = newparams(2) * rclfi_alpha_one(asparams(1))
+       asparams(3) = newparams(3)
        
     end select
 

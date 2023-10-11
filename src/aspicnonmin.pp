@@ -20,12 +20,12 @@
 !gravity for which you want the reheating energies to be computed in
 !the JORDAN FRAME.
 !  
-!All models non-appearing here will be assumed to be minimally
-!coupled. If a non-minimally coupled model is not listed here, its
+!All models appearing here will be assumed to be non-minimally coupled
+!to gravity. If a non-minimally coupled model is not listed here, its
 !energie density of reheating will still be computed but in the
-!Einstein Frame.
-  
-NONMIN(si)
+!Einstein Frame (check however for non-standard reheating models, that
+!could be also non-minimal and hardcoded in aspicmodels module)
+
 NONMIN(rpi1)
 NONMIN(rpi2)
 NONMIN(rpi3)

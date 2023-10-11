@@ -106,6 +106,7 @@ contains
     numAspicDerived = 0
     nonStandardReheat = .false.
 
+    
 !initialize pointers to conformal factor function for non-minimal
 !models
     select case (trim(name))
@@ -123,6 +124,16 @@ contains
     end select
 
 
+!for some models, we could keep trace of some extra parameter in derived params
+!    select case (trim(name))
+!
+!    case ('rclfi1')
+!       numAspicDerived = 1
+!       
+!    end select
+
+
+    
     
 !initialize pointers to Hubble flow and reheating functions for all
 !models
@@ -255,6 +266,13 @@ contains
        nonStandardReheat = .true.
        xEndIsParam = .false.
        numAspicParams = 2
+       numAspicDerived = 0
+       ptronep_ln_omega4 => nmlfi_parametric_ln_omega4
+
+    case ('nmlfi3')
+       nonStandardReheat = .true.
+       xEndIsParam = .true.
+       numAspicParams = 3
        numAspicDerived = 0
        ptronep_ln_omega4 => nmlfi_parametric_ln_omega4
        

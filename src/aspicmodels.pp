@@ -19,9 +19,7 @@
 !write down the list of aspic models having a *standard reheating
 !history* sorted according to the total number of ASPIC parameters,
 !append _XEND if the field value at the end of inflation is one of
-!them. Add the directive NON_MINIMAL if the model has a non-minimal
-!coupling to gravity (required to compute rhoEndInf in the Jordan
-!Frame)
+!them.
   
 ZERO(si)
 
@@ -107,7 +105,10 @@ THREE(ncli)
 THREE(saiii1)
 THREE(saiii2)
 THREE(saiii3)
-
+THREE(rclfi1)
+THREE(rclfi2)
+THREE(rclfi3)
+THREE(rclfi4)
 
 THREE_XEND(lmi2)
 THREE_XEND(rmi1)

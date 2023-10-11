@@ -64,6 +64,10 @@ contains
     case ('nmlfi1')
 !we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
        aspic_nonstd_rrad = nmlfi1_hbar_rrad(params(1),params(2),xend,lnRrad,Pstar,bfoldstar)
+
+    case ('nmlfi3')
+!we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
+       aspic_nonstd_rrad = nmlfi3_hbar_rrad(params(1),params(2),xend,lnRrad,Pstar,bfoldstar)
        
     case default
        stop 'aspic_nonstd_rrad: name not found!'
@@ -104,6 +108,10 @@ contains
     case ('nmlfi1')
 !we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
        aspic_nonstd_rreh = nmlfi1_hbar_rreh(params(1),params(2),xend,lnRreh,bfoldstar)
+
+    case ('nmlfi3')
+!we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
+       aspic_nonstd_rreh = nmlfi3_hbar_rreh(params(1),params(2),xend,lnRreh,bfoldstar)
        
     case default
        stop 'aspic_nonstd_rreh: name not found!'
@@ -142,6 +150,10 @@ contains
     case ('nmlfi1')
 !we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
        aspic_nonstd_rhow = nmlfi1_hbar_star(params(1),params(2),xend,w,lnRhoReh,Pstar,bfoldstar)
+
+    case ('nmlfi3')
+!we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
+       aspic_nonstd_rhow = nmlfi3_hbar_star(params(1),params(2),xend,w,lnRhoReh,Pstar,bfoldstar)
        
     case default
        stop 'aspic_nonstd_rhow: name not found!'
@@ -200,7 +212,7 @@ contains
 !computed to Lambda before calling this function)
        aspic_nonstd_potential = di_norm_parametric_potential(x,params(1))
 
-    case('nmlfi1')
+    case('nmlfi1','nmlfi3')
 !we are using the parametric field hbar in the computations
        aspic_nonstd_potential = nmlfi_norm_parametric_potential(x,params(1),params(2))
        
@@ -234,7 +246,7 @@ contains
 !be k2 on input) and the first derived parameter should be set to Lambda
        aspic_nonstd_epsilon_one = di_parametric_epsilon_one(x,params(1))/AspicModel%derived(1)**2
 
-    case('nmlfi1')
+    case('nmlfi1','nmlfi3')
 !we are using the parametric field hbar in the computations
        aspic_nonstd_epsilon_one = nmlfi_parametric_epsilon_one(x,params(1),params(2))
        
@@ -268,7 +280,7 @@ contains
 !be k2 on input) and the first derived parameter should be set to Lambda
        aspic_nonstd_epsilon_two = di_parametric_epsilon_two(x,params(1))/AspicModel%derived(1)**2
 
-    case('nmlfi1')
+    case('nmlfi1','nmlfi3')
 !we are using the parametric field hbar in the computations
        aspic_nonstd_epsilon_two = nmlfi_parametric_epsilon_two(x,params(1),params(2))       
        
@@ -302,7 +314,7 @@ contains
 !be k2 on input) and the first derived parameter should be set to Lambda
        aspic_nonstd_epsilon_three = di_parametric_epsilon_three(x,params(1))/AspicModel%derived(1)**2
 
-    case('nmlfi1')
+    case('nmlfi1','nmlfi3')
 !we are using the parametric field hbar in the computations
        aspic_nonstd_epsilon_three = nmlfi_parametric_epsilon_three(x,params(1),params(2))
        
