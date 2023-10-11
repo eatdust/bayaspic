@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -30,19 +30,21 @@ module aspicvars
   type infaspic     
      character(len=lname) :: name     
      character(len=lname) :: extname
-     integer :: nasp, nhid
+     integer :: nasp, nhid, nder
      real(kp), dimension(:), pointer :: params
      character(len=lname), dimension(:), pointer :: cmaps
      real(kp) :: Pstar, lnRrad, lnRreh
      real(kp) :: lnM, logeps, eps2, eps3
      real(kp) :: lnRhoEnd, bfold
      real(kp) :: ns, logr, alpha
+     real(kp), dimension(:), pointer :: derived
   end type infaspic
 
-  
+  type(infaspic), save :: AspicModel
+
   
   public infaspic, kp, pi, lname
-
+  public AspicModel
 
 
 end module aspicvars

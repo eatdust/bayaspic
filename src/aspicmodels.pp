@@ -16,11 +16,13 @@
 !   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
 
-!write down the list of aspic models sorted according to the total
-!number of ASPIC parameters, append _XEND if the field value at the end
-!of inflation is one of them.
-
+!write down the list of aspic models having a *standard reheating
+!history* sorted according to the total number of ASPIC parameters,
+!append _XEND if the field value at the end of inflation is one of
+!them.
+  
 ZERO(si)
+
 
 ONE(rchi)
 ONE(lfi)
@@ -100,6 +102,14 @@ THREE(lpi1)
 THREE(lpi2)
 THREE(lpi3)
 THREE(ncli)
+THREE(saiii1)
+THREE(saiii2)
+THREE(saiii3)
+THREE(rclfi1)
+THREE(rclfi2)
+THREE(rclfi3)
+THREE(rclfi4)
+THREE(rcipi)
 
 THREE_XEND(lmi2)
 THREE_XEND(rmi1)

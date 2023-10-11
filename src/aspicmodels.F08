@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -32,6 +32,14 @@ module aspicmodels
 !number of aspic parameters including xend
   integer, save :: numAspicParams = 0
 
+!number of derived aspic parameters
+  integer, save :: numAspicDerived = 0
+  
+!non-standard reheating history (see aspicnonstd.F08 module)
+  logical, save :: nonStandardReheat = .false.
+
+  procedure(onep_ln_omega4), pointer :: ptronep_ln_omega4 => null()
+  
   procedure(zerop_x_rrad), pointer :: ptrzerop_x_rrad => null()
   procedure(zerop_x_rreh), pointer :: ptrzerop_x_rreh => null()
   procedure(zerop_x_rhow), pointer :: ptrzerop_x_rhow => null()
@@ -71,12 +79,12 @@ module aspicmodels
 
 
   public check_aspic_ptrs, free_aspic_ptrs, get_aspic_numparams
-  public check_aspic_xend, initialize_aspic_ptrs
+  public get_aspic_numderived, check_aspic_xend, initialize_aspic_ptrs
 
   public aspic_x_rrad, aspic_x_rreh, aspic_x_rhow
   public aspic_norm_potential
   public aspic_epsilon_one, aspic_epsilon_two, aspic_epsilon_three
-  public aspic_x_endinf
+  public aspic_x_endinf, aspic_ln_rho_endinf
 
 contains
 
@@ -94,6 +102,41 @@ contains
     
     if (CheckAspicPtrs) return
 
+    numAspicParams = 0
+    numAspicDerived = 0
+    nonStandardReheat = .false.
+
+    
+!initialize pointers to conformal factor function for non-minimal
+!models
+    select case (trim(name))
+
+#define NONMIN(fooi) \
+    case ('fooi'); \
+       ptronep_ln_omega4 => fooi/**/_ln_omega4
+
+#include "aspicnonmin.pp"
+#undef NONMIN
+
+    case default
+       ptronep_ln_omega4 => null()
+       
+    end select
+
+
+!for some models, we could keep trace of some extra parameter in derived params
+!    select case (trim(name))
+!
+!    case ('rclfi1')
+!       numAspicDerived = 1
+!       
+!    end select
+
+
+    
+    
+!initialize pointers to Hubble flow and reheating functions for all
+!models
     select case (trim(name))
 
 !reminder: cpp is only used in "traditional mode" for fortran
@@ -109,7 +152,7 @@ contains
        ptrzerop_x_endinf => fooi/**/_x_endinf ; \
        xEndIsParam = .false. ; \
        numAspicParams = 0
-
+          
 #define ONE(fooi) \
     case ('fooi'); \
        ptronep_x_rrad => fooi/**/_x_rrad ; \
@@ -137,7 +180,6 @@ contains
        ptrzerop_x_endinf => null() ; \
        numAspicParams = 1
 
-       
 
 #define TWO(fooi) \
     case ('fooi') ; \
@@ -194,7 +236,6 @@ contains
        ptrtwop_x_endinf => null() ; \
        numAspicParams = 3
        
-
 #include "aspicmodels.pp"
 #undef ONE
 #undef ONE_XEND       
@@ -203,13 +244,43 @@ contains
 #undef THREE
 #undef THREE_XEND
 
+!the remaining case are non-standard reheating histories and require a
+!case-by-case treatment
+    case ('hi')
+       nonStandardReheat = .true.
+       xEndIsParam = .false.
+       numAspicParams = 0
+!we solve for xistar matching the CMB amplitude in aspic
+       numAspicDerived = 1
+       ptronep_ln_omega4 => hi_parametric_ln_omega4
+       
+    case ('di')
+       nonStandardReheat = .true.
+       xEndIsParam = .false.
+!this is the dimensionless parameter f
+       numAspicParams = 1
+       numAspicDerived = 1
+       ptronep_ln_omega4 => null()
 
+    case ('nmlfi1')
+       nonStandardReheat = .true.
+       xEndIsParam = .false.
+       numAspicParams = 2
+       numAspicDerived = 0
+       ptronep_ln_omega4 => nmlfi_parametric_ln_omega4
+
+    case ('nmlfi3')
+       nonStandardReheat = .true.
+       xEndIsParam = .true.
+       numAspicParams = 3
+       numAspicDerived = 0
+       ptronep_ln_omega4 => nmlfi_parametric_ln_omega4
+       
     case default
        stop 'initialize_aspic_ptrs: model not found!'
 
     end select
-
-  
+      
     CheckAspicPtrs = .true.
 
   end subroutine initialize_aspic_ptrs
@@ -241,6 +312,15 @@ contains
 
   end function get_aspic_numparams
 
+
+  function get_aspic_numderived()
+    implicit none
+    integer :: get_aspic_numderived
+
+    get_aspic_numderived = numAspicDerived
+
+  end function get_aspic_numderived
+  
 
   subroutine free_aspic_ptrs()
     implicit none
@@ -284,6 +364,8 @@ contains
     if (associated(ptrthreep_x_rreh)) ptrthreep_x_rreh => null()
     if (associated(ptrthreep_x_rhow)) ptrthreep_x_rhow => null()
 
+    if (associated(ptronep_ln_omega4)) ptronep_ln_omega4 => null()
+    
     CheckAspicPtrs = .false.
 
   end subroutine free_aspic_ptrs
@@ -291,11 +373,13 @@ contains
 
 
   function aspic_x_rrad(name,params,xend,lnRrad,Pstar,bfoldstar)
+    use aspicnonstd, only : aspic_nonstd_rrad
     implicit none
     real(kp) :: aspic_x_rrad
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
-    real(kp), intent(in) :: xend, lnRrad, Pstar
+    real(kp), intent(in) :: lnRrad, Pstar
+    real(kp), intent(inout) :: xend
     real(kp), optional, intent(out) :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
@@ -313,7 +397,10 @@ contains
     elseif (associated(ptrthreep_x_rrad)) then
        aspic_x_rrad = ptrthreep_x_rrad(params(1),params(2) &
             ,params(3),xend,lnRrad,Pstar,bfoldstar)
-    
+
+    elseif (nonStandardReheat) then
+       aspic_x_rrad = aspic_nonstd_rrad(name,params,xend,lnRrad,Pstar,bfoldstar)
+       
     else
        stop 'aspic_x_rrad: wrong nparams!'
     end if
@@ -322,12 +409,14 @@ contains
 
 
 
-  function aspic_x_rreh(name,params,xend,lnRreh,bfoldstar)
+  function aspic_x_rreh(name,params,xend,lnRreh,Pstar,bfoldstar)
+    use aspicnonstd, only : aspic_nonstd_rreh
     implicit none
     real(kp) :: aspic_x_rreh
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params   
-    real(kp), intent(in) :: xend, lnRreh
+    real(kp), intent(in) :: lnRreh,Pstar
+    real(kp), intent(inout) :: xend
     real(kp), intent(out), optional :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
@@ -346,6 +435,9 @@ contains
        aspic_x_rreh = ptrthreep_x_rreh(params(1),params(2) &
             ,params(3),xend,lnRreh,bfoldstar)
 
+    elseif (nonStandardReheat) then
+       aspic_x_rreh = aspic_nonstd_rreh(name,params,xend,lnRreh,Pstar,bfoldstar)
+       
     else
        stop 'aspic_x_rreh: wrong nparams!'
     end if
@@ -355,11 +447,13 @@ contains
 
 
   function aspic_x_rhow(name,params,xend,w,lnRhoReh,Pstar,bfoldstar)
+    use aspicnonstd, only : aspic_nonstd_rhow
     implicit none
     real(kp) :: aspic_x_rhow
     character(len=*), intent(in) :: name
     real(kp), dimension(:), intent(in) :: params
-    real(kp), intent(in) :: xend,w,lnRhoReh,Pstar
+    real(kp), intent(in) :: w,lnRhoReh,Pstar
+    real(kp), intent(inout) :: xend
     real(kp), intent(out), optional :: bfoldstar
 
     if (.not.CheckAspicPtrs) stop 'aspic not initialized!'
@@ -378,6 +472,9 @@ contains
        aspic_x_rhow = ptrthreep_x_rhow(params(1),params(2) &
             ,params(3),xend,w,lnRhoReh,Pstar,bfoldstar)
 
+    elseif (nonStandardReheat) then
+       aspic_x_rhow = aspic_nonstd_rhow(name,params,xend,w,lnRhoReh,Pstar,bfoldstar)
+       
     else
        stop 'aspic_x_rhow: wrong nparams!'
     end if
@@ -387,6 +484,7 @@ contains
 
 
   function aspic_norm_potential(name,x,params)
+    use aspicnonstd, only : aspic_nonstd_potential
     implicit none
     real(kp) :: aspic_norm_potential
     character(len=*), intent(in) :: name
@@ -414,6 +512,9 @@ contains
        aspic_norm_potential = ptrthreep_norm_potential(x &
             ,params(1),params(2),params(3))
 
+    elseif (nonStandardReheat) then
+       aspic_norm_potential = aspic_nonstd_potential(name,x,params)
+       
     else
        stop 'aspic_norm_potential: wrong nparams!'
     end if
@@ -423,6 +524,7 @@ contains
 
 
   function aspic_epsilon_one(name,x,params)
+    use aspicnonstd, only : aspic_nonstd_epsilon_one
     implicit none
     real(kp) :: aspic_epsilon_one
     character(len=*), intent(in) :: name
@@ -448,6 +550,9 @@ contains
        aspic_epsilon_one = ptrthreep_epsilon_one(x &
             ,params(1),params(2),params(3))
 
+    elseif (nonStandardReheat) then
+       aspic_epsilon_one = aspic_nonstd_epsilon_one(name,x,params)
+       
     else
        stop 'aspic_epsilon_one: wrong nparams!'
     end if
@@ -456,6 +561,7 @@ contains
 
 
   function aspic_epsilon_two(name,x,params)
+    use aspicnonstd, only : aspic_nonstd_epsilon_two
     implicit none
     real(kp) :: aspic_epsilon_two
     character(len=*), intent(in) :: name
@@ -481,6 +587,9 @@ contains
        aspic_epsilon_two = ptrthreep_epsilon_two(x &
             ,params(1),params(2),params(3))
 
+    elseif (nonStandardReheat) then
+       aspic_epsilon_two = aspic_nonstd_epsilon_two(name,x,params)
+              
     else
        stop 'aspic_epsilon_two: wrong nparams!'
     end if
@@ -491,6 +600,7 @@ contains
 
 
   function aspic_epsilon_three(name,x,params)
+    use aspicnonstd, only : aspic_nonstd_epsilon_three
     implicit none
     real(kp) :: aspic_epsilon_three
     character(len=*), intent(in) :: name
@@ -516,6 +626,9 @@ contains
        aspic_epsilon_three = ptrthreep_epsilon_three(x &
             ,params(1),params(2),params(3))
 
+    elseif (nonStandardReheat) then
+       aspic_epsilon_three = aspic_nonstd_epsilon_three(name,x,params)
+       
     else
        stop 'aspic_epsilon_three: wrong nparams!'
     end if
@@ -526,6 +639,7 @@ contains
 
 
   function aspic_x_endinf(name,params)
+    use aspicnonstd, only : aspic_nonstd_endinf
     implicit none
     real(kp) :: aspic_x_endinf
     character(len=*), intent(in) :: name
@@ -559,6 +673,9 @@ contains
 
        aspic_x_endinf = ptrthreep_x_endinf(params(1),params(2),params(3))
 
+    elseif (nonStandardReheat) then
+       aspic_x_endinf = aspic_nonstd_endinf(name,params)
+       
     else
        stop 'aspic_x_endinf: wrong nparams!'
     end if
@@ -566,5 +683,28 @@ contains
   end function aspic_x_endinf
 
 
+  
+  function aspic_ln_rho_endinf(name,Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend)
+    use srreheat, only : ln_rho_endinf
+    implicit none
+    real(kp) :: aspic_ln_rho_endinf
+    character(len=*), intent(in) :: name
+    real(kp), intent(in) :: Pstar,xstar,epsStar,Vstar,xend,epsEnd,Vend
+    real(kp) :: lnOmega4End
+
+    if (associated(ptronep_ln_omega4)) then
+
+       lnOmega4End = ptronep_ln_omega4(xend)
+       aspic_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar,lnOmega4End)
+
+    else
+
+       aspic_ln_rho_endinf = ln_rho_endinf(Pstar,epsStar,epsEnd,Vend/Vstar)
+
+    end if
+       
+  end function aspic_ln_rho_endinf
+
+  
 
 end module aspicmodels

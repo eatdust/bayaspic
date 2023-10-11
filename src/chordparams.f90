@@ -26,7 +26,7 @@ module chordparams
   integer(imn), parameter :: chordNlive = 20000
 
 !evidence tolerance factor < 0.5
-  real(fmn), parameter :: chordZTol = 0.01_fmn
+  real(fmn), parameter :: chordZTol = 0.001_fmn
 
 !dimension
   integer(imn), save :: chordNdim = 0
@@ -37,7 +37,7 @@ module chordparams
 !total number of parameters
   integer(imn), save :: chordNpars = 0
 
-  real(fmn), parameter :: chordBoost = 5._fmn
+  real(fmn), parameter :: chordBoost = -1._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
   real(fmn), parameter :: chordLogZero = -1d30
@@ -72,6 +72,9 @@ module chordparams
   logical, parameter :: chordOutStats = .true.
   logical, parameter :: chordOutParamNames = .false. 
 
+  !synchronous parallisation (false if likes are same speed)
+  logical, parameter :: chordSync = .false.
+  
 
 contains
 
@@ -101,6 +104,7 @@ contains
     write(*,*)'chordOutDead  =         ',chordOutDead
     write(*,*)'chordOutStats =         ',chordOutStats
     write(*,*)'chordOutPNames=         ',chordOutParamNames
+    write(*,*)'chordSync     =         ',chordSync
     write(*,*)'chordDir      =         ',trim(chordDir)
     write(*,*)'chordName     =         ',trim(chordName)
     write(*,*)'-----------------------------------------------------'
@@ -135,6 +139,7 @@ contains
     set%cluster_posteriors = chordClusterPost
     set%feedback = chordFeedBack
     set%boost_posterior = chordBoost
+    set%synchronous = chordSync
     
 
   end subroutine chord_settings

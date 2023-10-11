@@ -44,7 +44,7 @@ module samplaspic
   character(len=*), parameter :: filefnn = 'fnndata/fnndata.dat'
   character(len=*), parameter :: filefnnbounds = 'fnndata/bounds.dat'
   
-  integer(imn), parameter :: numDerivedParams = 11
+  integer(imn), save :: numDerivedParams = 0
 
   integer(imn), save :: fitNdim = 0
 
@@ -83,7 +83,7 @@ contains
 
    
   subroutine init_aspic(modelname)
-    use wraspic, only : set_model, get_ntot
+    use wraspic, only : set_model, get_ntot, get_nderived
     use wraspic, only : allocate_and_set_allprior
     use rbflike, only : initialize_rbf_like, check_rbf, get_rbf_fmin
     use rbflike, only : get_rbf_ndim, get_rbf_xpmin, get_rbf_xpmax
@@ -132,7 +132,8 @@ contains
     if ((size(samplPmin,1).ne.samplNdim).or.(size(samplPmax,1).ne.samplNdim)) then
        stop 'init_aspic: samplPmin/max size not matching ntot!'
     endif
-    
+
+    numDerivedParams = get_nderived()
     samplNpars = samplNdim + numDerivedParams
 
 
