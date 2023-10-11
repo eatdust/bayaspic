@@ -59,7 +59,7 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('rclfi4 m')
+  call initialize_onemodel('rcipi 26')
 !  call initialize_onemodel('gdwi l')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()

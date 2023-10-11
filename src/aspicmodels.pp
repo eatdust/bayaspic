@@ -109,6 +109,7 @@ THREE(rclfi1)
 THREE(rclfi2)
 THREE(rclfi3)
 THREE(rclfi4)
+THREE(rcipi)
 
 THREE_XEND(lmi2)
 THREE_XEND(rmi1)

@@ -84,3 +84,5 @@ use rclfi2sr, only : rclfi2_check_params, rclfi2_numacc_mumin
 use rclfi3sr, only : rclfi3_numacc_pmin
 use rclfi3sr, only : rclfi3_check_params, rclfi3_numacc_alphamin
 use rclfi4sr, only : rclfi4_check_params
+use rcipisr, only : rcipi_efoldmax
+use rcipisr, only : rcipi_check_params, rcipi_alpha_zero

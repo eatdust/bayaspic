@@ -161,7 +161,15 @@ contains
     disfavour = .false.
 
     select case (name)
-
+       
+    case ('rcipi1tune2p','rcipi1tune2m','rcipi1tune4p','rcipi1tune4m','rcipi1m')
+       ignore = .not.rcipi_check_params(params(1),params(2),params(3))
+       disfavour = .false.
+       if (.not.ignore) then
+          ignore = rcipi_efoldmax(params(1),params(2),params(3)).lt.efoldNum
+          disfavour = ignore
+       endif
+       
     case ('rclfi1pm','rclfi1mm')
        ignore = .not.rclfi1_check_params(params(1),params(2),params(3))
        disfavour = .false.
@@ -727,6 +735,32 @@ contains
        asparams(1) = newparams(1)
        asparams(2) = newparams(2) * rclfi_alpha_one(asparams(1))
        asparams(3) = newparams(3)
+
+    case ('rcipi1tune2p','rcipi1tune4p')
+       asparams(1) = newparams(1)
+       asparams(3) = newparams(3)
+       asparams(2) = newparams(2) + rcipi_alpha_zero(asparams(1),asparams(3))
+
+    case ('rcipi1tune2m','rcipi1tune4m')
+       asparams(1) = newparams(1)
+       asparams(3) = newparams(3)
+       asparams(2) = newparams(2) - rcipi_alpha_zero(asparams(1),asparams(3))
+       
+    case ('rcipi1m')
+       asparams(1) = newparams(1)
+       asparams(3) = newparams(3)
+       asparams(2) = -2._kp*sqrt(asparams(3)) + newparams(2) &
+            * ( -rcipi_alpha_zero(asparams(1),asparams(3)) + 2._kp*sqrt(asparams(3)) )
+       
+    case ('rcipi22','rcipi23','rcipi24','rcipi25','rcipi26')
+       asparams(1) = newparams(1)
+       asparams(3) = newparams(3)
+       asparams(2) = newparams(2) * rcipi_alpha_zero(asparams(1),asparams(3))
+
+    case ('rcipi2')
+       asparams(1) = newparams(1)
+       asparams(3) = newparams(3) * sqrt(asparams(1))
+       asparams(2) = newparams(2) * rcipi_alpha_zero(asparams(1),asparams(3))
        
     end select
 

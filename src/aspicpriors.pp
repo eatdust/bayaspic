@@ -466,9 +466,27 @@ THREEPRIORS(rclfi4p,4.1_kp,8._kp,flat,-3._kp,0._kp,log,-2._kp,4._kp,log)
 !last is mu
 THREEPRIORS(rclfi4m,0.1_kp,3.9_kp,flat,-3._kp,0._kp,log,-2._kp,4._kp,log)
 
+!first param is p, second is alpha-alphazero > 0 (tuned),third is beta
+THREEPRIORS(rcipi1tune2p,2._kp,2._kp,flat,-5._kp,-2._kp,log,-2._kp,log10(4._kp),log)
+THREEPRIORS(rcipi1tune4p,4._kp,4._kp,flat,-5._kp,-2._kp,log,-2._kp,log10(16._kp),log)
+!first param is p, second is alpha-(-alphazero) < 0 (tuned),third is beta
+THREEPRIORS(rcipi1tune2m,2._kp,2._kp,flat,-5._kp,-2._kp,mlog,-2._kp,log10(4._kp),log)
+THREEPRIORS(rcipi1tune4m,4._kp,4._kp,flat,-5._kp,-2._kp,mlog,-2._kp,log10(16._kp),log)
+!first param is p, second is -alphahat (alpha<0), third is beta
+THREEPRIORS(rcipi1m,2._kp,4._kp,flat,0._kp,1._kp,flat,-2._kp,log10(4._kp),log)
+
+!first param is p, second is alpha/alpha_0, third is beta
+THREEPRIORS(rcipi22,2._kp,2._kp,flat,-1._kp,1._kp,flat,-2._kp,log10(4._kp),log)
+THREEPRIORS(rcipi23,3._kp,3._kp,flat,-1._kp,1._kp,flat,-2._kp,log10(9._kp),log)
+THREEPRIORS(rcipi24,4._kp,4._kp,flat,-1._kp,1._kp,flat,-2._kp,log10(16._kp),log)
+THREEPRIORS(rcipi25,5._kp,5._kp,flat,-1._kp,1._kp,flat,-2._kp,log10(25._kp),log)
+THREEPRIORS(rcipi26,6._kp,6._kp,flat,-1._kp,1._kp,flat,-2._kp,log10(36._kp),log)
+
+!first param is p, second is alpha/alpha_0, third is beta/betamax
+THREEPRIORS(rcipi2,2._kp,6._kp,flat,-1._kp,1._kp,flat,-2._kp,0._kp,log)
+
 !bi/kklti pheno, xstg and xuv have no role and they are fixed to
 !unphysical values (xstg=-1,xuv is omitted). Inflation ends at xeps1
-
 THREEPRIORS(kklti,2._kp,10._kp,flat,-3._kp,3._kp,log,-1._kp,-1._kp,flat)
 THREEPRIORS(kkltis,2._kp,10._kp,flat,-3._kp,0._kp,log,-1._kp,-1._kp,flat)
 
