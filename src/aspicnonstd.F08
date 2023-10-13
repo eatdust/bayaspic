@@ -54,13 +54,13 @@ contains
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
     case ('di')
-!We outout the modulus k2star, params(1) is f and Lambda will be put
+!We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rrad = di_k2_rrad(params(1),lnRrad,Pstar,bfoldstar)
+       aspic_nonstd_rrad = di_k2_rrad(params(1),lnRrad,Pstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rrad,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
-
+       
     case ('nmlfi1')
 !we output the parametric field hbarstar (hbarend is on input, see nonstd_endinf)
        aspic_nonstd_rrad = nmlfi1_hbar_rrad(params(1),params(2),xend,lnRrad,Pstar,bfoldstar)
@@ -98,10 +98,10 @@ contains
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
     case ('di')
-!We outout the modulus k2star, params(1) is f and Lambda will be put
+!We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rreh = di_k2_rreh(params(1),lnRreh,Pstar,bfoldstar)
+       aspic_nonstd_rreh = di_k2_rreh(params(1),lnRreh,Pstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rreh,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
 
@@ -140,10 +140,10 @@ contains
        aspic_nonstd_rhow = hi_hbar_star(w,lnRhoReh,Pstar,bfoldstar,AspicModel%derived(1))
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
-!We outout the modulus k2star, params(1) is f and Lambda will be put
+!We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rhow = di_k2_star(params(1),w,lnRhoReh,Pstar,bfoldstar)
+       aspic_nonstd_rhow = di_k2_star(params(1),w,lnRhoReh,Pstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rhow,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
 

@@ -123,7 +123,10 @@ ONEPRIOR(osti,1._kp,4._kp,log)
 ONEPRIOR(wrig,-3._kp,3._kp,log)
 ONEPRIOR(wrio,1._kp,1._kp,flat)
 
-ONEPRIOR(di,-5._kp,-1.5_kp,log)
+ONEPRIOR(di,-5._kp,0._kp,log)
+ONEPRIOR(dis,-5._kp,-2._kp,log)
+ONEPRIOR(dil,-2._kp,0._kp,log)
+ONEPRIOR(di1,0._kp,0._kp,log)
 
 ONEPRIOR(ccsi1,-6._kp,0._kp,log)
 
@@ -292,6 +295,8 @@ TWOPRIORS(hbio,0._kp,1._kp,flat,0.01_kp,1._kp,flat)
 TWOPRIORS(hbip,0._kp,5._kp,flat,0._kp,3._kp,log)
 
 TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
+
+TWOPRIORS(dei1,0._kp,1._kp,flat,1._kp,4._kp,log)
 
 TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
 TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
