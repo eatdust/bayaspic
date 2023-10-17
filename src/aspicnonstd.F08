@@ -57,7 +57,7 @@ contains
 !We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rrad = di_k2_rrad(params(1),lnRrad,Pstar)
+       aspic_nonstd_rrad = di_k2_rrad(params(1),lnRrad,Pstar,bfoldstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rrad,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
        
@@ -101,7 +101,7 @@ contains
 !We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rreh = di_k2_rreh(params(1),lnRreh,Pstar)
+       aspic_nonstd_rreh = di_k2_rreh(params(1),lnRreh,Pstar,bfoldstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rreh,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
 
@@ -140,10 +140,11 @@ contains
        aspic_nonstd_rhow = hi_hbar_star(w,lnRhoReh,Pstar,bfoldstar,AspicModel%derived(1))
        xend = hi_hbar_endinf(AspicModel%derived(1))
 
+    case('di')       
 !We output the modulus k2star, params(1) is f and Lambda will be put
 !into the first derived parameter. k2end is also computed here as it
 !depends on k2star and Lambda
-       aspic_nonstd_rhow = di_k2_star(params(1),w,lnRhoReh,Pstar)
+       aspic_nonstd_rhow = di_k2_star(params(1),w,lnRhoReh,Pstar,bfoldstar)
        AspicModel%derived(1) = di_lambda_star(aspic_nonstd_rhow,params(1),Pstar)
        xend = di_k2_epsoneunity(params(1),AspicModel%derived(1))
 
