@@ -30,7 +30,7 @@ module aspicnonstd
   private
 
   public aspic_nonstd_rrad, aspic_nonstd_rreh, aspic_nonstd_rhow
-  public aspic_nonstd_endinf, aspic_nonstd_potential
+  public aspic_nonstd_endinf, aspic_nonstd_potential, aspic_nonstd_lnrho_endinf
   public aspic_nonstd_epsilon_one, aspic_nonstd_epsilon_two, aspic_nonstd_epsilon_three
   
 contains
@@ -326,5 +326,36 @@ contains
     
   end function aspic_nonstd_epsilon_three
  
+
+   function aspic_nonstd_lnrho_endinf(name,params,xend,xstar,Pstar)
+    implicit none
+    real(kp) :: aspic_nonstd_lnrho_endinf
+    character(len=*), intent(in) :: name
+    real(kp), dimension(:), intent(in) :: params
+    real(kp), intent(in) :: xend, xstar, Pstar
+
+    
+    select case(trim(name))
+       
+    case('hi')
+!we are using the parametric field hbar in the computations (x should
+!be hbar on input and the first derived parameter should have been
+!computed to xistar before calling this function)
+       aspic_nonstd_lnrho_endinf = hi_parametric_lnrho_endinf(AspicModel%derived(1),xend,xstar,Pstar)
+
+    case('di')
+       aspic_nonstd_lnrho_endinf = di_parametric_lnrho_endinf(params(1),xend,xstar,Pstar)
+
+    case('nmlfi1','nmlfi3')
+!we are using the parametric field hbar in the computations
+       aspic_nonstd_lnrho_endinf = nmlfi_parametric_lnrho_endinf(params(1),params(2),xend,xstar,Pstar)
+       
+    case default
+       stop 'aspic_nonstd_lnrho_endinf: name not found!'
+       
+    end select
+    
+  end function aspic_nonstd_lnrho_endinf
+
   
 end module aspicnonstd

@@ -544,7 +544,7 @@ contains
 
     integer :: npar, ntot, neps
     integer :: i
-
+    
     ntot = get_ntot()
     npar = AspicModel%nasp + AspicModel%nhid
     neps = nstar - 1
@@ -619,8 +619,9 @@ contains
 
 !the conformal term is computed in the aspicnonstd module for non
 !standard reheating. This quantity is therefore Jordan Frame
-    lnRhoEnd = aspic_ln_rho_endinf(aspname,Pstar,xstar,epsHStar(1),Vstar,xend,epsOneEnd,Vend)
 
+    lnRhoEnd = aspic_lnrho_endinf(aspname,asparams,xend,xstar,Pstar)
+    !    print *,'test',lnRhoEnd,check_lnrho_endinf(aspname,Pstar,xstar,epsVStar(1),Vstar,xend,epsOneEnd,Vend)
     
 !safeguard against insane values
     if (isnan(lnRhoEnd)) then

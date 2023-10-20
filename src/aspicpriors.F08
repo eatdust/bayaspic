@@ -161,6 +161,12 @@ contains
     disfavour = .false.
 
     select case (name)
+
+!this is SI assuming a hard prior as a minimal coupling to gravity    
+    case ('si mc')
+       ignore = .false.
+       disfavour = .false.
+       call si_set_minimal_coupling(.true.)
        
     case ('rcipi1tune2p','rcipi1tune2m','rcipi1tune4p','rcipi1tune4m','rcipi1m')
        ignore = .not.rcipi_check_params(params(1),params(2),params(3))

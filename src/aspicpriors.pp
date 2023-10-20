@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -49,7 +49,9 @@
 !sampled parameter inverse rescaling.
 
 ZEROPRIOR(si)
+ZEROPRIOR(simc)
 ZEROPRIOR(hi)
+
 
 ONEPRIOR(rchio,-48._kp,-20._kp,flat)
 ONEPRIOR(rchi,-65._kp,100._kp,flat)
@@ -298,7 +300,7 @@ TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
 
 TWOPRIORS(dei1,0._kp,1._kp,flat,1._kp,4._kp,log)
 
-TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp,1._kp/3._kp,flat)
 TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
 TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)

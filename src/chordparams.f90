@@ -68,7 +68,8 @@ module chordparams
 
 !whether to write output files
   logical, parameter :: chordOutLive = .true.
-  logical, parameter :: chordOutDead = .false.
+!required by infdistbayes
+  logical, parameter :: chordOutDead = .true.
   logical, parameter :: chordOutStats = .true.
   logical, parameter :: chordOutParamNames = .false. 
 
