@@ -611,9 +611,12 @@ contains
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vend = aspic_norm_potential(aspname,xend,asparams)
 
-!clamp unobservable slow-roll violations at the end of inflation that
-!would completely screw estimation of rhoend for instance
-    epsOneEnd = min(epsOneEnd,epsVClamp)
+!Warn if there are large slow-roll violations at the end of inflation
+!that would completely screw estimation of rhoend for instance (this
+!should be dealt with in aspic)
+    if (epsOneEnd.gt.epsVClamp) then
+       write(*,*)'Model ',trim(aspname),'has epsOneEnd= ',epsOneEnd
+    endif
     
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
 
@@ -628,6 +631,7 @@ contains
        write(*,*)'xend= ',xend
        write(*,*)'eps* epsend= ',epsHStar,epsOneEnd
        write(*,*)'Vend= Vstar= ',Vend,Vstar
+       write(*,*)'Model name = ',trim(aspname)
        stop 'wraspic: NaN caught in lnRhoEnd!'
     endif
 
