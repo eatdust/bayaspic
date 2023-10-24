@@ -38,6 +38,8 @@ module aspicvars
      real(kp) :: lnRhoEnd, bfold
      real(kp) :: ns, logr, alpha
      real(kp), dimension(:), pointer :: derived
+   contains
+     procedure :: print => print_infaspic
   end type infaspic
 
   type(infaspic), save :: AspicModel
@@ -46,5 +48,30 @@ module aspicvars
   public infaspic, kp, pi, lname
   public AspicModel
 
+contains
+
+
+  subroutine print_infaspic(this)
+    implicit none
+    class(infaspic), intent(in) :: this
+
+    write(*,*)'--------------------------------------------------------'
+    write(*,*)'name:                ',trim(this%name)
+    write(*,*)'extname:             ',trim(this%extname)
+    write(*,*)'Pstar=               ',this%Pstar
+    write(*,*)'lnRrad= lnRreh=      ',this%lnRrad, this%lnRreh
+    write(*,*)'lnM=                 ',this%lnM
+    write(*,*)'log(epsV1)= epsV23=  ',this%logeps, this%eps2, this%eps3
+    write(*,*)'ln(rhoend)= N*-Nend= ',this%lnRhoEnd,this%bfold
+    write(*,*)'ns= log(r)= alpha=   ',this%ns,this%logr,this%alpha
+    write(*,*)'cmaps=               ',this%cmaps
+    write(*,*)'params=              ',this%params
+    write(*,*)'derived=             ',this%derived
+    write(*,*)'--------------------------------------------------------'
+
+    
+  end subroutine print_infaspic
+  
+  
 
 end module aspicvars

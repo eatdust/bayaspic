@@ -58,6 +58,7 @@ module wraspic
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
+  logical, save :: warn = .true.
 
 !clamp eps1 at this values in case of slow-roll violations (end of
 !inflation) to have meaningful derived parameter values
@@ -90,6 +91,9 @@ contains
     
     if (AspicModel%nasp.gt.nparmax) stop 'set_model: nparmax too small!'
 
+!reset warning model per model
+    warn = .true.
+    
   end subroutine set_model
 
 
@@ -614,8 +618,10 @@ contains
 !Warn if there are large slow-roll violations at the end of inflation
 !that would completely screw estimation of rhoend for instance (this
 !should be dealt with in aspic, not here)
-    if (epsOneEnd.gt.epsVClamp) then
-       write(*,*)'Model ',trim(aspname),' has epsOneEnd= ',epsOneEnd
+    if (warn.and.(epsOneEnd.gt.epsVClamp)) then
+       write(*,*)'epsOneEnd= ',epsOneEnd
+       call AspicModel%print()
+       warn = .false.
     endif
     
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
@@ -667,7 +673,7 @@ contains
     if (display) then
        write(*,*)
        write(*,*)'get_hubbleflow:',neps
-       call print_aspicmodel(AspicModel)
+       call AspicModel%print()
     end if
       
 
@@ -679,22 +685,6 @@ contains
   end function get_hubbleflow
 
   
-  subroutine print_aspicmodel(model)
-    implicit none
-    type(infaspic), intent(in) :: model
-
-    write(*,*)'AspicModel Params:   '
-    write(*,*)'Pstar= asparams=     ',Model%Pstar,Model%params
-    write(*,*)'lnRrad= lnRreh=      ',Model%lnRrad, Model%lnRreh
-    write(*,*)'lnM= lnRhoEnd=       ',Model%lnM,Model%lnRhoEnd
-    write(*,*)'N*-Nend=             ',Model%bfold
-    write(*,*)'log(epsV1)= epsV23=  ',Model%logeps, Model%eps2, Model%eps3
-    write(*,*)'ns= log(r)= alpha=   ',Model%ns,Model%logr,Model%alpha
-    write(*,*)
-
-  end subroutine print_aspicmodel
-
-
 
   function test_aspic_hardprior(mnParams,disfavour)
     use aspicpriors, only : check_aspic_hardprior
