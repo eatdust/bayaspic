@@ -619,8 +619,8 @@ contains
 !that would completely screw estimation of rhoend for instance (this
 !should be dealt with in aspic, not here)
     if (warn.and.(epsOneEnd.gt.epsVClamp)) then
+       write(*,*)'Model name = ',trim(aspname)
        write(*,*)'epsOneEnd= ',epsOneEnd
-       call AspicModel%print()
        warn = .false.
     endif
     
