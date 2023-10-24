@@ -265,6 +265,7 @@ contains
        numAspicDerived = 0
        
     case default
+       write(*,*)'name: ',(trim(name))
        stop 'initialize_aspic_ptrs: model not found!'
 
     end select
