@@ -330,7 +330,7 @@ contains
        disfavour = params(2).gt.bsusybi_xendmax(efoldNum,params(1))
        ignore = disfavour
 !this is roughly -95
-       ignore = ignore .or. (params(2).lt.bsusybi_numacc_xendmin(1d-99,params(1)))
+       ignore = ignore .or. (params(2).lt.bsusybi_numacc_xendmin(10._kp**(-99._kp),params(1)))
 
     case ('gmssmi')
        ignore = (params(1).lt.gmssmi_alphamin(efoldNum,params(2)) &
@@ -571,9 +571,9 @@ contains
 
     case ('csi')
        asparams(1) = newparams(1)
-       asparams(2) = csi_numacc_x_epsonesmall(asparams(1),1d-5) &
+       asparams(2) = csi_numacc_x_epsonesmall(asparams(1),10._kp**(-5._kp)) &
             + newparams(2) * ( csi_xendmax(efoldNum,asparams(1)) &
-            - csi_numacc_x_epsonesmall(asparams(1),1d-5) )
+            - csi_numacc_x_epsonesmall(asparams(1),10._kp**(-5._kp)) )
 
     case ('cnci')
        asparams(1) = newparams(1)
