@@ -271,15 +271,12 @@ contains
 
     case('hni1f')
        ignore = params(1).le.hni1_alphamin(params(2))
-       if (.not.ignore) then
-          ignore = hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
-       endif
+       if (.not.ignore) ignore = hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
        disfavour = .false.
 
     case('hni2f','hni2l')
        ignore = params(3).ge.hni2_xendmax(params(1),params(2))
-       if (.not.ignore) then
-          ignore = hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       if (.not.ignore) ignore = hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
        endif
        disfavour = .false.
 
