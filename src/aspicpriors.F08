@@ -270,8 +270,10 @@ contains
        disfavour = .false.
 
     case('hni1f')
-       ignore = params(1).le.hni1_alphamin(params(2)) .or. &
-            hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       ignore = params(1).le.hni1_alphamin(params(2))
+       if (.not.ignore) then
+          ignore = hni1_numacc_efoldmax(params(1),params(2)).le.efoldNum
+       endif
        disfavour = .false.
 
     case('hni2f','hni2l')
