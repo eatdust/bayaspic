@@ -317,7 +317,7 @@ TWOPRIORS(fi0,-8._kp,-4._kp,log,0._kp,0._kp,flat)
 TWOPRIORS(fi1,-32._kp/3._kp,-16._kp/3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(fi2,-40._kp/3._kp,-20._kp/3._kp,log,2._kp,2._kp,flat)
 
-TWOPRIORS(hni1f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log)
+TWOPRIORS(hni1f,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,3._kp,log)
 
 TWOPRIORS(saii1n,-3._kp,-3._kp,mlog,0._kp,3._kp,log)
 TWOPRIORS(saii1p,-3._kp,3._kp,log,0._kp,3._kp,log)
@@ -386,7 +386,7 @@ THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,1._kp
 THREEPRIORS(nfi4p,epsilon(1._kp),10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
 THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 
-THREEPRIORS(hni2f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
+THREEPRIORS(hni2f,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 THREEPRIORS(hni2l,-3._kp,-epsilon(1._kp),log,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 
 !the first param is xi, second param is p and last params hbarend

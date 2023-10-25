@@ -205,12 +205,13 @@ contains
 
 !    lnRMin = 0.25_kp * lnRhoNuc
 !which is ~
-    lnRMin = -46
+    lnRMin = -46._kp
 
 !    lnRMax = -1._kp/12._kp * lnRhoNuc
 !which is ~
-    lnRMax = 15
+    lnRMax = 15._kp
 
+    
   end subroutine get_prior_lnRreh
 
 
