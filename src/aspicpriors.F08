@@ -277,7 +277,6 @@ contains
     case('hni2f','hni2l')
        ignore = params(3).ge.hni2_xendmax(params(1),params(2))
        if (.not.ignore) ignore = hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
-       endif
        disfavour = .false.
 
     case('ncli1','ncli2','ncli3','ncli4', 'ncli')
