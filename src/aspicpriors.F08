@@ -208,13 +208,13 @@ contains
        ignore = .not.rclfi4_check_params(params(1),params(2),params(3))
        disfavour = .false.
        
-    case ('nmlfi1s','nmlfi1l')
+    case ('nmlfi1s','nmlfi1l','nmlfi11','nmlfi12','nmlfi13')
        ignore = .not.nmlfi1_check_params(params(1),params(2))
        if (.not.ignore) ignore = nmlfi1_numacc_efoldmax(params(1),params(2)).lt.efoldNum
        if (.not.ignore) ignore = nmlfi_epsilon_one_infinity(params(1),params(2)).gt.epsilonMax
        disfavour = .false.
 
-    case ('nmlfi3s','nmlfi3l')
+    case ('nmlfi3s','nmlfi3l','nmlfi31','nmlfi32','nmlfi33')
        ignore = .not.nmlfi3_check_params(params(1),params(2))
        if (.not.ignore) ignore = params(3).lt.nmlfi3_numacc_hbarendmin(efoldNum,params(1),params(2))
        disfavour = .false.

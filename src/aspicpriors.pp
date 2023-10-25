@@ -391,9 +391,10 @@ THREEPRIORS(hni2l,-3._kp,-epsilon(1._kp),log,0._kp,3._kp,log,epsilon(1._kp),pi-e
 
 !the first param is xi, second param is p and last params hbarend
 THREEPRIORS(nmlfi3s,-4._kp,-2._kp,log,0.1_kp,0.5_kp,flat,-1._kp,2._kp,log)
-
-!the first param is xi, second param is p and last param is hbarend
 THREEPRIORS(nmlfi3l,-4._kp,-2._kp,log,0.6_kp,3.5_kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi31,-4._kp,-2._kp,log,1._kp,1._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi32,-4._kp,-2._kp,log,2._kp,2._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi33,-4._kp,-2._kp,log,3._kp,3._kp,flat,-1._kp,2._kp,log)
 
 !without xend
 
