@@ -59,14 +59,15 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('nmlfi1 1')
+  call initialize_onemodel('si mc')
 !  call initialize_onemodel('gdwi l')
 !  call initialize_onemodel('kklti stg')
 !  call initialize_manymodels()
 
 !  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
-
+!  call initialize_filemodels('list_rreh_qpmodels.dat')
+  
 
 
 #ifdef MPISCHED

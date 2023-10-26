@@ -5,7 +5,7 @@ ext=$(shell uname | cut -c1-3)
 ifeq ($(ext),Lin)
 FC = mpif90
 FCFLAGS = -O2  -fopenmp -DASPIC -DLIKENULL -DMPISCHED
-#-DASPICQ -DNOFANN -DLIKENULL -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
+#-DASPICQ -DNOFANN -DLIKENULL -DLIKESHEP -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
 #-DMPISCHED or -DMPI
 
 #extra flags for F08 cpp generated source files
@@ -21,7 +21,6 @@ INCLUDE =-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
 
 #if the fann library is present, build the NN likelihood
-LDFANN = -l doublefann
 #LDFANN = -ldoublefann
 
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)

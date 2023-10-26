@@ -642,6 +642,15 @@ contains
        stop 'wraspic: NaN caught in lnRhoEnd!'
     endif
 
+
+    if (isnan(bfoldstar)) then
+       write(*,*)'Model name = ',trim(aspname)
+       write(*,*)'xend= ',xend
+       write(*,*)'eps* epsend= ',epsHStar,epsOneEnd
+       write(*,*)'Vend= Vstar= ',Vend,Vstar
+       stop 'wraspic: NaN caught in bfoldstar!'
+    endif
+    
 !this conversions work for Jordan Frame lnRhoEnd    
     select case (ReheatModel)
     case ('Rrad')
