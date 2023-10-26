@@ -453,7 +453,7 @@ THREEPRIORS(rclfi1mp,0.1_kp,0.8_kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
 !the last is mu/mumin
 THREEPRIORS(rclfi2pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
 !the first param is p<4, the second is alpha < 0, the last is mu/mumin
-THREEPRIORS(rclfi2mm,0.1_kp,3.9_kp,flat,-0.2_kp,-2._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2mm,0.1_kp,3.9_kp,flat,-2._kp,-0.2_kp,flat,0._kp,3._kp,log)
 !the first param is p/pmax (pmax<4), the second is alpha/alpha_0>1, the last is mu/mumin
 THREEPRIORS(rclfi2mp,0.1_kp,0.9_kp,flat,1.0_kp,10._kp,flat,0._kp,3._kp,log)
 
