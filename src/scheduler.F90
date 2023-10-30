@@ -421,8 +421,8 @@ contains
     if (nsize.eq.1) return
 
 
-    if (qbounds%size.ge.2*chunk) then
-!    if (qbounds%size.gt.2*chunk) then
+!    if (qbounds%size.ge.2*chunk) then
+    if (qbounds%size.gt.2*chunk) then
 
        call give_nodes(chunk)
      
