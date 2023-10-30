@@ -274,10 +274,10 @@ TWOPRIORS(ssbi4,-5._kp,-1._kp,log,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
 TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
 
-TWOPRIORS(ssbi1f,0.001,10._kp,flat,0.00001_kp,10._kp,flat)
+TWOPRIORS(ssbi1f,0.001_kp,10._kp,flat,0.00001_kp,10._kp,flat)
 TWOPRIORS(ssbi2f,-0.1_kp,-0.00001_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi3f,0.00001_kp,10._kp,flat,-10._kp,-0.00001_kp,flat)
-TWOPRIORS(ssbi4f,0.00001,0.1_kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi4f,0.00001_kp,0.1_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
