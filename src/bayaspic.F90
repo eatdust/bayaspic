@@ -26,7 +26,7 @@ program bayaspic
 #endif
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
-  use scheduler, only : restore_scheduler, scheduler_save_queue
+  use scheduler, only : restore_scheduler, scheduler_save_queue, check_saved_queue
   implicit none
 
 
@@ -85,6 +85,9 @@ program bayaspic
      call initialize_scheduler(nmodels)
   endif
 
+  if ((cpSave).and.(.not.cpRestart)) then
+     if (check_saved_queue(mpiRank)) stop 'previous saved files present!'
+  endif
 
   do
 
