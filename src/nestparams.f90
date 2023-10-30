@@ -98,7 +98,7 @@ module nestparams
  !infinity. MultiNest will terminate if either it has done max no. of
  !iterations or convergence criterion (defined through nest_tol) has
  !been satisfied
-  integer(imn), parameter :: nestMaxIter = 0
+  integer(imn), parameter :: nestMaxIter = 1000000
 
 
 contains
