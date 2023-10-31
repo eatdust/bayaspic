@@ -58,7 +58,7 @@ module samplaspic
   integer, parameter :: lenlabel = 16
   character(len=lenlabel) :: label
 
-  integer, parameter :: countmax = 2000000
+  integer, parameter :: countmax = 1000000
   logical, parameter :: cuteps3 = .false.
   
   
@@ -494,7 +494,7 @@ contains
        write(*,*)'rbf_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       stop
+!       stop
     endif
     
     if (debug) then
@@ -603,7 +603,7 @@ contains
        write(*,*)'shep_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       stop
+!       stop
     endif
     
     if (debug) then
@@ -713,7 +713,7 @@ contains
        write(*,*)'fnn_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       stop
+!       stop
     endif
     
     if (debug) then
