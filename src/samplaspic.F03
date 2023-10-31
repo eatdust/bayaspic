@@ -50,13 +50,17 @@ module samplaspic
 
   integer(imn), parameter :: pstarpos = 1
   integer(imn), parameter :: eps1pos = 2
-
+  integer(imn), parameter :: eps3pos = 4
+  
+  
   real(fmn), save :: fitLogZero = 0._fmn
 
   integer, parameter :: lenlabel = 16
   character(len=lenlabel) :: label
 
   integer, parameter :: countmax = 2000000
+  logical, parameter :: cuteps3 = .false.
+  
   
 !the name of the fastlike method we call
 
@@ -400,7 +404,7 @@ contains
   subroutine rbf_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
     use rbfprec, only : fp
     use rbflike, only : cubize_rbfparams, uncubize_rbfparams, check_rbf
-    use rbflike, only : rbflike_eval, cutmin_rbfparams
+    use rbflike, only : rbflike_eval, cutmin_rbfparams, cutmax_rbfparams
     use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
@@ -449,6 +453,12 @@ contains
 !if eps1<eps1min, the likelihood is flat
           rbfcuts = cutmin_rbfparams(fitNdim,eps1pos,rbfpars)
 
+!In case the posterior of eps3 is not going to zero on the boundaries          
+          if (cuteps3) then
+             rbfcuts = cutmin_rbfparams(fitNdim,eps3pos,rbfcuts)
+             rbfcuts = cutmax_rbfparams(fitNdim,eps3pos,rbfcuts)
+          endif
+             
 !go into cubic space for the rbf likelihood
           rbfcube = cubize_rbfparams(fitNdim,rbfcuts)
        
@@ -503,7 +513,7 @@ contains
   subroutine shep_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
     use shepprec, only : fp
     use sheplike, only : cubize_shepparams, uncubize_shepparams, check_shep
-    use sheplike, only : sheplike_eval, cutmin_shepparams
+    use sheplike, only : sheplike_eval, cutmin_shepparams, cutmax_shepparams
     use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
@@ -551,6 +561,12 @@ contains
 !if eps1<eps1min, the likelihood is flat
           shepcuts = cutmin_shepparams(fitNdim,eps1pos,sheppars)
 
+!In case the posterior of eps3 is not going to zero on the boundaries          
+          if (cuteps3) then
+             shepcuts = cutmin_shepparams(fitNdim,eps3pos,shepcuts)
+             shepcuts = cutmax_shepparams(fitNdim,eps3pos,shepcuts)
+          endif
+          
 !go into cubic space for the shep likelihood
           shepcube = cubize_shepparams(fitNdim,shepcuts)
        
@@ -605,7 +621,7 @@ contains
   subroutine fnn_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
     use fnnprec, only : fp
     use fnnlike, only : cubize_fnnparams, uncubize_fnnparams, check_fnn
-    use fnnlike, only : fnnlike_eval, cutmin_fnnparams
+    use fnnlike, only : fnnlike_eval, cutmin_fnnparams, cutmax_fnnparams
     use wraspic, only : get_hubbleflow, get_derived
     use wraspic, only : test_aspic_hardprior, test_reheating_hardprior
     use nestparams, only : nestLogZero
@@ -654,6 +670,12 @@ contains
 !if eps1<eps1min, the likelihood is flat
           fnncuts = cutmin_fnnparams(fitNdim,eps1pos,fnnpars)
 
+!In case the posterior of eps3 is not going to zero on the boundaries          
+          if (cuteps3) then
+             fnncuts = cutmin_fnnparams(fitNdim,eps3pos,fnncuts)
+             fnncuts = cutmax_fnnparams(fitNdim,eps3pos,fnncuts)
+          endif          
+          
 !go into cubic space for the fnn likelihood
           fnncube = cubize_fnnparams(fitNdim,fnncuts)
        
