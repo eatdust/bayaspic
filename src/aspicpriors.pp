@@ -76,7 +76,7 @@ ONEPRIOR(esisqrt2,sqrt(2._kp),sqrt(2._kp),flat)
 ONEPRIOR(esisqrt23,sqrt(2._kp/3._kp),sqrt(2._kp/3._kp),flat)
 ONEPRIOR(esi8,8._kp,8._kp,flat)
 
-ONEPRIOR(plip,0._kp,1.1_kp,flat)
+ONEPRIOR(plip,epsilon(1._kp),1.1_kp,flat)
 ONEPRIOR(pli,-4._kp,0._kp,log)
 
 ONEPRIOR(kmii,0.382_kp,4._kp,log)
