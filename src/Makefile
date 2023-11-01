@@ -21,7 +21,7 @@ INCLUDE =-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
 
 #if the fann library is present, build the NN likelihood
-#LDFANN = -ldoublefann
+LDFANN = -ldoublefann
 
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)
 #-laspicq
