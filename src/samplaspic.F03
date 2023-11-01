@@ -59,7 +59,7 @@ module samplaspic
   character(len=lenlabel) :: label
 
   integer, parameter :: countmax = 1000000
-  logical, parameter :: cuteps3 = .false.
+  logical, parameter :: cuteps3 = .true.
   
   
 !the name of the fastlike method we call
@@ -494,6 +494,7 @@ contains
        write(*,*)'rbf_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
+       counthard = 0
 !       stop
     endif
     
@@ -603,6 +604,7 @@ contains
        write(*,*)'shep_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
+       counthard = 0
 !       stop
     endif
     
@@ -713,6 +715,7 @@ contains
        write(*,*)'fnn_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
+       counthard = 0
 !       stop
     endif
     
