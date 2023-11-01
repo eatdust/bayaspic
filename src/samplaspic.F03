@@ -494,8 +494,8 @@ contains
        write(*,*)'rbf_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       counthard = 0
-!       stop
+!trigger bogus in multinest that should halt sampling
+       lnew = huge(1._kp)
     endif
     
     if (debug) then
@@ -604,8 +604,8 @@ contains
        write(*,*)'shep_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       counthard = 0
-!       stop
+!trigger bogus in multinest that should halt sampling
+       lnew = huge(1._kp)
     endif
     
     if (debug) then
@@ -715,8 +715,8 @@ contains
        write(*,*)'fnn_multinest_aspic_loglike: trapped into hard prior regions'
        write(*,*)'model is: ',label
        write(*,*)'mnparams= ',mnpars(1:nestdim)
-       counthard = 0
-!       stop
+!trigger bogus in multinest that should halt sampling
+       lnew = huge(1._kp)
     endif
     
     if (debug) then
