@@ -129,7 +129,9 @@ contains
 
   subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
        , maxLogLike, logZ, INSlogZ, logZerr, context)
-
+#ifdef MPISCHED
+    use mpi
+#endif    
     implicit none
     ! number of samples in posterior array
     integer :: nSamples				
@@ -152,9 +154,16 @@ contains
     ! not required by MultiNest, any additional information user wants to pass
     integer(imn) :: context
 
+    integer :: mpiRank, mpiCode, mpiSize
+    
+#ifdef MPISCHED
+  call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
+  call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#endif
+    
     write(*,*)
     write(*,*)'**************************************************************************'
-    write(*,*)'nest_dumper: '
+    write(*,*)'nest_dumper: (rank= size=)',mpiRank,mpiSize
     write(*,*)'nestRoot: ',trim(nestRootName)
     write(*,*)'nSamples= ',nSamples
     write(*,*)'logZ= logZerr=        ',logZ, logZerr
