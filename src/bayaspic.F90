@@ -93,8 +93,6 @@ program bayaspic
 
      call start_scheduling(imodel)
 
-     call irq_scheduler()
-
      name = modelNames(imodel)
 
      if (display) then
@@ -133,7 +131,7 @@ program bayaspic
 
      end select
 
-
+     call irq_scheduler()
 
      if (cpSave) then
         call scheduler_save_queue(mpiRank)
