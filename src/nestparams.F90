@@ -155,10 +155,13 @@ contains
     integer(imn) :: context
 
     integer :: mpiRank, mpiCode, mpiSize
-    
+        
 #ifdef MPISCHED
   call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
   call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#else
+  mpiRank = 0
+  mpiSize = 1
 #endif
     
     write(*,*)
