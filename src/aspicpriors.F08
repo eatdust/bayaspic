@@ -366,18 +366,30 @@ contains
        
     case ('tiB1', 'tiD1', 'tiF1')
        ignore = abs(1._kp-2._kp*params(1)).gt.0.1_kp*params(2)**2
+       if (.not.ignore) then
+          ignore = ti_numacc_efoldmax(params(1),params(2)).lt.efoldNum
+       endif
        disfavour = .false.
        
     case ('tiB2')
        ignore = abs(1._kp-2._kp*params(1)).gt.0.2_kp*params(2)**2
+       if (.not.ignore) then
+          ignore = ti_numacc_efoldmax(params(1),params(2)).lt.efoldNum
+       endif
        disfavour = .false.
        
     case ('tiB3', 'tiD2', 'tiF2')
        ignore = abs(1._kp-2._kp*params(1)).gt.1._kp*params(2)**2
+       if (.not.ignore) then
+          ignore = ti_numacc_efoldmax(params(1),params(2)).lt.efoldNum
+       endif
        disfavour = .false.
        
     case ('tiD3', 'tiF3')
        ignore = abs(1._kp-2._kp*params(1)).gt.10._kp*params(2)**2
+       if (.not.ignore) then
+          ignore = ti_numacc_efoldmax(params(1),params(2)).lt.efoldNum
+       endif
        disfavour = .false.
        
     case ('psnioA', 'psnioB', 'psnioC')

@@ -45,6 +45,7 @@ use cndisr, only : cndi_xendmax
 use gmssmisr, only : gmssmi_epstwomin, gmssmi_alphamin
 use gripisr, only : gripi_epstwomin, gripi_alphamin
 use lisr, only : li_alphamin
+use tisr, only : ti_numacc_efoldmax
 use bisr, only : bi_x_epsoneunity, bi_x_trajectory
 use kkltisr, only : kklti_x_epsoneunity, kklti_x_trajectory
 use nfi1sr, only : nfi1_numacc_amin, nfi1_amax, nfi1_numacc_amax
