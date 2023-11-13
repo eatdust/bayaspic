@@ -435,8 +435,8 @@ contains
 
 
 !model parameter are in the last bits    
-    pmin(nextra+1:ntot) = aspmin(1:npar)
-    pmax(nextra+1:ntot) = aspmax(1:npar)
+    pmin(nextra+1:ntot) = real(aspmin(1:npar),fmn)
+    pmax(nextra+1:ntot) = real(aspmax(1:npar),fmn)
 
   end subroutine allocate_and_set_allprior
 
