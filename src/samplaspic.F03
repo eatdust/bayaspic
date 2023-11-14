@@ -424,6 +424,15 @@ contains
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
+!can happen only if abortForFaultySampler = F in sampl module (this
+!allows a gentle exit)
+    if (any(isnan(mnpars(1:nestdim)))) then
+       write(*,*) 'rbf_multinest_aspic_loglike: exiting faulty sampler!'
+       lnew = huge(1._fmn)
+       return
+    endif
+
+    
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars,disfavour)) then
 
@@ -533,6 +542,14 @@ contains
     
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim),label)
+
+!can happen only if abortForFaultySampler = F in sampl module (this
+!allows a gentle exit)
+    if (any(isnan(mnpars(1:nestdim)))) then
+       write(*,*) 'shep_multinest_aspic_loglike: exiting faulty sampler!'
+       lnew = huge(1._fmn)
+       return
+    endif
     
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars, disfavour)) then
@@ -643,6 +660,14 @@ contains
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
+!can happen only if abortForFaultySampler = F in sampl module (this
+!allows a gentle exit)
+    if (any(isnan(mnpars(1:nestdim)))) then
+       write(*,*) 'fnn_multinest_aspic_loglike: exiting faulty sampler!'
+       lnew = huge(1._fmn)
+       return
+    endif
+    
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars,disfavour)) then
 
@@ -749,6 +774,14 @@ contains
 !get the physical parameters we are sampling on
     mnpars(1:nestdim) = uncubize_samplparams(nestdim,cube(1:nestdim))
 
+!can happen only if abortForFaultySampler = F in sampl module (this
+!allows a gentle exit)
+    if (any(isnan(mnpars(1:nestdim)))) then
+       write(*,*) 'null_multinest_aspic_loglike: exiting faulty sampler!'
+       lnew = huge(1._fmn)
+       return
+    endif
+    
 !check for any hard prior in aspic model parameters
     if (test_aspic_hardprior(mnpars,disfavour)) then
 
