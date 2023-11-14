@@ -257,11 +257,11 @@ contains
 
        
     case('saii1n', 'saii1p', 'saii1f')
-       ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       ignore = saii1_numacc_efoldmax(params(1),params(2)).lt.efoldNum
        disfavour = .false.
 
     case('saii2n', 'saii2p', 'saii2f')
-       ignore = params(2).lt.saii1_numacc_mumin(efoldNum,params(1))
+       ignore = saii2_numacc_efoldmax(params(1),params(2)).lt.efoldNum
        disfavour = .false.
 
     case('sdi')
