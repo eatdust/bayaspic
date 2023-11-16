@@ -12,7 +12,7 @@ listnames=`cat $modelfile | awk '{print $1$2}'`
 
 for name in $listnames
 do
-    isthere=`ls $chaindir/*.ini | grep $name`
+    isthere=`ls $chaindir/*.ini | grep bayesinf_$name.ini`
     if [[ -z "$isthere" ]]; then
 	echo 'Missing model '$name
     else
