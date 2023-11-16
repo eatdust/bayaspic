@@ -59,8 +59,8 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('si mc')
-!  call initialize_manymodels()
+!  call initialize_onemodel('si mc')
+  call initialize_manymodels()
 
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
 !  call initialize_filemodels('list_rreh_qpmodels.dat')
@@ -172,30 +172,12 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 20
+    nmodels = 2
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'saiii1 n'
-    Modelnames(1) = 'rclfi1 pm'
-    Modelnames(2) = 'rclfi1 mm'
-    Modelnames(3) = 'rclfi1 mp'
-    Modelnames(4) = 'rclfi2 pm'
-    Modelnames(5) = 'rclfi2 mm'
-    Modelnames(6) = 'rclfi2 mp'
-    Modelnames(7) = 'rclfi3 pp'
-    Modelnames(8) = 'rclfi3 pm'
-    Modelnames(9) = 'rclfi3 mp'
-    Modelnames(10) = 'rcipi 1m'
-    Modelnames(11) = 'rcipi 1tune2p'
-    Modelnames(12) = 'rcipi 1tune4p'
-    Modelnames(13) = 'rcipi 1tune4m'
-    Modelnames(14) = 'rcipi 2'
-    Modelnames(15) = 'rcipi 22'
-    Modelnames(16) = 'rcipi 23'
-    Modelnames(17) = 'rcipi 24'
-    Modelnames(18) = 'rcipi 25'
-    Modelnames(19) = 'rcipi 26'
+    Modelnames(0) = 'rclfi4 p'
+    Modelnames(1) = 'rclfi4 m'
     
 
   end subroutine initialize_manymodels
