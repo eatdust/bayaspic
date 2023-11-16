@@ -466,7 +466,7 @@ THREEPRIORS(rclfi3pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
 !last is mu
 THREEPRIORS(rclfi3mp,0.1_kp,3.9_kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
 
-!the first param is p<4, the second is alpha/alpha_1 (alpha_1<0), the
+!the first param is p>4, the second is alpha/alpha_1 (alpha_1<0), the
 !last is mu. Log prior for alpha, rclfi4 is the perturbative regime,
 !alpha << 1 are expected
 THREEPRIORS(rclfi4p,4.1_kp,8._kp,flat,-3._kp,0._kp,log,-2._kp,4._kp,log)
