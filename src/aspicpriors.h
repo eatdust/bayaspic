@@ -76,7 +76,7 @@ use saiii3sr, only : saiii3_check_params
 use nmlficommon, only : nmlfi_parametric_ln_omega4, nmlfi_epsilon_one_infinity
 use nmlficommon, only : nmlfi_xizero
 use nmlfi1sr, only : nmlfi1_check_params, nmlfi1_numacc_efoldmax
-use nmlfi3sr, only : nmlfi3_check_params, nmlfi3_numacc_hbarendmin
+use nmlfi3sr, only : nmlfi3_check_params, nmlfi3_numacc_efoldmax
 use rclficommon, only : rclfi_alpha_one, rclfi_alpha_zero
 use rclfi1sr, only : rclfi1_numacc_alphamax, rclfi1_numacc_pmax
 use rclfi1sr, only : rclfi1_numacc_mumin, rclfi1_check_params

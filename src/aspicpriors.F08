@@ -216,7 +216,7 @@ contains
 
     case ('nmlfi3s','nmlfi3l','nmlfi31','nmlfi32','nmlfi33')
        ignore = .not.nmlfi3_check_params(params(1),params(2))
-       if (.not.ignore) ignore = params(3).lt.nmlfi3_numacc_hbarendmin(efoldNum,params(1),params(2))
+       if (.not.ignore) ignore = nmlfi3_numacc_efoldmax(params(1),params(2),params(3)).lt.efoldNum
        disfavour = .false.
        
     case ('saiii1p','saiii1n')

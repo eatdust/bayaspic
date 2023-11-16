@@ -59,12 +59,9 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('saii1 f')
-!  call initialize_onemodel('gdwi l')
-!  call initialize_onemodel('kklti stg')
+  call initialize_onemodel('si mc')
 !  call initialize_manymodels()
 
-!  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
 !  call initialize_filemodels('list_rreh_qpmodels.dat')
   
@@ -175,20 +172,31 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 6
+    nmodels = 20
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'saii1 n'
-    Modelnames(1) = 'saii1 p'
-    Modelnames(2) = 'saii1 f'
-    Modelnames(3) = 'saii2 n'
-    Modelnames(4) = 'saii2 p'
-    Modelnames(5) = 'saii2 f'
-!    Modelnames(6) = 'lpi2 6'
-!    Modelnames(7) = 'lpi3 2'
-!    Modelnames(8) = 'lpi3 4'
-!    Modelnames(9) = 'lpi3 6'
+    Modelnames(0) = 'saiii1 n'
+    Modelnames(1) = 'rclfi1 pm'
+    Modelnames(2) = 'rclfi1 mm'
+    Modelnames(3) = 'rclfi1 mp'
+    Modelnames(4) = 'rclfi2 pm'
+    Modelnames(5) = 'rclfi2 mm'
+    Modelnames(6) = 'rclfi2 mp'
+    Modelnames(7) = 'rclfi3 pp'
+    Modelnames(8) = 'rclfi3 pm'
+    Modelnames(9) = 'rclfi3 mp'
+    Modelnames(10) = 'rcipi 1m'
+    Modelnames(11) = 'rcipi 1tune2p'
+    Modelnames(12) = 'rcipi 1tune4p'
+    Modelnames(13) = 'rcipi 1tune4m'
+    Modelnames(14) = 'rcipi 2'
+    Modelnames(15) = 'rcipi 22'
+    Modelnames(16) = 'rcipi 23'
+    Modelnames(17) = 'rcipi 24'
+    Modelnames(18) = 'rcipi 25'
+    Modelnames(19) = 'rcipi 26'
+    
 
   end subroutine initialize_manymodels
 
