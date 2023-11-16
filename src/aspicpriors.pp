@@ -442,29 +442,29 @@ THREEPRIORS(ncli,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,10._kp,flat)
 
 !the first param is p>4, the second is alpha/alpha_1>1 (alpha_1<0),
 !the last is mu/mumin
-THREEPRIORS(rclfi1pm,4.1_kp,6._kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi1pm,4.1_kp,6._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 !the first param is p<4, the second is alpha<0, the last is mu/mumin
 THREEPRIORS(rclfi1mm,0.1_kp,3.9_kp,flat,-4._kp,-0.1_kp,flat,0._kp,3._kp,log)
 !the first param is p/pmax (pmax<4), the second is y such that
 !alpha/alpha_1 (alpha_1>0), the last is mu/mumin
-THREEPRIORS(rclfi1mp,0.1_kp,0.8_kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi1mp,0.1_kp,0.8_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 
 !the first param is p>4, the second is alpha/alpha_0>1 (alpha_0<0),
 !the last is mu/mumin
-THREEPRIORS(rclfi2pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2pm,4.1_kp,8._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 !the first param is p<4, the second is alpha < 0, the last is mu/mumin
 THREEPRIORS(rclfi2mm,0.1_kp,3.9_kp,flat,-2._kp,-0.2_kp,flat,0._kp,3._kp,log)
 !the first param is p/pmax (pmax<4), the second is alpha/alpha_0>1, the last is mu/mumin
-THREEPRIORS(rclfi2mp,0.1_kp,0.9_kp,flat,1.0_kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2mp,0.1_kp,0.9_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 
 !the first param is p>4, the second is alpha > 0, the last is mu
 THREEPRIORS(rclfi3pp,4.1_kp,8._kp,flat,-2._kp,2._kp,log,-3._kp,3._kp,log)
 !the first param is p>4, the second is alpha/alpha_0 (alpha_0<0), the
 !last is mu
-THREEPRIORS(rclfi3pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(rclfi3pm,4.1_kp,8._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,-3._kp,3._kp,log)
 !the first param is p<4, the second is alpha/alpha_0 (alpha_0>0), the
 !last is mu
-THREEPRIORS(rclfi3mp,0.1_kp,3.9_kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(rclfi3mp,0.1_kp,3.9_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,-3._kp,3._kp,log)
 
 !the first param is p>4, the second is alpha/alpha_1 (alpha_1<0), the
 !last is mu. Log prior for alpha, rclfi4 is the perturbative regime,
