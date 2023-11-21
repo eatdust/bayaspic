@@ -449,7 +449,7 @@ contains
        disfavour = .false.
        
 !equivalent to an hard prior on mumin to get efoldnum
-    case ('vhi12')
+    case ('vhi12','vhi1','vhi1l')
        ignore = vhi_xendmax(efoldNum,params(1),params(2)) &
             .eq.vhi_xendmin(params(1),params(2))
        disfavour = .false.
