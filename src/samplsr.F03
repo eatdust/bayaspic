@@ -381,6 +381,7 @@ contains
   subroutine chord_init_slowroll()    
     use chordparams, only : chordNdim, chordNpars, chordNderived
     use chordparams, only : chordName, chordDir, chord_print
+    use chordparams, only : chordBoost
     use sampl, only : sampl_print
     implicit none
 
@@ -389,7 +390,9 @@ contains
     chordNdim = samplNdim
     chordNderived = 0
     chordNpars = samplNdim
-
+!to test the machine-learned against full marginalized, we keep all
+    chordBoost = -1._fmn
+    
     chordDir=rootDir
     chordName = trim(rootName)
    

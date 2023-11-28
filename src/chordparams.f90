@@ -26,7 +26,7 @@ module chordparams
   integer(imn), parameter :: chordNlive = 20000
 
 !evidence tolerance factor < 0.5
-  real(fmn), parameter :: chordZTol = 0.001_fmn
+  real(fmn), parameter :: chordZTol = 0.01_fmn
 
 !dimension
   integer(imn), save :: chordNdim = 0
@@ -37,7 +37,9 @@ module chordparams
 !total number of parameters
   integer(imn), save :: chordNpars = 0
 
-  real(fmn), parameter :: chordBoost = -1._fmn
+!could be boosted to -1 for getting most of posterior sampling (large
+!output files)
+  real(fmn), parameter :: chordBoost = 0._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
   real(fmn), parameter :: chordLogZero = -1d30
