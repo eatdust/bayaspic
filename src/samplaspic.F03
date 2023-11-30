@@ -901,7 +901,7 @@ contains
 
     end select
 
-    call run_polychord(ptrchord_aspic_loglike,polychord_prior,runset)
+    call run_polychord(ptrchord_aspic_loglike,polychord_prior,chord_dumper,runset)
 
     if (associated(ptrchord_aspic_loglike)) ptrchord_aspic_loglike => null()
 
@@ -1259,12 +1259,27 @@ contains
 
 
   subroutine chord_free_aspic()
+#ifdef MPI
+    use mpi
+#endif    
     use wraspic, only : free_model
     implicit none
 
+    logical, intent(out) :: flag
+    integer :: mpiCode
+    
     call free_model()       
     call free_samplparams()
 
+    !polychord not finalizing properly    
+#ifdef MPI
+    flag = .true.
+    call MPI_FINALIZED(flag)
+    if (.not.flag) then
+       call MPI_FINALIZE(mpiCode)
+    endif
+#endif    
+    
   end subroutine chord_free_aspic
 
 

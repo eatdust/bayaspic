@@ -148,4 +148,39 @@ contains
   end subroutine chord_settings
 
 
+
+  subroutine chord_dumper(live, dead, logweights, logZ, logZerr)
+#ifdef MPISCHED
+    use mpi
+#endif    
+    implicit none
+    real(fmn), dimension(:,:), intent(in) :: live
+    real(fmn), dimension(:,:), intent(in), dead
+    real(fmn), dimension(:), intent(in) :: logweights
+    real(fmn), intent(in) :: logZ, logZerr
+
+    integer :: mpiRank, mpiCode, mpiSize
+        
+#ifdef MPISCHED
+  call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
+  call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#else
+  mpiRank = 0
+  mpiSize = 1
+#endif
+    
+    write(*,*)
+    write(*,*)'**************************************************************************'
+    write(*,*)'chord_dumper: (rank= size=)',mpiRank,mpiSize
+    write(*,*)'chordName: ',trim(chordName)
+    write(*,*)'logZ= logZerr=        ',logZ, logZerr
+    write(*,*)'**************************************************************************'
+    write(*,*)
+
+
+  end subroutine chord_dumper
+
+
+  
+
 end module chordparams

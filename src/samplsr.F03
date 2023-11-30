@@ -438,7 +438,7 @@ contains
 
     end select
 
-    call run_polychord(ptrchord_slowroll_loglike,ptrchord_prior,runset)
+    call run_polychord(ptrchord_slowroll_loglike,ptrchord_prior,chord_dumper,runset)
 
     if (associated(ptrchord_slowroll_loglike)) ptrchord_slowroll_loglike => null()
     if (associated(ptrchord_prior)) ptrchord_prior => null()
@@ -571,10 +571,25 @@ contains
 
 
   subroutine chord_free_slowroll()
+#ifdef MPI
+    use mpi
+#endif    
     implicit none
-   
+
+    logical, intent(out) :: flag
+    integer :: mpiCode
+    
     call free_samplparams()
 
+    !polychord not finalizing properly    
+#ifdef MPI
+    flag = .true.
+    call MPI_FINALIZED(flag)
+    if (.not.flag) then
+       call MPI_FINALIZE(mpiCode)
+    endif
+#endif    
+    
   end subroutine chord_free_slowroll
 
 
