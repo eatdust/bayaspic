@@ -1265,7 +1265,7 @@ contains
     use wraspic, only : free_model
     implicit none
 
-    logical, intent(out) :: flag
+    logical :: flag
     integer :: mpiCode
     
     call free_model()       
@@ -1274,7 +1274,7 @@ contains
     !polychord not finalizing properly    
 #ifdef MPI
     flag = .true.
-    call MPI_FINALIZED(flag)
+    call MPI_FINALIZED(flag,mpiCode)
     if (.not.flag) then
        call MPI_FINALIZE(mpiCode)
     endif

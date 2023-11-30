@@ -576,7 +576,7 @@ contains
 #endif    
     implicit none
 
-    logical, intent(out) :: flag
+    logical :: flag
     integer :: mpiCode
     
     call free_samplparams()
@@ -584,7 +584,7 @@ contains
     !polychord not finalizing properly    
 #ifdef MPI
     flag = .true.
-    call MPI_FINALIZED(flag)
+    call MPI_FINALIZED(flag,mpiCode)
     if (.not.flag) then
        call MPI_FINALIZE(mpiCode)
     endif

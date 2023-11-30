@@ -155,7 +155,7 @@ contains
 #endif    
     implicit none
     real(fmn), dimension(:,:), intent(in) :: live
-    real(fmn), dimension(:,:), intent(in), dead
+    real(fmn), dimension(:,:), intent(in) :: dead
     real(fmn), dimension(:), intent(in) :: logweights
     real(fmn), intent(in) :: logZ, logZerr
 
