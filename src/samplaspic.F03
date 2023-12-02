@@ -1259,9 +1259,6 @@ contains
 
 
   subroutine chord_free_aspic()
-#ifdef MPI
-    use mpi
-#endif    
     use wraspic, only : free_model
     implicit none
 
@@ -1270,15 +1267,6 @@ contains
     
     call free_model()       
     call free_samplparams()
-
-    !polychord not finalizing properly    
-#ifdef MPI
-    flag = .true.
-    call MPI_FINALIZED(flag,mpiCode)
-    if (.not.flag) then
-       call MPI_FINALIZE(mpiCode)
-    endif
-#endif    
     
   end subroutine chord_free_aspic
 

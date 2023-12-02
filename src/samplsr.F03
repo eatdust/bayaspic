@@ -571,24 +571,12 @@ contains
 
 
   subroutine chord_free_slowroll()
-#ifdef MPI
-    use mpi
-#endif    
     implicit none
 
     logical :: flag
     integer :: mpiCode
     
     call free_samplparams()
-
-    !polychord not finalizing properly    
-#ifdef MPI
-    flag = .true.
-    call MPI_FINALIZED(flag,mpiCode)
-    if (.not.flag) then
-       call MPI_FINALIZE(mpiCode)
-    endif
-#endif    
     
   end subroutine chord_free_slowroll
 
