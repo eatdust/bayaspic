@@ -39,7 +39,7 @@ module chordparams
 
 !could be boosted to -1 for getting most of posterior sampling (large
 !output files)
-  real(fmn), parameter :: chordBoost = 0._fmn
+  real(fmn), save :: chordBoost = 0._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
   real(fmn), parameter :: chordLogZero = -1d30
