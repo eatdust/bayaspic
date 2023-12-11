@@ -58,6 +58,7 @@ module wraspic
   public test_aspic_hardprior, test_reheating_hardprior
 
   logical, parameter :: display = .false.
+  logical, save :: warn = .true.
 
 !clamp eps1 at this values in case of slow-roll violations (end of
 !inflation) to have meaningful derived parameter values
@@ -90,6 +91,9 @@ contains
     
     if (AspicModel%nasp.gt.nparmax) stop 'set_model: nparmax too small!'
 
+!reset warning model per model
+    warn = .true.
+    
   end subroutine set_model
 
 
@@ -201,12 +205,13 @@ contains
 
 !    lnRMin = 0.25_kp * lnRhoNuc
 !which is ~
-    lnRMin = -46
+    lnRMin = -46._kp
 
 !    lnRMax = -1._kp/12._kp * lnRhoNuc
 !which is ~
-    lnRMax = 15
+    lnRMax = 15._kp
 
+    
   end subroutine get_prior_lnRreh
 
 
@@ -430,8 +435,8 @@ contains
 
 
 !model parameter are in the last bits    
-    pmin(nextra+1:ntot) = aspmin(1:npar)
-    pmax(nextra+1:ntot) = aspmax(1:npar)
+    pmin(nextra+1:ntot) = real(aspmin(1:npar),fmn)
+    pmax(nextra+1:ntot) = real(aspmax(1:npar),fmn)
 
   end subroutine allocate_and_set_allprior
 
@@ -544,7 +549,7 @@ contains
 
     integer :: npar, ntot, neps
     integer :: i
-
+    
     ntot = get_ntot()
     npar = AspicModel%nasp + AspicModel%nhid
     neps = nstar - 1
@@ -611,25 +616,41 @@ contains
     epsOneEnd = aspic_epsilon_one(aspname,xend,asparams)
     Vend = aspic_norm_potential(aspname,xend,asparams)
 
-!clamp unobservable slow-roll violations at the end of inflation that
-!would completely screw estimation of rhoend for instance
-    epsOneEnd = min(epsOneEnd,epsVClamp)
+!Warn if there are large slow-roll violations at the end of inflation
+!that would completely screw estimation of rhoend for instance (this
+!should be dealt with in aspic, not here)
+    if (warn.and.(epsOneEnd.gt.epsVClamp)) then
+       write(*,*)'SR violations for: ',trim(aspname)
+       write(*,*)'epsOneEnd= ',epsOneEnd
+       warn = .false.
+    endif
     
     lnM = log(potential_normalization(Pstar,epsHStar(1),Vstar))
 
 !the conformal term is computed in the aspicnonstd module for non
 !standard reheating. This quantity is therefore Jordan Frame
-    lnRhoEnd = aspic_ln_rho_endinf(aspname,Pstar,xstar,epsHStar(1),Vstar,xend,epsOneEnd,Vend)
 
+    lnRhoEnd = aspic_lnrho_endinf(aspname,asparams,xend,xstar,Pstar)
+    !    print *,'test',lnRhoEnd,check_lnrho_endinf(aspname,Pstar,xstar,epsVStar(1),Vstar,xend,epsOneEnd,Vend)
     
 !safeguard against insane values
     if (isnan(lnRhoEnd)) then
+       write(*,*)'Model name = ',trim(aspname)
        write(*,*)'xend= ',xend
        write(*,*)'eps* epsend= ',epsHStar,epsOneEnd
        write(*,*)'Vend= Vstar= ',Vend,Vstar
        stop 'wraspic: NaN caught in lnRhoEnd!'
     endif
 
+
+    if (isnan(bfoldstar)) then
+       write(*,*)'Model name = ',trim(aspname)
+       write(*,*)'xend= ',xend
+       write(*,*)'eps* epsend= ',epsHStar,epsOneEnd
+       write(*,*)'Vend= Vstar= ',Vend,Vstar
+       stop 'wraspic: NaN caught in bfoldstar!'
+    endif
+    
 !this conversions work for Jordan Frame lnRhoEnd    
     select case (ReheatModel)
     case ('Rrad')
@@ -662,7 +683,7 @@ contains
     if (display) then
        write(*,*)
        write(*,*)'get_hubbleflow:',neps
-       call print_aspicmodel(AspicModel)
+       call AspicModel%print()
     end if
       
 
@@ -674,22 +695,6 @@ contains
   end function get_hubbleflow
 
   
-  subroutine print_aspicmodel(model)
-    implicit none
-    type(infaspic), intent(in) :: model
-
-    write(*,*)'AspicModel Params:   '
-    write(*,*)'Pstar= asparams=     ',Model%Pstar,Model%params
-    write(*,*)'lnRrad= lnRreh=      ',Model%lnRrad, Model%lnRreh
-    write(*,*)'lnM= lnRhoEnd=       ',Model%lnM,Model%lnRhoEnd
-    write(*,*)'N*-Nend=             ',Model%bfold
-    write(*,*)'log(epsV1)= epsV23=  ',Model%logeps, Model%eps2, Model%eps3
-    write(*,*)'ns= log(r)= alpha=   ',Model%ns,Model%logr,Model%alpha
-    write(*,*)
-
-  end subroutine print_aspicmodel
-
-
 
   function test_aspic_hardprior(mnParams,disfavour)
     use aspicpriors, only : check_aspic_hardprior

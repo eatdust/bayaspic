@@ -16,14 +16,6 @@
 !   along with bayaspic.  If not, see <https://www.gnu.org/licenses/>.
 
   abstract interface
-
-!ln[1/A^4] for non-minimal models
-     function onep_ln_omega4(x)
-       use infprec, only : kp
-       implicit none
-       real(kp) :: onep_ln_omega4
-       real(kp), intent(in) :: x
-     end function onep_ln_omega4
      
 !for zero potential parameter models
      function zerop_norm_potential(x)
@@ -59,7 +51,7 @@
        implicit none
        real(kp) :: zerop_x_endinf
      end function zerop_x_endinf
-
+     
 
 !for one potential parameter models
      function onep_norm_potential(x,p1)
@@ -96,8 +88,7 @@
        real(kp), intent(in) :: p1
        real(kp) :: onep_x_endinf
      end function onep_x_endinf
-
-
+          
 !for two potential parameters models
      function twop_norm_potential(x,p1,p2)
        use infprec, only : kp
@@ -133,7 +124,7 @@
        real(kp), intent(in) :: p1,p2
        real(kp) :: twop_x_endinf
      end function twop_x_endinf
-
+     
 !three potential parameters
      function threep_norm_potential(x,p1,p2,p3)
        use infprec, only : kp
@@ -169,7 +160,7 @@
        real(kp), intent(in) :: p1,p2,p3
        real(kp) :: threep_x_endinf
      end function threep_x_endinf
-
+     
 
 !for zero param reheat
      function zerop_x_rrad(xend,lnRrad,Pstar,bfoldstar)
@@ -196,6 +187,12 @@
        real(kp), intent(out), optional :: bfoldstar
      end function zerop_x_rhow
 
+     function zerop_lnrho_endinf(x,y,P)
+       use infprec, only : kp
+       implicit none
+       real(kp) :: zerop_lnrho_endinf
+       real(kp), intent(in) :: x,y,P
+     end function zerop_lnrho_endinf
 
 !for one param reheat
      function onep_x_rrad(p1,xend,lnRrad,Pstar,bfoldstar)
@@ -222,6 +219,14 @@
        real(kp), intent(out), optional :: bfoldstar
      end function onep_x_rhow
 
+     function onep_lnrho_endinf(p1,x,y,P)
+       use infprec, only : kp
+       implicit none
+       real(kp), intent(in) :: p1
+       real(kp), intent(in) :: x,y,P
+       real(kp) :: onep_lnrho_endinf
+     end function onep_lnrho_endinf
+     
 !for two params reheat
     function twop_x_rrad(p1,p2,xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
@@ -247,6 +252,14 @@
        real(kp), intent(out), optional :: bfoldstar
      end function twop_x_rhow
 
+     function twop_lnrho_endinf(p1,p2,x,y,P)
+       use infprec, only : kp
+       implicit none
+       real(kp), intent(in) :: p1,p2
+       real(kp), intent(in) :: x,y,P
+       real(kp) :: twop_lnrho_endinf
+     end function twop_lnrho_endinf
+     
 !for three params reheat
     function threep_x_rrad(p1,p2,p3,xend,lnRrad,Pstar,bfoldstar)
        use infprec, only : kp
@@ -272,5 +285,12 @@
        real(kp), intent(out), optional :: bfoldstar
      end function threep_x_rhow
 
+     function threep_lnrho_endinf(p1,p2,p3,x,y,P)
+       use infprec, only : kp
+       implicit none
+       real(kp), intent(in) :: p1,p2,p3
+       real(kp), intent(in) :: x,y,P
+       real(kp) :: threep_lnrho_endinf
+     end function threep_lnrho_endinf
      
   end interface

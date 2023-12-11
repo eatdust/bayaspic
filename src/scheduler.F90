@@ -64,7 +64,7 @@ module scheduler
     
   public initialize_scheduler, free_scheduler, scheduler_save_queue
   public start_scheduling, irq_scheduler, stop_scheduling
-  public restore_scheduler, scheduled_size
+  public restore_scheduler, scheduled_size, check_saved_queue
       
 contains
 
@@ -341,6 +341,17 @@ contains
 
 
 
+  function check_saved_queue(rank)
+    use iofifo, only : check_queue_file
+    implicit none
+    logical :: check_saved_queue
+    integer :: rank
+    
+    check_saved_queue = check_queue_file(rank)
+    
+  end function check_saved_queue
+
+  
 
   subroutine scheduler_save_queue(rank)
     use iofifo, only : dump_queue_vals
@@ -410,8 +421,8 @@ contains
     if (nsize.eq.1) return
 
 
-    if (qbounds%size.ge.2*chunk) then
-!    if (qbounds%size.gt.2*chunk) then
+!    if (qbounds%size.ge.2*chunk) then
+    if (qbounds%size.gt.2*chunk) then
 
        call give_nodes(chunk)
      

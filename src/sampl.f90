@@ -33,6 +33,8 @@ module sampl
   character(len=lenmn), parameter :: rootPrefix = 'bayesinf_'
   character(len=lenmn), save :: rootName = rootPrefix
 
+  logical, parameter :: abortForFaultySampler = .false.
+  
 
   abstract interface
 
@@ -113,7 +115,10 @@ contains
     if (any(isnan(cube))) then
        write(*,*)'uncubize_samplparams: cube= ',cube
        if (present(alabel)) write(*,*)'model is: ',alabel
-       stop 'faulty sampler: NaN caught in cube output :('
+       write(*,*)'NaN caught in cube output :('
+       if (abortForFaultySampler) then
+          stop 'faulty sampler: abort!'
+       endif
     endif
 
     do i=1,ndimout

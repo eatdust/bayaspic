@@ -92,13 +92,13 @@ module nestparams
   logical, parameter :: nestInitMPI = .true.
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: nestLogZero = -1.0d50
+  real(fmn), parameter :: nestLogZero = -1d50
 
  !max no. of iterations, a non-positive value means
  !infinity. MultiNest will terminate if either it has done max no. of
  !iterations or convergence criterion (defined through nest_tol) has
  !been satisfied
-  integer(imn), parameter :: nestMaxIter = 0
+  integer(imn), parameter :: nestMaxIter = 1000000
 
 
 contains
@@ -129,7 +129,9 @@ contains
 
   subroutine nest_dumper(nSamples, nlive, nPar, physLive, posterior, paramConstr &
        , maxLogLike, logZ, INSlogZ, logZerr, context)
-
+#ifdef MPISCHED
+    use mpi
+#endif    
     implicit none
     ! number of samples in posterior array
     integer :: nSamples				
@@ -152,9 +154,19 @@ contains
     ! not required by MultiNest, any additional information user wants to pass
     integer(imn) :: context
 
+    integer :: mpiRank, mpiCode, mpiSize
+        
+#ifdef MPISCHED
+  call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
+  call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#else
+  mpiRank = 0
+  mpiSize = 1
+#endif
+    
     write(*,*)
     write(*,*)'**************************************************************************'
-    write(*,*)'nest_dumper: '
+    write(*,*)'nest_dumper: (rank= size=)',mpiRank,mpiSize
     write(*,*)'nestRoot: ',trim(nestRootName)
     write(*,*)'nSamples= ',nSamples
     write(*,*)'logZ= logZerr=        ',logZ, logZerr

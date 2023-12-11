@@ -37,10 +37,12 @@ module chordparams
 !total number of parameters
   integer(imn), save :: chordNpars = 0
 
-  real(fmn), parameter :: chordBoost = -1._fmn
+!could be boosted to -1 for getting most of posterior sampling (large
+!output files)
+  real(fmn), save :: chordBoost = 0._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: chordLogZero = -1d30
+  real(fmn), parameter :: chordLogZero = -1d50
 
 !Whether to calculate weighted posteriors
   logical, parameter :: chordWeightedPost = .true.
@@ -68,7 +70,8 @@ module chordparams
 
 !whether to write output files
   logical, parameter :: chordOutLive = .true.
-  logical, parameter :: chordOutDead = .false.
+!required by infdistbayes
+  logical, parameter :: chordOutDead = .true.
   logical, parameter :: chordOutStats = .true.
   logical, parameter :: chordOutParamNames = .false. 
 
@@ -144,5 +147,40 @@ contains
 
   end subroutine chord_settings
 
+
+
+  subroutine chord_dumper(live, dead, logweights, logZ, logZerr)
+#ifdef MPISCHED
+    use mpi
+#endif    
+    implicit none
+    real(fmn), dimension(:,:), intent(in) :: live
+    real(fmn), dimension(:,:), intent(in) :: dead
+    real(fmn), dimension(:), intent(in) :: logweights
+    real(fmn), intent(in) :: logZ, logZerr
+
+    integer :: mpiRank, mpiCode, mpiSize
+        
+#ifdef MPISCHED
+  call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
+  call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#else
+  mpiRank = 0
+  mpiSize = 1
+#endif
+    
+    write(*,*)
+    write(*,*)'**************************************************************************'
+    write(*,*)'chord_dumper: (rank= size=)',mpiRank,mpiSize
+    write(*,*)'chordName: ',trim(chordName)
+    write(*,*)'logZ= logZerr=        ',logZ, logZerr
+    write(*,*)'**************************************************************************'
+    write(*,*)
+
+
+  end subroutine chord_dumper
+
+
+  
 
 end module chordparams

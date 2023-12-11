@@ -45,6 +45,7 @@ use cndisr, only : cndi_xendmax
 use gmssmisr, only : gmssmi_epstwomin, gmssmi_alphamin
 use gripisr, only : gripi_epstwomin, gripi_alphamin
 use lisr, only : li_alphamin
+use tisr, only : ti_numacc_efoldmax
 use bisr, only : bi_x_epsoneunity, bi_x_trajectory
 use kkltisr, only : kklti_x_epsoneunity, kklti_x_trajectory
 use nfi1sr, only : nfi1_numacc_amin, nfi1_amax, nfi1_numacc_amax
@@ -65,17 +66,17 @@ use nclisr, only : ncli_check_params
 use hni1sr, only : hni1_alphamin, hni1_numacc_efoldmax
 use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
 use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax
-use saii1sr, only : saii1_numacc_mumin
-use saii2sr, only : saii2_numacc_mumin
+use saii1sr, only : saii1_numacc_efoldmax
+use saii2sr, only : saii2_numacc_efoldmax
 use saiiicommon, only : beta0, beta1, beta2, beta3, saiii_alpha_potneg
 use saiiicommon, only : saiii_alpha_one, saiii_alpha_two, saiii_alpha_three
 use saiii1sr, only : saiii1_check_params, saiii1_numacc_efoldmax
 use saiii2sr, only : saiii2_check_params, saiii2_numacc_efoldmax
 use saiii3sr, only : saiii3_check_params
 use nmlficommon, only : nmlfi_parametric_ln_omega4, nmlfi_epsilon_one_infinity
-use nmlficommon, only : nmlfi_xizero
+  use nmlficommon, only : nmlfi_xizero, nmlfi_hbar_potmax
 use nmlfi1sr, only : nmlfi1_check_params, nmlfi1_numacc_efoldmax
-use nmlfi3sr, only : nmlfi3_check_params, nmlfi3_numacc_hbarendmin
+use nmlfi3sr, only : nmlfi3_check_params, nmlfi3_numacc_efoldmax
 use rclficommon, only : rclfi_alpha_one, rclfi_alpha_zero
 use rclfi1sr, only : rclfi1_numacc_alphamax, rclfi1_numacc_pmax
 use rclfi1sr, only : rclfi1_numacc_mumin, rclfi1_check_params
@@ -86,3 +87,4 @@ use rclfi3sr, only : rclfi3_check_params, rclfi3_numacc_alphamin
 use rclfi4sr, only : rclfi4_check_params
 use rcipisr, only : rcipi_efoldmax
 use rcipisr, only : rcipi_check_params, rcipi_alpha_zero
+use sisr, only : si_set_minimal_coupling

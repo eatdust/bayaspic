@@ -26,7 +26,7 @@ program bayaspic
 #endif
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
   use scheduler, only : start_scheduling, irq_scheduler, stop_scheduling
-  use scheduler, only : restore_scheduler, scheduler_save_queue
+  use scheduler, only : restore_scheduler, scheduler_save_queue, check_saved_queue
   implicit none
 
 
@@ -59,14 +59,12 @@ program bayaspic
   integer, save :: mpiPrevSize = 0
 
 
-  call initialize_onemodel('si')
-!  call initialize_onemodel('gdwi l')
-!  call initialize_onemodel('kklti stg')
-!  call initialize_manymodels()
+!  call initialize_onemodel('si mc')
+  call initialize_manymodels()
 
-!  call initialize_filemodels('list_ootest.dat')
 !  call initialize_filemodels('list_rreh_dpmodels.dat')
-
+!  call initialize_filemodels('list_rreh_qpmodels.dat')
+  
 
 
 #ifdef MPISCHED
@@ -84,12 +82,13 @@ program bayaspic
      call initialize_scheduler(nmodels)
   endif
 
+  if ((cpSave).and.(.not.cpRestart)) then
+     if (check_saved_queue(mpiRank)) stop 'previous saved files present!'
+  endif
 
   do
 
      call start_scheduling(imodel)
-
-     call irq_scheduler()
 
      name = modelNames(imodel)
 
@@ -129,7 +128,7 @@ program bayaspic
 
      end select
 
-
+     call irq_scheduler()
 
      if (cpSave) then
         call scheduler_save_queue(mpiRank)
@@ -173,20 +172,13 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 6
+    nmodels = 2
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'saii1 n'
-    Modelnames(1) = 'saii1 p'
-    Modelnames(2) = 'saii1 f'
-    Modelnames(3) = 'saii2 n'
-    Modelnames(4) = 'saii2 p'
-    Modelnames(5) = 'saii2 f'
-!    Modelnames(6) = 'lpi2 6'
-!    Modelnames(7) = 'lpi3 2'
-!    Modelnames(8) = 'lpi3 4'
-!    Modelnames(9) = 'lpi3 6'
+    Modelnames(0) = 'rclfi4 p'
+    Modelnames(1) = 'rclfi4 m'
+    
 
   end subroutine initialize_manymodels
 

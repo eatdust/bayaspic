@@ -381,6 +381,7 @@ contains
   subroutine chord_init_slowroll()    
     use chordparams, only : chordNdim, chordNpars, chordNderived
     use chordparams, only : chordName, chordDir, chord_print
+    use chordparams, only : chordBoost
     use sampl, only : sampl_print
     implicit none
 
@@ -389,7 +390,9 @@ contains
     chordNdim = samplNdim
     chordNderived = 0
     chordNpars = samplNdim
-
+!to test the machine-learned against full marginalized, we keep all
+    chordBoost = -1._fmn
+    
     chordDir=rootDir
     chordName = trim(rootName)
    
@@ -435,7 +438,7 @@ contains
 
     end select
 
-    call run_polychord(ptrchord_slowroll_loglike,ptrchord_prior,runset)
+    call run_polychord(ptrchord_slowroll_loglike,ptrchord_prior,chord_dumper,runset)
 
     if (associated(ptrchord_slowroll_loglike)) ptrchord_slowroll_loglike => null()
     if (associated(ptrchord_prior)) ptrchord_prior => null()
@@ -569,9 +572,12 @@ contains
 
   subroutine chord_free_slowroll()
     implicit none
-   
-    call free_samplparams()
 
+    logical :: flag
+    integer :: mpiCode
+    
+    call free_samplparams()
+    
   end subroutine chord_free_slowroll
 
 

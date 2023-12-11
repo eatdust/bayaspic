@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2023 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -49,7 +49,9 @@
 !sampled parameter inverse rescaling.
 
 ZEROPRIOR(si)
+ZEROPRIOR(simc)
 ZEROPRIOR(hi)
+
 
 ONEPRIOR(rchio,-48._kp,-20._kp,flat)
 ONEPRIOR(rchi,-65._kp,100._kp,flat)
@@ -74,7 +76,7 @@ ONEPRIOR(esisqrt2,sqrt(2._kp),sqrt(2._kp),flat)
 ONEPRIOR(esisqrt23,sqrt(2._kp/3._kp),sqrt(2._kp/3._kp),flat)
 ONEPRIOR(esi8,8._kp,8._kp,flat)
 
-ONEPRIOR(plip,0._kp,1.1_kp,flat)
+ONEPRIOR(plip,epsilon(1._kp),1.1_kp,flat)
 ONEPRIOR(pli,-4._kp,0._kp,log)
 
 ONEPRIOR(kmii,0.382_kp,4._kp,log)
@@ -272,10 +274,10 @@ TWOPRIORS(ssbi4,-5._kp,-1._kp,log,-5._kp,1._kp,mlog)
 TWOPRIORS(ssbi5,-5._kp,-1._kp,mlog,-5._kp,-1._kp,log)
 TWOPRIORS(ssbi6,-5._kp,1._kp,mlog,-5._kp,1._kp,log)
 
-TWOPRIORS(ssbi1f,0.001,10._kp,flat,0.00001_kp,10._kp,flat)
+TWOPRIORS(ssbi1f,0.001_kp,10._kp,flat,0.00001_kp,10._kp,flat)
 TWOPRIORS(ssbi2f,-0.1_kp,-0.00001_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi3f,0.00001_kp,10._kp,flat,-10._kp,-0.00001_kp,flat)
-TWOPRIORS(ssbi4f,0.00001,0.1_kp,flat,-10._kp,-0.00001_kp,flat)
+TWOPRIORS(ssbi4f,0.00001_kp,0.1_kp,flat,-10._kp,-0.00001_kp,flat)
 TWOPRIORS(ssbi5f,-0.1_kp,-0.00001_kp,flat,0.00001,0.1_kp,flat)
 TWOPRIORS(ssbi6f,-10._kp,-0.00001_kp,flat,0.00001,10._kp,flat)
 
@@ -298,7 +300,7 @@ TWOPRIORS(shi,-3._kp,3._kp,log,-2._kp,2._kp,log)
 
 TWOPRIORS(dei1,0._kp,1._kp,flat,1._kp,4._kp,log)
 
-TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
+TWOPRIORS(sabi13,-3._kp,3._kp,log,1._kp/3._kp,1._kp/3._kp,flat)
 TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
 TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
@@ -315,7 +317,7 @@ TWOPRIORS(fi0,-8._kp,-4._kp,log,0._kp,0._kp,flat)
 TWOPRIORS(fi1,-32._kp/3._kp,-16._kp/3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(fi2,-40._kp/3._kp,-20._kp/3._kp,log,2._kp,2._kp,flat)
 
-TWOPRIORS(hni1f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log)
+TWOPRIORS(hni1f,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,3._kp,log)
 
 TWOPRIORS(saii1n,-3._kp,-3._kp,mlog,0._kp,3._kp,log)
 TWOPRIORS(saii1p,-3._kp,3._kp,log,0._kp,3._kp,log)
@@ -384,14 +386,15 @@ THREEPRIORS(nfi2,-10._kp,0._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,1._kp
 THREEPRIORS(nfi4p,epsilon(1._kp),10._kp,flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,1._kp,flat)
 THREEPRIORS(nfi4n,-10._kp,-epsilon(1._kp),flat,-10._kp,0._kp,flat,0._kp,1._kp,flat)
 
-THREEPRIORS(hni2f,epsilon(1._kp),1-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
+THREEPRIORS(hni2f,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 THREEPRIORS(hni2l,-3._kp,-epsilon(1._kp),log,0._kp,3._kp,log,epsilon(1._kp),pi-epsilon(1._kp),flat)
 
 !the first param is xi, second param is p and last params hbarend
 THREEPRIORS(nmlfi3s,-4._kp,-2._kp,log,0.1_kp,0.5_kp,flat,-1._kp,2._kp,log)
-
-!the first param is xi, second param is p and last param is hbarend
 THREEPRIORS(nmlfi3l,-4._kp,-2._kp,log,0.6_kp,3.5_kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi31,-4._kp,-2._kp,log,1._kp,1._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi32,-4._kp,-2._kp,log,2._kp,2._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(nmlfi33,-4._kp,-2._kp,log,3._kp,3._kp,flat,-1._kp,2._kp,log)
 
 !without xend
 
@@ -423,12 +426,12 @@ THREEPRIORS(lpi34,1._kp,6._kp,flat,4._kp,4._kp,flat,2._kp,5._kp,log)
 THREEPRIORS(lpi36,1._kp,6._kp,flat,6._kp,6._kp,flat,2._kp,5._kp,log)
 
 
-THREEPRIORS(saiii1p,0._kp,3._kp,flat,0._kp,3._kp,flat,-1._kp,2._kp,log)
-THREEPRIORS(saiii1n,-3._kp,-0._kp,flat,-3._kp,-0._kp,flat,-1._kp,2._kp,log)
-THREEPRIORS(saiii2p,0._kp,3._kp,flat,0._kp,beta2,flat,-1._kp,2._kp,log)
-THREEPRIORS(saiii2n,-3._kp,-0._kp,flat,beta3,0._kp,flat,-1._kp,2._kp,log)
-THREEPRIORS(saiii3p,0._kp,3._kp,flat,beta0,3._kp,flat,-1._kp,2._kp,log)
-THREEPRIORS(saiii3n,-3._kp,-0._kp,flat,-3._kp,-1._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii1p,epsilon(1._kp),3._kp,flat,epsilon(1._kp),3._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii1n,-3._kp,-epsilon(1._kp),flat,-3._kp,-epsilon(1._kp),flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii2p,epsilon(1._kp),3._kp,flat,epsilon(1._kp),beta2,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii2n,-3._kp,-epsilon(1._kp),flat,beta3,-epsilon(1._kp),flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii3p,epsilon(1._kp),3._kp,flat,beta0,3._kp,flat,-1._kp,2._kp,log)
+THREEPRIORS(saiii3n,-3._kp,-epsilon(1._kp),flat,-3._kp,-1._kp,flat,-1._kp,2._kp,log)
 
 
 THREEPRIORS(ncli1,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,1._kp,flat)
@@ -439,31 +442,31 @@ THREEPRIORS(ncli,-6._kp,-1._kp,log,-3._kp,0._kp,log,1._kp,10._kp,flat)
 
 !the first param is p>4, the second is alpha/alpha_1>1 (alpha_1<0),
 !the last is mu/mumin
-THREEPRIORS(rclfi1pm,4.1_kp,6._kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi1pm,4.1_kp,6._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 !the first param is p<4, the second is alpha<0, the last is mu/mumin
 THREEPRIORS(rclfi1mm,0.1_kp,3.9_kp,flat,-4._kp,-0.1_kp,flat,0._kp,3._kp,log)
 !the first param is p/pmax (pmax<4), the second is y such that
 !alpha/alpha_1 (alpha_1>0), the last is mu/mumin
-THREEPRIORS(rclfi1mp,0.1_kp,0.8_kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi1mp,0.1_kp,0.8_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 
 !the first param is p>4, the second is alpha/alpha_0>1 (alpha_0<0),
 !the last is mu/mumin
-THREEPRIORS(rclfi2pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2pm,4.1_kp,8._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 !the first param is p<4, the second is alpha < 0, the last is mu/mumin
-THREEPRIORS(rclfi2mm,0.1_kp,3.9_kp,flat,-0.2_kp,-2._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2mm,0.1_kp,3.9_kp,flat,-2._kp,-0.2_kp,flat,0._kp,3._kp,log)
 !the first param is p/pmax (pmax<4), the second is alpha/alpha_0>1, the last is mu/mumin
-THREEPRIORS(rclfi2mp,0.1_kp,0.9_kp,flat,1.0_kp,10._kp,flat,0._kp,3._kp,log)
+THREEPRIORS(rclfi2mp,0.1_kp,0.9_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,0._kp,3._kp,log)
 
 !the first param is p>4, the second is alpha > 0, the last is mu
 THREEPRIORS(rclfi3pp,4.1_kp,8._kp,flat,-2._kp,2._kp,log,-3._kp,3._kp,log)
 !the first param is p>4, the second is alpha/alpha_0 (alpha_0<0), the
 !last is mu
-THREEPRIORS(rclfi3pm,4.1_kp,8._kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(rclfi3pm,4.1_kp,8._kp,flat,1._kp+epsilon(1._kp),10._kp,flat,-3._kp,3._kp,log)
 !the first param is p<4, the second is alpha/alpha_0 (alpha_0>0), the
 !last is mu
-THREEPRIORS(rclfi3mp,0.1_kp,3.9_kp,flat,1._kp,10._kp,flat,-3._kp,3._kp,log)
+THREEPRIORS(rclfi3mp,0.1_kp,3.9_kp,flat,1._kp+epsilon(1._kp),10._kp,flat,-3._kp,3._kp,log)
 
-!the first param is p<4, the second is alpha/alpha_1 (alpha_1<0), the
+!the first param is p>4, the second is alpha/alpha_1 (alpha_1<0), the
 !last is mu. Log prior for alpha, rclfi4 is the perturbative regime,
 !alpha << 1 are expected
 THREEPRIORS(rclfi4p,4.1_kp,8._kp,flat,-3._kp,0._kp,log,-2._kp,4._kp,log)

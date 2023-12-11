@@ -24,7 +24,7 @@ module iofifo
 
   public dump_queue_vals, read_queue_vals
 
-  public write_queue_vals
+  public write_queue_vals, check_queue_file
 
   logical, parameter :: display = .true.
 
@@ -152,7 +152,31 @@ contains
 
 
 
+  function check_queue_file(rank)
+    implicit none
+    integer, intent(in), optional :: rank
+    logical :: check_queue_file
 
+    integer, parameter :: nunit = 301
+    character(len=lenIoMax) :: filename
+
+    logical :: ishere
+    integer :: nsize,i
+
+    if (present(rank)) then
+       filename = queue_filename(rank)
+    else
+       filename = queue_filename()
+    endif
+
+    inquire(file=filename,exist=ishere) 
+    
+    check_queue_file = ishere
+        
+  end function  check_queue_file
+    
+
+  
   subroutine read_queue_vals(ptrval, rank)
     implicit none
     type(qval), dimension(:), intent(inout), pointer :: ptrval
