@@ -92,7 +92,7 @@ module nestparams
   logical, parameter :: nestInitMPI = .true.
 
 !points with loglike < nestlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: nestLogZero = -1d30
+  real(fmn), parameter :: nestLogZero = -1d50
 
  !max no. of iterations, a non-positive value means
  !infinity. MultiNest will terminate if either it has done max no. of

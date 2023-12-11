@@ -757,7 +757,7 @@ contains
 
 
 
-  subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)    
+  subroutine null_multinest_aspic_loglike(cube,nestdim,nestpars,lnew,context)
     use nestparams, only : nestLogZero
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
     use wraspic, only : get_hubbleflow
@@ -1197,12 +1197,11 @@ contains
 
   
 
-  function null_polychord_aspic_loglike(theta,phi)    
+  function null_polychord_aspic_loglike(theta,phi) result(lnew)
     use chordparams, only : chordLogZero, chordNderived, chordNdim
     use wraspic, only : get_derived, test_aspic_hardprior, test_reheating_hardprior
     use wraspic, only : get_hubbleflow
     implicit none   
-    real(fmn) :: null_polychord_aspic_loglike
     real(fmn), dimension(:), intent(in) :: theta
     real(fmn), dimension(:), intent(out) :: phi
 

@@ -42,7 +42,7 @@ module chordparams
   real(fmn), save :: chordBoost = 0._fmn
 
 !points with loglike < chordlogZero will be ignored (not disfavoured)
-  real(fmn), parameter :: chordLogZero = -1d30
+  real(fmn), parameter :: chordLogZero = -1d50
 
 !Whether to calculate weighted posteriors
   logical, parameter :: chordWeightedPost = .true.
