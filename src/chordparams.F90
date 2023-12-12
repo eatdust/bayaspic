@@ -23,7 +23,7 @@ module chordparams
   public
 
 !max no. of live points !20000
-  integer(imn), parameter :: chordNlive = 20000
+  integer(imn), save :: chordNlive = 20000
 
 !evidence tolerance factor < 0.5
   real(fmn), parameter :: chordZTol = 0.001_fmn

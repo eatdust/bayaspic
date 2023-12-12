@@ -48,6 +48,7 @@ module samplsr
   integer(imn), save :: fitNdim = 0
   real(fmn), save :: fitLogZero = 0._fmn
 
+  integer(imn), parameter :: chordNliveMin = 40000
 
 
 !the name of the fastlike method we call
@@ -381,7 +382,7 @@ contains
   subroutine chord_init_slowroll()    
     use chordparams, only : chordNdim, chordNpars, chordNderived
     use chordparams, only : chordName, chordDir, chord_print
-    use chordparams, only : chordBoost
+    use chordparams, only : chordBoost, chordNlive
     use sampl, only : sampl_print
     implicit none
 
@@ -392,6 +393,8 @@ contains
     chordNpars = samplNdim
 !to test the machine-learned against full marginalized, we keep all
     chordBoost = -1._fmn
+!we need enough live points to test the tails
+    chordNlive = max(chordNlive, chordNliveMin)
     
     chordDir=rootDir
     chordName = trim(rootName)
