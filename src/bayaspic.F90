@@ -73,6 +73,10 @@ program bayaspic
   call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
 #endif
 
+#ifdef MPI
+  if (sampler == 'polychord') call MPI_INIT(mpiCode)
+#endif
+
 
   if (mpiPrevSize.eq.0) mpiPrevSize = mpiSize
 
@@ -147,6 +151,12 @@ program bayaspic
   call MPI_FINALIZE(mpiCode)
 #endif
 
+
+#ifdef MPI
+  if (sampler == 'polychord') call MPI_FINALIZE(mpiCode)
+#endif
+
+
   if (mpiRank.eq.0) then
      write(*,*)'all models done!'
   endif
@@ -172,12 +182,14 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 2
+    nmodels = 4
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'rclfi4 p'
-    Modelnames(1) = 'rclfi4 m'
+    Modelnames(0) = 'di'
+    Modelnames(1) = 'di 1'
+    Modelnames(2) = 'di s'
+    Modelnames(3) = 'di l'
     
 
   end subroutine initialize_manymodels
