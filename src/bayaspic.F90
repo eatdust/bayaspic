@@ -21,7 +21,7 @@ program bayaspic
   use sampl
   use samplaspic, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use samplaspic, only : chord_init_aspic, chord_sample_aspic, chord_free_aspic
-#ifdef MPISCHED
+#if defined MPISCHED || defined MPI
   use mpi
 #endif
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
@@ -33,7 +33,7 @@ program bayaspic
   character(len=*), parameter :: sampler = 'multinest'
 !  character(len=*), parameter :: sampler = 'polychord'
 
-#ifdef MPISCHED
+#if defined MPISCHED || defined MPI
   integer :: mpiCode
 #endif
 
