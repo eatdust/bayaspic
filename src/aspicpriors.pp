@@ -139,7 +139,7 @@ ONEPRIOR(pai,-3._kp,3._kp,log)
 ONEPRIOR(pais,-3._kp,0._kp,log)
 ONEPRIOR(pail,0._kp,3._kp,log)
 
-ONEPRIORS(saai,-3._kp,3._kp,log)
+ONEPRIOR(saai,-3._kp,3._kp,log)
 
 ONEPRIOR(sbkin,-4._kp,-1._kp,mlog)
 ONEPRIOR(sbkip,-4._kp,-1._kp,log)
