@@ -48,7 +48,7 @@ module samplsr
   integer(imn), save :: fitNdim = 0
   real(fmn), save :: fitLogZero = 0._fmn
 
-  integer(imn), parameter :: chordNliveMin = 40000
+  integer(imn), parameter :: chordNliveMin = 100000
 
 
 !the name of the fastlike method we call
