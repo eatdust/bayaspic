@@ -48,25 +48,27 @@ module samplsr
   integer(imn), save :: fitNdim = 0
   real(fmn), save :: fitLogZero = 0._fmn
 
-  integer(imn), parameter :: chordNliveMin = 100000
-
 
 !the name of the fastlike method we call
 
 #ifdef LIKENULL  
   character(len=*), parameter :: fastLikeName = 'null'
-
+  integer(imn), parameter :: chordNliveMin = 200000
+  
 #elif LIKERBF
 ! radial basis functions
   character(len=*), parameter :: fastLikeName = 'rbf'
-
+  integer(imn), parameter :: chordNliveMin = 40000
+  
 #elif LIKEFANN  
 !feedforward neural network
   character(len=*), parameter :: fastLikeName = 'fnn'
-
+  integer(imn), parameter :: chordNliveMin = 40000
+  
 #else  
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
+  integer(imn), parameter :: chordNliveMin = 40000
 #endif
 
 
