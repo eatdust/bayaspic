@@ -862,7 +862,7 @@ contains
     chordName = trim(rootName)
 
 #ifdef LIKENULL
-    choordBoost = -1
+    chordBoost = -1
     chordNlive = max(chordNlive,chordNliveNull)
 #endif
     
