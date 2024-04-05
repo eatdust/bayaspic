@@ -47,28 +47,23 @@ module samplsr
 
   integer(imn), save :: fitNdim = 0
   real(fmn), save :: fitLogZero = 0._fmn
-
-
+  
 !the name of the fastlike method we call
 
 #ifdef LIKENULL  
   character(len=*), parameter :: fastLikeName = 'null'
-  integer(imn), parameter :: chordNliveMin = 200000
   
 #elif LIKERBF
 ! radial basis functions
   character(len=*), parameter :: fastLikeName = 'rbf'
-  integer(imn), parameter :: chordNliveMin = 40000
   
 #elif LIKEFANN  
 !feedforward neural network
   character(len=*), parameter :: fastLikeName = 'fnn'
-  integer(imn), parameter :: chordNliveMin = 40000
   
 #else  
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
-  integer(imn), parameter :: chordNliveMin = 40000
 #endif
 
 
@@ -417,6 +412,9 @@ contains
     use sampl, only : sampl_print
     implicit none
 
+    integer(imn), parameter :: chordNliveNull = 200000
+    integer(imn), parameter :: chordNliveMed = 40000
+    
     call init_slowroll()
 
     chordNdim = samplNdim
@@ -425,7 +423,11 @@ contains
 !to test the machine-learned against full marginalized, we keep all
     chordBoost = -1._fmn
 !we need enough live points to test the tails
-    chordNlive = max(chordNlive, chordNliveMin)
+#ifdef LIKENULL
+    chordNlive = max(chordNlive, chordNliveNull)
+#else
+    chordNlive = max(chordNlive, chordNliveMed)
+#endif
     
     chordDir=rootDir
     chordName = trim(rootName)

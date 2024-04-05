@@ -844,10 +844,14 @@ contains
   subroutine chord_init_aspic(modelname)    
     use chordparams, only : chordNdim, chordNpars, chordNderived
     use chordparams, only : chordName, chordDir, chord_print
+    use chordparams, only : chordNlive, chordBoost
     use sampl, only : sampl_print
     implicit none
     character(len=*), intent(in) :: modelname
 
+    integer(imn), parameter :: chordNliveNull = 100000
+
+    
     call init_aspic(modelname)
 
     chordNdim = samplNdim
@@ -856,7 +860,12 @@ contains
 
     chordDir=rootDir
     chordName = trim(rootName)
-   
+
+#ifdef LIKENULL
+    choordBoost = -1
+    chordNlive = max(chordNlive,chordNliveNull)
+#endif
+    
     call chord_print()
 
     call sampl_print()
