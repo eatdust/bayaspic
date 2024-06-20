@@ -21,7 +21,7 @@ program bayaspic
   use sampl
   use samplaspic, only : nest_init_aspic, nest_sample_aspic, nest_free_aspic
   use samplaspic, only : chord_init_aspic, chord_sample_aspic, chord_free_aspic
-#ifdef MPISCHED
+#if defined MPISCHED || defined MPI
   use mpi
 #endif
   use scheduler, only : initialize_scheduler, free_scheduler,scheduled_size
@@ -33,7 +33,7 @@ program bayaspic
   character(len=*), parameter :: sampler = 'multinest'
 !  character(len=*), parameter :: sampler = 'polychord'
 
-#ifdef MPISCHED
+#if defined MPISCHED || defined MPI
   integer :: mpiCode
 #endif
 
@@ -71,6 +71,10 @@ program bayaspic
   call MPI_INIT(mpiCode)
   call MPI_COMM_RANK(MPI_COMM_WORLD,mpiRank,mpiCode)
   call MPI_COMM_SIZE(MPI_COMM_WORLD,mpiSize,mpiCode)
+#endif
+
+#ifdef MPI
+  if (sampler == 'polychord') call MPI_INIT(mpiCode)
 #endif
 
 
@@ -147,6 +151,12 @@ program bayaspic
   call MPI_FINALIZE(mpiCode)
 #endif
 
+
+#ifdef MPI
+  if (sampler == 'polychord') call MPI_FINALIZE(mpiCode)
+#endif
+
+
   if (mpiRank.eq.0) then
      write(*,*)'all models done!'
   endif
@@ -172,12 +182,14 @@ contains
   subroutine initialize_manymodels()
     implicit none
 
-    nmodels = 2
+    nmodels = 4
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'rclfi4 p'
-    Modelnames(1) = 'rclfi4 m'
+    Modelnames(0) = 'di'
+    Modelnames(1) = 'di 1'
+    Modelnames(2) = 'di s'
+    Modelnames(3) = 'di l'
     
 
   end subroutine initialize_manymodels

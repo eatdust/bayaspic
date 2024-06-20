@@ -47,22 +47,20 @@ module samplsr
 
   integer(imn), save :: fitNdim = 0
   real(fmn), save :: fitLogZero = 0._fmn
-
-
-
+  
 !the name of the fastlike method we call
 
 #ifdef LIKENULL  
   character(len=*), parameter :: fastLikeName = 'null'
-
+  
 #elif LIKERBF
 ! radial basis functions
   character(len=*), parameter :: fastLikeName = 'rbf'
-
+  
 #elif LIKEFANN  
 !feedforward neural network
   character(len=*), parameter :: fastLikeName = 'fnn'
-
+  
 #else  
 ! inverse shepard method
   character(len=*), parameter :: fastLikeName = 'shep'
@@ -137,6 +135,20 @@ contains
           samplPmax(i) = get_fnn_xpmax(i)
        enddo
 #endif
+
+    case ('null')
+       fitNdim = 4
+
+       call init_samplparams(fitNdim)
+
+       samplPmin(1) = 2.4
+       samplPmax(1) = 3.6
+       samplPmin(2) = -5.0
+       samplPmax(2) = -0.7
+       samplPmin(3) = -0.2
+       samplPmax(3) = 0.2
+       samplPmin(4) = -0.2
+       samplPmax(4) = 0.2              
        
     case default
 
@@ -278,6 +290,9 @@ contains
     case ('fnn')
        ptrnest_slowroll_loglike => fnn_multinest_slowroll_loglike
 #endif
+
+    case ('null')
+       ptrnest_slowroll_loglike => null_multinest_slowroll_loglike
        
     case default
 
@@ -363,6 +378,18 @@ contains
   end subroutine fnn_multinest_slowroll_loglike
 #endif
 
+  subroutine null_multinest_slowroll_loglike(cube,nestdim,nestpars,lnew,context)
+    implicit none   
+    integer(imn) :: nestdim, nestpars
+    real(fmn), dimension(nestpars) :: cube
+    real(fmn) :: lnew
+    integer(imn) :: context
+    
+    lnew = 1._fmn
+    
+    cube(1:nestdim) = samplPmin(1:nestdim) + (samplPmax(1:nestdim) - samplPmin(1:nestdim))*cube(1:nestdim)
+    
+  end subroutine null_multinest_slowroll_loglike
 
 
   subroutine nest_free_slowroll()
@@ -381,10 +408,13 @@ contains
   subroutine chord_init_slowroll()    
     use chordparams, only : chordNdim, chordNpars, chordNderived
     use chordparams, only : chordName, chordDir, chord_print
-    use chordparams, only : chordBoost
+    use chordparams, only : chordBoost, chordNlive
     use sampl, only : sampl_print
     implicit none
 
+    integer(imn), parameter :: chordNliveNull = 200000
+    integer(imn), parameter :: chordNliveMed = 40000
+    
     call init_slowroll()
 
     chordNdim = samplNdim
@@ -392,6 +422,12 @@ contains
     chordNpars = samplNdim
 !to test the machine-learned against full marginalized, we keep all
     chordBoost = -1._fmn
+!we need enough live points to test the tails
+#ifdef LIKENULL
+    chordNlive = max(chordNlive, chordNliveNull)
+#else
+    chordNlive = max(chordNlive, chordNliveMed)
+#endif
     
     chordDir=rootDir
     chordName = trim(rootName)
@@ -432,6 +468,10 @@ contains
        ptrchord_slowroll_loglike => fnn_polychord_slowroll_loglike
        ptrchord_prior => fnn_polychord_prior
 #endif
+
+    case ('null')
+       ptrchord_slowroll_loglike => null_polychord_slowroll_loglike
+       ptrchord_prior => null_polychord_prior
        
     case default
        stop 'chord_sample_slowroll: fast like not found!'
@@ -525,6 +565,29 @@ contains
 
   end function shep_polychord_slowroll_loglike
 
+
+ function null_polychord_slowroll_loglike(theta,phi)
+    implicit none   
+    real(fmn) :: null_polychord_slowroll_loglike
+    real(fmn), dimension(:), intent(in) :: theta
+    real(fmn), dimension(:), intent(out) :: phi
+   
+    null_polychord_slowroll_loglike = 1._fmn
+
+  end function null_polychord_slowroll_loglike
+
+  
+  function null_polychord_prior(cube)
+    implicit none
+    real(fmn), dimension(:), intent(in) :: cube
+    real(fmn), dimension(size(cube,1)) :: null_polychord_prior
+    integer(imn) :: ndim
+
+    ndim = size(cube,1)
+
+    null_polychord_prior = samplPmin(1:ndim) + (samplPmax(1:ndim) - samplPmin(1:ndim))*cube(1:ndim)
+
+  end function null_polychord_prior
 
 #ifndef NOFANN
   function fnn_polychord_prior(cube)

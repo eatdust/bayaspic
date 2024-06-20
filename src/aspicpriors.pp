@@ -135,9 +135,11 @@ ONEPRIOR(ccsi1,-6._kp,0._kp,log)
 !alpha/alphamin(efold=120)
 ONEPRIOR(ccsi3,-6._kp,0._kp,log)
 
-ONEPRIOR(pai,-3._kp,3.1_kp,log)
+ONEPRIOR(pai,-3._kp,3._kp,log)
 ONEPRIOR(pais,-3._kp,0._kp,log)
-ONEPRIOR(pail,-3._kp,0._kp,log)
+ONEPRIOR(pail,0._kp,3._kp,log)
+
+ONEPRIOR(saai,-3._kp,3._kp,log)
 
 ONEPRIOR(sbkin,-4._kp,-1._kp,mlog)
 ONEPRIOR(sbkip,-4._kp,-1._kp,log)
@@ -285,9 +287,6 @@ TWOPRIORS(nfi1,0._kp,10._kp,flat,1._kp+epsilon(1._kp),10._kp,flat)
 TWOPRIORS(nfi3n,-10._kp,-epsilon(1._kp),flat,epsilon(1._kp),1._kp-epsilon(1._kp),flat)
 TWOPRIORS(nfi3p,epsilon(1._kp),10._kp,flat,-10._kp,-epsilon(1._kp),flat)
 
-TWOPRIORS(saai,-3._kp,3._kp,log,1._kp/3._kp,2._kp,flat)
-
-
 TWOPRIORS(vfmi,0.1_kp,10._kp,flat,0.1_kp,10._kp,flat)
 TWOPRIORS(vfmis,0.25_kp,4._kp,flat,0.25_kp,4._kp,flat)
 
@@ -305,6 +304,8 @@ TWOPRIORS(sabi12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
 TWOPRIORS(sabi1,-3._kp,3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(sabi32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
 TWOPRIORS(sabi2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+TWOPRIORS(sabi52,-3._kp,3._kp,log,2.5_kp,2.5_kp,flat)
+TWOPRIORS(sabi3,-3._kp,3._kp,log,3._kp,3._kp,flat)
 
 TWOPRIORS(satione,1._kp,1._kp,flat,1._kp, 10._kp,flat)
 TWOPRIORS(sati13,-3._kp,3._kp,log,1._kp/3._kp, 1._kp/3._kp,flat)
@@ -312,6 +313,8 @@ TWOPRIORS(sati12,-3._kp,3._kp,log,0.5_kp,0.5_kp,flat)
 TWOPRIORS(sati1,-3._kp,3._kp,log,1._kp,1._kp,flat)
 TWOPRIORS(sati32,-3._kp,3._kp,log,1.5_kp,1.5_kp,flat)
 TWOPRIORS(sati2,-3._kp,3._kp,log,2._kp,2._kp,flat)
+TWOPRIORS(sati52,-3._kp,3._kp,log,2.5_kp,2.5_kp,flat)
+TWOPRIORS(sati3,-3._kp,3._kp,log,3._kp,3._kp,flat)	
 
 TWOPRIORS(fi0,-8._kp,-4._kp,log,0._kp,0._kp,flat)
 TWOPRIORS(fi1,-32._kp/3._kp,-16._kp/3._kp,log,1._kp,1._kp,flat)
@@ -319,7 +322,7 @@ TWOPRIORS(fi2,-40._kp/3._kp,-20._kp/3._kp,log,2._kp,2._kp,flat)
 
 TWOPRIORS(hni1f,epsilon(1._kp),1._kp-epsilon(1._kp),flat,0._kp,3._kp,log)
 
-TWOPRIORS(saii1n,-3._kp,-3._kp,mlog,0._kp,3._kp,log)
+TWOPRIORS(saii1n,-3._kp,3._kp,mlog,0._kp,3._kp,log)
 TWOPRIORS(saii1p,-3._kp,3._kp,log,0._kp,3._kp,log)
 TWOPRIORS(saii1f,-10._kp,10._kp,flat,0._kp,3._kp,log)
 
@@ -477,10 +480,10 @@ THREEPRIORS(rclfi4m,0.1_kp,3.9_kp,flat,-3._kp,0._kp,log,-2._kp,4._kp,log)
 !first param is p, second is alpha-alphazero > 0 (tuned),third is beta
 THREEPRIORS(rcipi1tune2p,2._kp,2._kp,flat,-5._kp,-2._kp,log,-2._kp,log10(4._kp),log)
 THREEPRIORS(rcipi1tune4p,4._kp,4._kp,flat,-5._kp,-2._kp,log,-2._kp,log10(16._kp),log)
-!first param is p, second is alpha-(-alphazero) < 0 (tuned),third is beta
+!first param is p, second is -alpha-(-alphazero) < 0 (tuned),third is beta
 THREEPRIORS(rcipi1tune2m,2._kp,2._kp,flat,-5._kp,-2._kp,mlog,-2._kp,log10(4._kp),log)
 THREEPRIORS(rcipi1tune4m,4._kp,4._kp,flat,-5._kp,-2._kp,mlog,-2._kp,log10(16._kp),log)
-!first param is p, second is -alphahat (alpha<0), third is beta
+!first param is p, second is alphahat (cf EI)), third is beta
 THREEPRIORS(rcipi1m,2._kp,4._kp,flat,0._kp,1._kp,flat,-2._kp,log10(4._kp),log)
 
 !first param is p, second is alpha/alpha_0, third is beta
