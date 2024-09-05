@@ -276,7 +276,8 @@ contains
        disfavour = .false.
 
     case('hni2f','hni2l')
-       ignore = params(3).ge.hni2_xendmax(params(1),params(2))
+       ignore = params(1).ge.hni2_alphamax(params(2))
+       if (.not.ignore) ignore = params(3).ge.hni2_xendmax(params(1),params(2))
        if (.not.ignore) ignore = hni2_numacc_efoldmax(params(1),params(2)).le.efoldNum
        disfavour = .false.
 
