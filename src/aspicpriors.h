@@ -64,7 +64,7 @@ use sbkisr, only : sbki_alphamin, sbki_alphamax
 use fisr, only : fi_check_params
 use nclisr, only : ncli_check_params
 use hni1sr, only : hni1_alphamin, hni1_numacc_efoldmax
-use hni2sr, only : hni2_xendmax, hni2_numacc_efoldmax
+use hni2sr, only : hni2_alphamax, hni2_xendmax, hni2_numacc_efoldmax
 use sdisr, only : sdi_numacc_xendmin, sdi_numacc_xendmax
 use saii1sr, only : saii1_numacc_efoldmax
 use saii2sr, only : saii2_numacc_efoldmax
