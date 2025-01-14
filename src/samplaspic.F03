@@ -357,7 +357,9 @@ contains
   
  
   subroutine nest_sample_aspic()
+#ifndef NOMN
     use nested, only : nestRun
+#endif    
     use nestparams
     implicit none
     
@@ -389,10 +391,14 @@ contains
 
     end select
 
+#ifndef NOMN
     call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestTol,nestSampEff,nestNdim,nestNpars, &
          nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
          nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
          ,ptrnest_aspic_loglike,nest_dumper,context)
+#else
+    stop 'nest_sample_aspic: multinest support not built!'
+#endif    
 
     if (associated(ptrnest_aspic_loglike)) ptrnest_aspic_loglike => null()
 
@@ -876,18 +882,20 @@ contains
 
 
   subroutine chord_sample_aspic()
+#ifndef NOCHORD
     use interfaces_module, only : run_polychord
     use settings_module, only : program_settings
+#endif    
     use chordparams
     implicit none    
 
     procedure(pc_loglike), pointer :: ptrchord_aspic_loglike => null()
     
-
+#ifndef NOCHORD
     type(program_settings) :: runset
-
     call chord_settings(runset)
-
+#endif
+    
     select case (fastLikeName)
 
     case ('rbf')
@@ -910,8 +918,12 @@ contains
 
     end select
 
+#ifndef NOCHORD    
     call run_polychord(ptrchord_aspic_loglike,polychord_prior,chord_dumper,runset)
-
+#else
+    stop 'chord_sample_aspic: polychord support not built!'
+#endif
+    
     if (associated(ptrchord_aspic_loglike)) ptrchord_aspic_loglike => null()
 
   end subroutine chord_sample_aspic

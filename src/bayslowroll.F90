@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2021 C. Ringeval
+!   Copyright (C) 2013-2025 C. Ringeval
 !   
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -20,15 +20,27 @@
 program bayslowroll
   use samplsr, only : nest_init_slowroll, nest_sample_slowroll
   use samplsr, only : chord_init_slowroll, chord_sample_slowroll
+#if defined MPISCHED
+  use mpi
+#endif
   implicit none
 
-!  character(len=*), parameter :: sampler = 'multinest'
-  character(len=*), parameter :: sampler = 'polychord'
+#if defined MPISCHED
+  integer :: mpiCode
+#endif
+  
+  character(len=*), parameter :: sampler = 'multinest'
+!  character(len=*), parameter :: sampler = 'polychord'
   
   write(*,*)
   write(*,*)'Sampling slow-roll parameter space with: ', sampler
   write(*,*)
 
+
+#ifdef MPISCHED
+  call MPI_INIT(mpiCode)
+#endif
+  
   select case (sampler)
 
   case ('multinest')
@@ -44,4 +56,11 @@ program bayslowroll
 
   end select
 
+
+#ifdef MPISCHED
+  call MPI_BARRIER(MPI_COMM_WORLD,mpiCode)
+  call MPI_FINALIZE(mpiCode)
+#endif
+
+  
 end program bayslowroll
