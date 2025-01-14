@@ -1,4 +1,4 @@
-# Bayaspic: The fast Bayesian evidences for ASPIC
+# Bayaspic: fast bayesian evidences for ASPIC
 
 ### Summary
 
@@ -66,7 +66,7 @@ The (empty) directories "shepdata/", "rbfdata/" and "fnndata/" should
 be filled with specific data files encoding the weights of the
 machine- learned likelihood (LIKESHEP, LIKERBF and LIKEFANN). At the
 time if this writing, they are made available there:
-[bayaspic-data](https://curl.irmp.ucl.ac.be/~chris/bayaspic-data)
+[bayaspic-data](https://curl.irmp.ucl.ac.be/~chris/upload/bayaspic-data)
 
 ---
 
