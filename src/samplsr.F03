@@ -268,7 +268,9 @@ contains
 
 
   subroutine nest_sample_slowroll()
+#ifndef NOMN
     use nested, only : nestRun
+#endif    
     use nestparams
     implicit none
 
@@ -300,11 +302,15 @@ contains
 
     end select
 
+#ifndef NOMN    
     call nestRun(nestINS,nestMmodal,nestCteEff,nestNlive,nestTol,nestSampEff,nestNdim,nestNpars, &
          nestCdim,nestMaxModes,nestUpdInt,nestNullZ,nestRootName,nestSeed,nestPwrap, &
          nestFeedBack,nestResume,nestOutfile,nestInitMPI,nestLogZero,nestMaxIter &
          ,ptrnest_slowroll_loglike,nest_dumper,context)
-
+#else
+    stop 'nest_sample_slowroll: multinest support not built!'
+#endif    
+    
     if (associated(ptrnest_slowroll_loglike)) ptrnest_slowroll_loglike => null()
 
   end subroutine nest_sample_slowroll
@@ -441,18 +447,21 @@ contains
 
 
   subroutine chord_sample_slowroll()
+#ifndef NOCHORD
     use interfaces_module, only : run_polychord
     use settings_module, only : program_settings
+#endif
     use chordparams
     implicit none
 
     procedure(pc_loglike), pointer :: ptrchord_slowroll_loglike => null()
     procedure(pc_prior), pointer :: ptrchord_prior => null()
 
+#ifndef NOCHORD
     type(program_settings) :: runset
-
     call chord_settings(runset)
-
+#endif
+    
     select case (fastLikeName)
 
     case ('rbf')
@@ -478,8 +487,12 @@ contains
 
     end select
 
+#ifndef NOCHORD    
     call run_polychord(ptrchord_slowroll_loglike,ptrchord_prior,chord_dumper,runset)
-
+#else
+    stop 'chord_sample_slowroll: polychord support not built!'
+#endif    
+    
     if (associated(ptrchord_slowroll_loglike)) ptrchord_slowroll_loglike => null()
     if (associated(ptrchord_prior)) ptrchord_prior => null()
 

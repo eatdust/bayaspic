@@ -6,7 +6,7 @@ ifeq ($(ext),Lin)
 FC = mpif90
 FCFLAGS = -O2  -fopenmp -DASPIC -DLIKENULL -DMPISCHED
 #-DASPICQ -DNOFANN -DLIKENULL -DLIKESHEP -DLIKEFANN -DLIKERBF -DRRAD -DRHOW
-#-DMPISCHED or -DMPI
+#-DMPISCHED (model parallelism) or -DMPI (sample parallelism)
 
 #extra flags for F08 cpp generated source files
 F08FLAGS = -ffree-line-length-none
@@ -20,7 +20,7 @@ FPCFLAGS = -ffree-line-length-none
 INCLUDE =-I/usr/local/include/aspic
 #-I/usr/local/include/aspicq
 
-#if the fann library is present, build the NN likelihood
+#Build the fast NN likelihood (undefined to disable)
 LDFANN = -ldoublefann
 
 LFLAGS= -lblas -llapack -L/usr/local/lib -laspic $(LDFANN)
@@ -38,6 +38,8 @@ endif
 
 
 LIKEDIR = ../fastlikes
+
+#undefined to disable
 NESTDIR = ../multinest
 CHORDDIR = ../polychord/src/polychord
 
@@ -48,24 +50,32 @@ else
 FCFLAGS += -DNOFANN
 endif
 
+ifneq ($(NESTDIR),)
+OBJSNEST = utilsMN.o utils1.o priorsMN.o kmeans_clstr.o \
+	xmeans_clstr.o posterior.o nested.o
+else
+FCFLAGS += -DNOMN
+endif
+
+
+
+ifneq ($(CHORDDIR),)
+OBJSCHORD = utilsPC.o abort.o settings.o mpi_utils.o random_utils.o  \
+	array_utils.o calculate.o run_time_info.o params.o priorsPC.o \
+	read_write.o feedback.o chordal_sampling.o clustering.o \
+	generate.o nelder_mead.o maximiser.o nested_sampling.o ini.o interfaces.o 
+else
+FCFLAGS += -DNOCHORD
+endif
+
 OBJSLIKE =  mlprec.o ioml.o iocmb.o rbfprec.o iorbf.o rbfuncs.o rbfnd.o rbflike.o \
 	shepprec.o qshepmdata.o ioshep.o qshepmd.o shepnd.o sheplike.o $(FANNLIKE)
-
 
 #with -DASPIC
 OBJSASPIC = aspicvars.o aspicnonstd.o aspicmodels.o aspicpriors.o wraspic.o 
 
 OBJSMPI = fifo.o iofifo.o scheduler.o
 
-OBJSNEST = utilsMN.o utils1.o priorsMN.o kmeans_clstr.o \
-	xmeans_clstr.o posterior.o nested.o
-
-OBJSCHORD = utilsPC.o abort.o settings.o mpi_utils.o random_utils.o  \
-	array_utils.o calculate.o run_time_info.o params.o priorsPC.o \
-	read_write.o feedback.o chordal_sampling.o clustering.o \
-	generate.o nelder_mead.o maximiser.o nested_sampling.o ini.o interfaces.o 
-
-#nestwrap.o
 OBJFILES = sampl.o $(OBJSASPIC) $(OBJSLIKE) $(OBJSNEST) $(OBJSCHORD) \
 	nestparams.o chordparams.o samplaspic.o
 
@@ -83,9 +93,8 @@ bayslowroll.$(ext): $(OBJSMIN) bayslowroll.o
 
 aspicmodels.o: aspicmodels.h aspicmodels.pp
 aspicpriors.o: aspicpriors.h aspicpriors.pp
-#nestwrap.o: nestparams.o wraspic.o
-chordparams.o: settings.o
-samplsr.o: settings.o interfaces.o
+samplaspic.o: $(OBJSCHORD) $(OBJSNEST)
+samplsr.o: $(OBJSCHORD) $(OBJSNEST)
 
 %.o: $(LIKEDIR)/common/%.f90
 	$(FC) $(FCFLAGS) -c $<

@@ -1,6 +1,6 @@
 !   This file is part of bayaspic
 !
-!   Copyright (C) 2013-2023 C. Ringeval
+!   Copyright (C) 2013-2025 C. Ringeval
 !
 !   bayaspic is free software: you can redistribute it and/or modify
 !   it under the terms of the GNU General Public License as published by
@@ -186,10 +186,10 @@ contains
 
     allocate(ModelNames(0:nmodels-1))
 
-    Modelnames(0) = 'di'
-    Modelnames(1) = 'di 1'
-    Modelnames(2) = 'di s'
-    Modelnames(3) = 'di l'
+    Modelnames(0) = 'si mc'
+    Modelnames(1) = 'rgi'
+    Modelnames(2) = 'hi'
+    Modelnames(3) = 'sfi 4'
     
 
   end subroutine initialize_manymodels

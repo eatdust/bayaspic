@@ -116,11 +116,13 @@ contains
   end subroutine chord_print
 
 
+#ifndef NOCHORD
   subroutine chord_settings(set)
     use settings_module, only : program_settings
     use settings_module, only : initialise_settings
-    implicit none
 
+    implicit none
+    
     type(program_settings), intent(out) :: set
 
     set%ndims = chordNdim
@@ -146,7 +148,7 @@ contains
     
 
   end subroutine chord_settings
-
+#endif
 
 
   subroutine chord_dumper(live, dead, logweights, logZ, logZerr)
